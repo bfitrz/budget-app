@@ -272,6 +272,7 @@ export function SaldoView() {
                   {...field}
                   label="Data"
                   helperText="Opcjonalne — bez daty = saldo początkowe"
+                  onClear={() => field.onChange('')}
                   fullWidth
                 />
               )}
