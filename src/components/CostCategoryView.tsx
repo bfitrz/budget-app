@@ -151,6 +151,8 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
     const data: Record<string, string | number> = {};
     data[config.groupField] = item[config.groupField] as string || '';
     config.addFields.forEach(f => { data[f.field] = item[f.field] as string || ''; });
+    data[costField] = getCost(item);
+    data.uwagi = (item.uwagi as string) || '';
     setFormData(data);
     setDialogOpen(true);
   };
@@ -160,6 +162,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
       const updates: Record<string, unknown> = {};
       updates[config.groupField] = formData[config.groupField];
       config.addFields.forEach(f => { updates[f.field] = formData[f.field]; });
+      updates[costField] = Number(formData[costField]) || 0;
       updates.uwagi = formData.uwagi || '';
       updateItem(editingItem.id, updates as Partial<CostItem>);
     } else {
@@ -559,9 +562,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
           {config.addFields.map(f => (
             <TextField key={f.field} label={f.label} value={formData[f.field] || ''} onChange={(e) => setFormData(p => ({ ...p, [f.field]: e.target.value }))} fullWidth required={f.required} />
           ))}
-          {!editingItem && (
-            <TextField label={costField === 'kwota' ? 'Kwota (PLN)' : 'Cena (PLN)'} type="number" value={formData[costField] || ''} onChange={(e) => setFormData(p => ({ ...p, [costField]: e.target.value }))} fullWidth />
-          )}
+          <TextField label={costField === 'kwota' ? 'Kwota (PLN)' : 'Cena (PLN)'} type="number" value={formData[costField] || ''} onChange={(e) => setFormData(p => ({ ...p, [costField]: e.target.value }))} fullWidth />
           <TextField label="Uwagi" value={formData.uwagi || ''} onChange={(e) => setFormData(p => ({ ...p, uwagi: e.target.value }))} fullWidth multiline rows={2} />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2.5, justifyContent: 'space-between' }}>
