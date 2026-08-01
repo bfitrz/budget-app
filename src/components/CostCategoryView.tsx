@@ -575,7 +575,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
             <Autocomplete freeSolo options={allGroupNames} value={formData[config.groupField] as string || ''} onInputChange={(_, v) => setFormData(p => ({ ...p, [config.groupField]: v }))}
               renderInput={(params) => <TextField {...params} label="Grupa" helperText="Wybierz lub wpisz nową" />} />
           )}
-          {config.addFields.map(f => (
+          {config.addFields.filter(f => !editingItem || f.field !== config.swapField).map(f => (
             <TextField key={f.field} label={f.label} value={formData[f.field] || ''} onChange={(e) => setFormData(p => ({ ...p, [f.field]: e.target.value }))} fullWidth required={f.required} />
           ))}
           <TextField label={costField === 'kwota' ? 'Kwota (PLN)' : 'Cena (PLN)'} type="number" value={formData[costField] || ''} onChange={(e) => setFormData(p => ({ ...p, [costField]: e.target.value }))} fullWidth />
