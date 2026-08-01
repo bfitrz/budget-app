@@ -80,6 +80,7 @@ export function MebleView() {
   const [linksAlt, setLinksAlt] = useState<{ itemId: string; alt: AlternativeItem } | null>(null);
   const [altItem, setAltItem] = useState<MebleItem | null>(null);
   const [editingAlt, setEditingAlt] = useState<{ itemId: string; alt: AlternativeItem } | null>(null);
+  const [editingMainPrice, setEditingMainPrice] = useState<MebleItem | null>(null);
   const [payChoiceItem, setPayChoiceItem] = useState<MebleItem | null>(null);
   const [deleteChoiceItem, setDeleteChoiceItem] = useState<MebleItem | null>(null);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
@@ -147,11 +148,11 @@ export function MebleView() {
 
   const onSubmit = (data: MebleFormData) => {
     if (editingItem) {
+      // Level 1 edit: metadata only (no price — price is managed at level 3)
       updateMebleItem(editingItem.id, {
         pomieszczenie: data.pomieszczenie,
         kategoria: data.kategoria,
         nazwa: data.nazwa,
-        cena: Number(data.cena),
         uwagi: data.uwagi,
       });
     } else {
@@ -482,7 +483,7 @@ export function MebleView() {
                                         sx={{ fontSize: '0.55rem', height: 18, cursor: 'pointer', backgroundColor: alpha(theme.palette.primary.main, 0.08), '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.14) } }} />
                                     )}
                                     <Tooltip title="Linki"><IconButton size="small" onClick={() => setLinksItem(item)} sx={{ opacity: 0.5, '&:hover': { opacity: 1 }, width: 20, height: 20 }}><LinkIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
-                                    <Tooltip title="Edytuj"><IconButton size="small" onClick={() => openEditDialog(item)} sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.primary.main }, width: 20, height: 20 }}><EditIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                    <Tooltip title="Edytuj cenę"><IconButton size="small" onClick={() => setEditingMainPrice(item)} sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.primary.main }, width: 20, height: 20 }}><EditIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
                                     {(item.alternatywy || []).length > 0 && (
                                       <Tooltip title="Usuń MAIN (wybierz nowy)"><IconButton size="small" onClick={() => setDeleteChoiceItem(item)} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.error.main }, width: 20, height: 20 }}><DeleteIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
                                     )}
@@ -620,21 +621,23 @@ export function MebleView() {
                 />
               )}
             />
-            <Controller
-              name="cena"
-              control={control}
-              rules={{ required: 'Wymagane', min: { value: 0, message: 'Min 0' } }}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="Cena (PLN)"
-                  type="number"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                  fullWidth
-                />
-              )}
-            />
+            {!editingItem && (
+              <Controller
+                name="cena"
+                control={control}
+                rules={{ required: 'Wymagane', min: { value: 0, message: 'Min 0' } }}
+                render={({ field, fieldState }) => (
+                  <TextField
+                    {...field}
+                    label="Cena (PLN)"
+                    type="number"
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                    fullWidth
+                  />
+                )}
+              />
+            )}
             <Controller
               name="uwagi"
               control={control}
@@ -856,6 +859,29 @@ export function MebleView() {
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={() => setDeleteChoiceItem(null)}>Anuluj</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit MAIN price dialog */}
+      <Dialog open={!!editingMainPrice} onClose={() => setEditingMainPrice(null)} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ fontWeight: 600 }}>Edytuj cenę główną</DialogTitle>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
+          <TextField
+            label="Cena (PLN)"
+            type="number"
+            defaultValue={editingMainPrice?.cena || 0}
+            onChange={(e) => { if (editingMainPrice) setEditingMainPrice({ ...editingMainPrice, cena: Number(e.target.value) }); }}
+            fullWidth size="small"
+          />
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setEditingMainPrice(null)}>Anuluj</Button>
+          <Button variant="contained" onClick={() => {
+            if (editingMainPrice) {
+              updateMebleItem(editingMainPrice.id, { cena: editingMainPrice.cena });
+              setEditingMainPrice(null);
+            }
+          }}>Zapisz</Button>
         </DialogActions>
       </Dialog>
 
