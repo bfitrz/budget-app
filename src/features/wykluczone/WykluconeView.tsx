@@ -10,15 +10,19 @@ import {
   Card,
   CardContent,
   Chip,
+  IconButton,
+  Tooltip,
   alpha,
   useTheme,
 } from '@mui/material';
+import { AddCircle as RestoreIcon } from '@mui/icons-material';
 import { useBudgetStore } from '@/store';
 import { formatCurrency } from '@/utils';
 
 interface ExcludedRow {
   id: string;
   kategoria: string;
+  source: 'meble' | 'wykonczenie' | 'agd' | 'pozostale' | 'wyprowadzka';
   grupa: string;
   nazwa: string;
   kwota: number;
@@ -31,13 +35,28 @@ export function WykluconeView() {
   const agd = useBudgetStore((s) => s.agd);
   const pozostale = useBudgetStore((s) => s.pozostale);
   const wyprowadzka = useBudgetStore((s) => s.wyprowadzka);
+  const updateMebleItem = useBudgetStore((s) => s.updateMebleItem);
+  const updateWykonczenieItem = useBudgetStore((s) => s.updateWykonczenieItem);
+  const updateAGDItem = useBudgetStore((s) => s.updateAGDItem);
+  const updatePozostaleItem = useBudgetStore((s) => s.updatePozostaleItem);
+  const updateWyprowadzkaItem = useBudgetStore((s) => s.updateWyprowadzkaItem);
+
+  const restoreItem = (row: ExcludedRow) => {
+    switch (row.source) {
+      case 'meble': updateMebleItem(row.id, { included: true }); break;
+      case 'wykonczenie': updateWykonczenieItem(row.id, { included: true }); break;
+      case 'agd': updateAGDItem(row.id, { included: true }); break;
+      case 'pozostale': updatePozostaleItem(row.id, { included: true }); break;
+      case 'wyprowadzka': updateWyprowadzkaItem(row.id, { included: true }); break;
+    }
+  };
 
   const excluded: ExcludedRow[] = [
-    ...meble.filter(i => !i.included).map(i => ({ id: i.id, kategoria: 'Meblowanie', grupa: i.pomieszczenie, nazwa: i.nazwa, kwota: i.cena })),
-    ...wykonczenie.filter(i => !i.included).map(i => ({ id: i.id, kategoria: 'Wykończenie', grupa: i.etap, nazwa: i.opis, kwota: i.kwota })),
-    ...agd.filter(i => !i.included).map(i => ({ id: i.id, kategoria: 'AGD / RTV', grupa: i.producent, nazwa: `${i.nazwa} ${i.model}`.trim(), kwota: i.cena })),
-    ...pozostale.filter(i => !i.included).map(i => ({ id: i.id, kategoria: 'Inne', grupa: i.grupa, nazwa: i.nazwa, kwota: i.cena })),
-    ...wyprowadzka.filter(i => !i.included).map(i => ({ id: i.id, kategoria: 'Wyprowadzka', grupa: i.grupa, nazwa: i.nazwa, kwota: i.cena })),
+    ...meble.filter(i => !i.included).map(i => ({ id: i.id, kategoria: 'Meblowanie', source: 'meble' as const, grupa: i.pomieszczenie, nazwa: i.nazwa, kwota: i.cena })),
+    ...wykonczenie.filter(i => !i.included).map(i => ({ id: i.id, kategoria: 'Wykończenie', source: 'wykonczenie' as const, grupa: i.etap, nazwa: i.opis, kwota: i.kwota })),
+    ...agd.filter(i => !i.included).map(i => ({ id: i.id, kategoria: 'AGD / RTV', source: 'agd' as const, grupa: i.producent, nazwa: `${i.nazwa} ${i.model}`.trim(), kwota: i.cena })),
+    ...pozostale.filter(i => !i.included).map(i => ({ id: i.id, kategoria: 'Inne', source: 'pozostale' as const, grupa: i.grupa, nazwa: i.nazwa, kwota: i.cena })),
+    ...wyprowadzka.filter(i => !i.included).map(i => ({ id: i.id, kategoria: 'Wyprowadzka', source: 'wyprowadzka' as const, grupa: i.grupa, nazwa: i.nazwa, kwota: i.cena })),
   ];
 
   const totalSaved = excluded.reduce((s, i) => s + i.kwota, 0);
@@ -88,6 +107,7 @@ export function WykluconeView() {
                   <TableCell>Grupa</TableCell>
                   <TableCell>Nazwa</TableCell>
                   <TableCell align="right">Kwota</TableCell>
+                  <TableCell sx={{ width: 50 }}></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -111,12 +131,19 @@ export function WykluconeView() {
                       <TableCell align="right">
                         <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>{formatCurrency(item.kwota)}</Typography>
                       </TableCell>
+                      <TableCell>
+                        <Tooltip title="Przywróć do budżetu">
+                          <IconButton size="small" onClick={() => restoreItem(item)} sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.success.main } }}>
+                            <RestoreIcon sx={{ fontSize: 18 }} />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
                     </TableRow>
                   ))
                 ))}
                 {/* Total row */}
                 <TableRow>
-                  <TableCell colSpan={3} sx={{ fontWeight: 700, borderTop: `2px solid ${theme.palette.divider}` }}>
+                  <TableCell colSpan={4} sx={{ fontWeight: 700, borderTop: `2px solid ${theme.palette.divider}` }}>
                     <Typography variant="body2" sx={{ fontWeight: 700 }}>Razem pominięte</Typography>
                   </TableCell>
                   <TableCell align="right" sx={{ borderTop: `2px solid ${theme.palette.divider}` }}>
