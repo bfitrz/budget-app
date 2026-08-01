@@ -1,0 +1,1 @@
+export { MebleView } from './MebleView';
