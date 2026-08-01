@@ -608,13 +608,13 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
 
       {/* Edit MAIN price */}
       <Dialog open={!!editingMainPrice} onClose={() => setEditingMainPrice(null)} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontWeight: 600 }}>Edytuj MAIN — {editingMainPrice ? (editingMainPrice[config.nameField] as string) : ''}</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 600 }}>Edytuj MAIN — {editingMainPrice ? (editingMainPrice[swapField] as string) : ''}</DialogTitle>
         <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2, maxHeight: '70vh' }}>
-          <TextField label={config.addFields[0]?.label || 'Nazwa'} defaultValue={editingMainPrice ? (editingMainPrice[config.nameField] as string) : ''} onChange={(e) => { if (editingMainPrice) setEditingMainPrice({ ...editingMainPrice, [config.nameField]: e.target.value } as CostItem); }} fullWidth size="small" />
+          <TextField label={swapField === config.nameField ? (config.addFields[0]?.label || 'Nazwa') : swapField.charAt(0).toUpperCase() + swapField.slice(1)} defaultValue={editingMainPrice ? (editingMainPrice[swapField] as string) : ''} onChange={(e) => { if (editingMainPrice) setEditingMainPrice({ ...editingMainPrice, [swapField]: e.target.value } as CostItem); }} fullWidth size="small" />
           <TextField label={costField === 'kwota' ? 'Kwota (PLN)' : 'Cena (PLN)'} type="number" defaultValue={editingMainPrice ? getCost(editingMainPrice) : 0} onChange={(e) => { if (editingMainPrice) setEditingMainPrice({ ...editingMainPrice, [costField]: Number(e.target.value) } as CostItem); }} fullWidth size="small" />
           <TextField label="Uwagi" defaultValue={editingMainPrice?.uwagi || ''} onChange={(e) => { if (editingMainPrice) setEditingMainPrice({ ...editingMainPrice, uwagi: e.target.value } as CostItem); }} fullWidth size="small" multiline rows={2} />
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2, justifyContent: 'space-between' }}><Button onClick={() => setEditingMainPrice(null)}>Zamknij</Button><Button variant="contained" onClick={() => { if (editingMainPrice) { updateItem(editingMainPrice.id, { [config.nameField]: editingMainPrice[config.nameField], [costField]: getCost(editingMainPrice), uwagi: editingMainPrice.uwagi } as Partial<CostItem>); setEditingMainPrice(null); } }}>Zapisz</Button></DialogActions>
+        <DialogActions sx={{ px: 3, pb: 2, justifyContent: 'space-between' }}><Button onClick={() => setEditingMainPrice(null)}>Zamknij</Button><Button variant="contained" onClick={() => { if (editingMainPrice) { updateItem(editingMainPrice.id, { [swapField]: editingMainPrice[swapField], [costField]: getCost(editingMainPrice), uwagi: editingMainPrice.uwagi } as Partial<CostItem>); setEditingMainPrice(null); } }}>Zapisz</Button></DialogActions>
       </Dialog>
 
       {/* Edit ALT */}
