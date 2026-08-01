@@ -173,18 +173,18 @@ export function HarmonogramView() {
             <Button
               variant="outlined"
               size="small"
-              startIcon={<ScheduleIcon />}
               onClick={() => { msReset({ data: new Date().toISOString().split('T')[0], opis: '' }); setMilestoneDialogOpen(true); }}
+              sx={{ fontSize: '0.75rem', px: 1.5, py: 0.5 }}
             >
               Milestone
             </Button>
             <Button
               variant="contained"
               size="small"
-              startIcon={<AddIcon />}
               onClick={openAddDialog}
+              sx={{ fontSize: '0.75rem', px: 1.5, py: 0.5 }}
             >
-              Zaplanuj wpływ
+              + Wpływ
             </Button>
           </Box>
         </Box>
