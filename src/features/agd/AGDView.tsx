@@ -7,6 +7,7 @@ const config: CostCategoryConfig = {
   helpText: 'Sprzęt AGD (pralka, lodówka, zmywarka) i RTV (telewizor, soundbar). Pogrupowane wg producenta — łatwo porównać modele i ceny.',
   groupField: 'producent',
   nameField: 'nazwa',
+  swapField: 'model',
   columns: [
     { field: 'nazwa', label: 'Nazwa' },
     { field: 'model', label: 'Model' },
