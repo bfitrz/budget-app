@@ -39,8 +39,8 @@ import {
   Link as LinkIcon,
   KeyboardArrowDown as ArrowDownIcon,
   KeyboardArrowRight as ArrowRightIcon,
-  Visibility as VisibilityIcon,
-  VisibilityOff as VisibilityOffIcon,
+  AttachMoney as IncludedIcon,
+  MoneyOff as ExcludedIcon,
 } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { useBudgetStore } from '@/store';
@@ -379,7 +379,7 @@ export function MebleView() {
                               </IconButton>
                             </TableCell>
                             <TableCell padding="checkbox">
-                              <Tooltip title={item.included ? 'Wyklucz z kosztów' : 'Uwzględnij w kosztach'}>
+                              <Tooltip title={item.included ? 'Kliknij aby wykluczyć z budżetu' : 'Kliknij aby wliczyć do budżetu'}>
                                 <IconButton
                                   size="small"
                                   onClick={() => handleToggleIncluded(item)}
@@ -390,7 +390,7 @@ export function MebleView() {
                                     '&:hover': { opacity: 1 },
                                   }}
                                 >
-                                  {item.included ? <VisibilityIcon sx={{ fontSize: 15 }} /> : <VisibilityOffIcon sx={{ fontSize: 15 }} />}
+                                  {item.included ? <IncludedIcon sx={{ fontSize: 15 }} /> : <ExcludedIcon sx={{ fontSize: 15 }} />}
                                 </IconButton>
                               </Tooltip>
                             </TableCell>
@@ -484,57 +484,66 @@ export function MebleView() {
                               <Collapse in={expandedItems.has(item.id)} timeout="auto" unmountOnExit>
                                 <Box sx={{ pl: 6, pr: 2, pb: 1.5, pt: 0.5, display: 'flex', flexDirection: 'column', gap: 0.75 }}>
                                   {/* MAIN entry */}
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, px: 1.5, py: 0.75, borderRadius: 1.5, backgroundColor: alpha(theme.palette.success.main, 0.03), border: `1px solid ${alpha(theme.palette.success.main, 0.1)}` }}>
+                                  <Box sx={{ display: 'grid', gridTemplateColumns: '24px 50px 1fr 110px 80px 100px', alignItems: 'center', gap: 1, px: 1.5, py: 0.75, borderRadius: 1.5, backgroundColor: alpha(theme.palette.success.main, 0.03), border: `1px solid ${alpha(theme.palette.success.main, 0.1)}` }}>
+                                    <Box></Box>
                                     <Chip label="MAIN" size="small" sx={{ fontSize: '0.5rem', height: 16, fontWeight: 700, backgroundColor: alpha(theme.palette.success.main, 0.12), color: theme.palette.success.main }} />
-                                    <Typography variant="body2" sx={{ fontSize: '0.7rem', flex: 1 }}>Cena główna</Typography>
-                                    <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '0.75rem' }}>{formatCurrency(item.cena)}</Typography>
-                                    {(item.linki || []).length > 0 && (
-                                      <Chip label={`${item.linki.length} link${item.linki.length > 1 ? 'i' : ''}`} size="small"
-                                        onClick={() => setLinksItem(item)}
-                                        sx={{ fontSize: '0.55rem', height: 18, cursor: 'pointer', backgroundColor: alpha(theme.palette.primary.main, 0.08), '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.14) } }} />
-                                    )}
-                                    <Tooltip title="Linki"><IconButton size="small" onClick={() => setLinksItem(item)} sx={{ opacity: 0.5, '&:hover': { opacity: 1 }, width: 20, height: 20 }}><LinkIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
-                                    <Tooltip title="Edytuj cenę"><IconButton size="small" onClick={() => setEditingMainPrice(item)} sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.primary.main }, width: 20, height: 20 }}><EditIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
-                                    {(item.alternatywy || []).length > 0 && (
-                                      <Tooltip title="Usuń MAIN (wybierz nowy)"><IconButton size="small" onClick={() => setDeleteChoiceItem(item)} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.error.main }, width: 20, height: 20 }}><DeleteIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
-                                    )}
+                                    <Typography variant="body2" sx={{ fontSize: '0.7rem' }}>Cena główna</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '0.75rem', textAlign: 'right' }}>{formatCurrency(item.cena)}</Typography>
+                                    <Box>
+                                      {(item.linki || []).length > 0 && (
+                                        <Chip label={`${item.linki.length} link${item.linki.length > 1 ? 'i' : ''}`} size="small"
+                                          onClick={() => setLinksItem(item)}
+                                          sx={{ fontSize: '0.55rem', height: 18, cursor: 'pointer', backgroundColor: alpha(theme.palette.primary.main, 0.08), '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.14) } }} />
+                                      )}
+                                    </Box>
+                                    <Box sx={{ display: 'flex', gap: 0.25, justifyContent: 'flex-end' }}>
+                                      <Tooltip title="Linki"><IconButton size="small" onClick={() => setLinksItem(item)} sx={{ opacity: 0.5, '&:hover': { opacity: 1 }, width: 20, height: 20 }}><LinkIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                      <Tooltip title="Edytuj cenę"><IconButton size="small" onClick={() => setEditingMainPrice(item)} sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.primary.main }, width: 20, height: 20 }}><EditIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                      {(item.alternatywy || []).length > 0 && (
+                                        <Tooltip title="Usuń MAIN (wybierz nowy)"><IconButton size="small" onClick={() => setDeleteChoiceItem(item)} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.error.main }, width: 20, height: 20 }}><DeleteIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                      )}
+                                    </Box>
                                   </Box>
                                   {/* ALT entries */}
                                   {(item.alternatywy || []).map((alt) => (
                                     <Box key={alt.id} sx={{
-                                      display: 'flex', alignItems: 'center', gap: 1.5, px: 1.5, py: 0.75, borderRadius: 1.5,
+                                      display: 'grid', gridTemplateColumns: '24px 50px 1fr 110px 80px 100px', alignItems: 'center', gap: 1, px: 1.5, py: 0.75, borderRadius: 1.5,
                                       backgroundColor: alpha(theme.palette.info.main, 0.02), border: `1px solid ${alpha(theme.palette.info.main, 0.08)}`,
                                       opacity: alt.included ? 1 : 0.4,
                                     }}>
-                                      <Tooltip title={alt.included ? 'Wyklucz' : 'Uwzględnij'}>
+                                      <Tooltip title={alt.included ? 'Kliknij aby wykluczyć z budżetu' : 'Kliknij aby wliczyć do budżetu'}>
                                         <IconButton size="small" onClick={() => {
                                           const newAlts = (item.alternatywy || []).map((a) => a.id === alt.id ? { ...a, included: !a.included } : a);
                                           updateMebleItem(item.id, { alternatywy: newAlts });
                                         }} sx={{ p: 0, width: 20, height: 20, color: alt.included ? theme.palette.success.main : theme.palette.text.secondary, opacity: alt.included ? 0.7 : 0.3, '&:hover': { opacity: 1 } }}>
-                                          {alt.included ? <VisibilityIcon sx={{ fontSize: 13 }} /> : <VisibilityOffIcon sx={{ fontSize: 13 }} />}
+                                          {alt.included ? <IncludedIcon sx={{ fontSize: 13 }} /> : <ExcludedIcon sx={{ fontSize: 13 }} />}
                                         </IconButton>
                                       </Tooltip>
                                       <Chip label="ALT" size="small" sx={{ fontSize: '0.5rem', height: 16, fontWeight: 700, backgroundColor: alpha(theme.palette.info.main, 0.1), color: theme.palette.info.main }} />
-                                      <Typography variant="body2" sx={{ fontSize: '0.7rem', fontStyle: 'italic', flex: 1 }}>{alt.nazwa}</Typography>
-                                      <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '0.75rem', color: alt.cena <= item.cena ? theme.palette.success.main : theme.palette.warning.main }}>
+                                      <Typography variant="body2" sx={{ fontSize: '0.7rem', fontStyle: 'italic', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{alt.nazwa}</Typography>
+                                      <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '0.75rem', textAlign: 'right', color: alt.cena <= item.cena ? theme.palette.success.main : theme.palette.warning.main }}>
                                         {formatCurrency(alt.cena)}
                                       </Typography>
-                                      {(alt.linki || []).length > 0 && (
-                                        <Chip label={`${alt.linki.length} link${alt.linki.length > 1 ? 'i' : ''}`} size="small"
-                                          onClick={() => setLinksAlt({ itemId: item.id, alt })}
-                                          sx={{ fontSize: '0.55rem', height: 18, cursor: 'pointer', backgroundColor: alpha(theme.palette.primary.main, 0.08), '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.14) } }} />
-                                      )}
-                                      <Tooltip title="Ustaw jako MAIN"><IconButton size="small" onClick={() => {
-                                        const oldMain: AlternativeItem = { id: generateId(), included: true, nazwa: 'Poprzednia opcja', cena: item.cena, linki: item.linki || [], uwagi: '' };
-                                        const newAlts = [oldMain, ...(item.alternatywy || []).filter((a) => a.id !== alt.id)];
-                                        updateMebleItem(item.id, { cena: alt.cena, linki: alt.linki || [], alternatywy: newAlts });
-                                      }} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.success.main }, width: 20, height: 20 }}><AltIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
-                                      <Tooltip title="Linki"><IconButton size="small" onClick={() => setLinksAlt({ itemId: item.id, alt })} sx={{ opacity: 0.5, '&:hover': { opacity: 1 }, width: 20, height: 20 }}><LinkIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
-                                      <Tooltip title="Edytuj"><IconButton size="small" onClick={() => setEditingAlt({ itemId: item.id, alt })} sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.primary.main }, width: 20, height: 20 }}><EditIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
-                                      <Tooltip title="Usuń"><IconButton size="small" onClick={() => {
-                                        const newAlts = (item.alternatywy || []).filter((a) => a.id !== alt.id);
-                                        updateMebleItem(item.id, { alternatywy: newAlts });
-                                      }} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.error.main }, width: 20, height: 20 }}><DeleteIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                      <Box>
+                                        {(alt.linki || []).length > 0 && (
+                                          <Chip label={`${alt.linki.length} link${alt.linki.length > 1 ? 'i' : ''}`} size="small"
+                                            onClick={() => setLinksAlt({ itemId: item.id, alt })}
+                                            sx={{ fontSize: '0.55rem', height: 18, cursor: 'pointer', backgroundColor: alpha(theme.palette.primary.main, 0.08), '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.14) } }} />
+                                        )}
+                                      </Box>
+                                      <Box sx={{ display: 'flex', gap: 0.25, justifyContent: 'flex-end' }}>
+                                        <Tooltip title="Ustaw jako MAIN"><IconButton size="small" onClick={() => {
+                                          const oldMain: AlternativeItem = { id: generateId(), included: true, nazwa: 'Poprzednia opcja', cena: item.cena, linki: item.linki || [], uwagi: '' };
+                                          const newAlts = [oldMain, ...(item.alternatywy || []).filter((a) => a.id !== alt.id)];
+                                          updateMebleItem(item.id, { cena: alt.cena, linki: alt.linki || [], alternatywy: newAlts });
+                                        }} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.success.main }, width: 20, height: 20 }}><AltIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                        <Tooltip title="Linki"><IconButton size="small" onClick={() => setLinksAlt({ itemId: item.id, alt })} sx={{ opacity: 0.5, '&:hover': { opacity: 1 }, width: 20, height: 20 }}><LinkIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                        <Tooltip title="Edytuj"><IconButton size="small" onClick={() => setEditingAlt({ itemId: item.id, alt })} sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.primary.main }, width: 20, height: 20 }}><EditIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                        <Tooltip title="Usuń"><IconButton size="small" onClick={() => {
+                                          const newAlts = (item.alternatywy || []).filter((a) => a.id !== alt.id);
+                                          updateMebleItem(item.id, { alternatywy: newAlts });
+                                        }} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.error.main }, width: 20, height: 20 }}><DeleteIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                      </Box>
                                     </Box>
                                   ))}
                                 </Box>
