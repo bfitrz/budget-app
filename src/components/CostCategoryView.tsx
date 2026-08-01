@@ -119,6 +119,11 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
     const grp = (i[config.groupField] as string) || 'Bez grupy';
     return i.included && !disabledGroups.has(grp);
   }).reduce((s, i) => s + getCost(i), 0);
+  const paidTotal = items.filter((i) => {
+    const grp = (i[config.groupField] as string) || 'Bez grupy';
+    return i.included && !disabledGroups.has(grp) && i.status === 'Opłacone';
+  }).reduce((s, i) => s + getCost(i), 0);
+  const remainingTotal = totalIncluded - paidTotal;
   const paidCount = items.filter((i) => {
     const grp = (i[config.groupField] as string) || 'Bez grupy';
     return i.included && !disabledGroups.has(grp) && i.status === 'Opłacone';
@@ -253,9 +258,30 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
 
       {/* Summary cards */}
       <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
-        <Card sx={{ flex: 1, minWidth: 180 }}><CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}><Typography variant="overline" color="text.secondary">Suma</Typography><Typography variant="h5" sx={{ fontWeight: 700 }}>{formatCurrency(totalIncluded)}</Typography></CardContent></Card>
-        <Card sx={{ flex: 1, minWidth: 180 }}><CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}><Typography variant="overline" color="text.secondary">Opłacone</Typography><Typography variant="h5" sx={{ fontWeight: 700 }}>{paidCount} / {totalCount}</Typography></CardContent></Card>
-        <Card sx={{ flex: 1, minWidth: 180 }}><CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}><Typography variant="overline" color="text.secondary">Grupy</Typography><Typography variant="h5" sx={{ fontWeight: 700 }}>{groups.length}</Typography></CardContent></Card>
+        <Card sx={{ flex: 1, minWidth: 200 }}>
+          <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+            <Typography variant="overline" color="text.secondary">Suma</Typography>
+            <Typography variant="h5" sx={{ fontWeight: 700 }}>{formatCurrency(totalIncluded)}</Typography>
+            <Typography variant="caption" color="text.secondary">
+              Opłacone {formatCurrency(paidTotal)} · Zostało {formatCurrency(remainingTotal)}
+            </Typography>
+          </CardContent>
+        </Card>
+        <Card sx={{ flex: 1, minWidth: 200 }}>
+          <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+            <Typography variant="overline" color="text.secondary">Postęp</Typography>
+            <Typography variant="h5" sx={{ fontWeight: 700 }}>{paidCount} / {totalCount}</Typography>
+            <Typography variant="caption" color="text.secondary">
+              {totalIncluded > 0 ? `${Math.round((paidTotal / totalIncluded) * 100)}% budżetu opłacone` : 'brak pozycji'}
+            </Typography>
+          </CardContent>
+        </Card>
+        <Card sx={{ flex: 1, minWidth: 140 }}>
+          <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+            <Typography variant="overline" color="text.secondary">Grupy</Typography>
+            <Typography variant="h5" sx={{ fontWeight: 700 }}>{groups.length}</Typography>
+          </CardContent>
+        </Card>
       </Box>
 
       {/* Groups */}
