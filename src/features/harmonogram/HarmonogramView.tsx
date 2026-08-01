@@ -169,18 +169,26 @@ export function HarmonogramView() {
               Zaplanuj przyszłe wpływy (wypłaty, przelewy, zwroty) i zobacz na wykresie kiedy zgromadzisz wystarczająco środków na pokrycie kosztów.
             </Typography>
           </Box>
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: 'flex', gap: 1.5 }}>
             <Button
               variant="outlined"
-              size="small"
               onClick={() => { msReset({ data: new Date().toISOString().split('T')[0], opis: '' }); setMilestoneDialogOpen(true); }}
+              sx={{
+                borderColor: alpha(theme.palette.error.main, 0.4),
+                color: theme.palette.error.main,
+                '&:hover': { borderColor: theme.palette.error.main, backgroundColor: alpha(theme.palette.error.main, 0.06) },
+              }}
             >
               📌 Milestone
             </Button>
             <Button
               variant="contained"
-              startIcon={<AddIcon />}
+              startIcon={<TrendingUpIcon />}
               onClick={openAddDialog}
+              sx={{
+                background: `linear-gradient(135deg, ${theme.palette.success.main}, ${theme.palette.primary.main})`,
+                '&:hover': { background: `linear-gradient(135deg, ${theme.palette.success.dark || theme.palette.success.main}, ${theme.palette.primary.dark})` },
+              }}
             >
               Zaplanuj wpływ
             </Button>
