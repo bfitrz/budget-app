@@ -65,6 +65,7 @@ export function AlternativesModal({ open, onClose, alternatives, onSave, itemNam
     if (!formNazwa.trim()) return;
     const newAlt: AlternativeItem = {
       id: generateId(),
+      included: true,
       nazwa: formNazwa.trim(),
       cena: formCena,
       uwagi: formUwagi,

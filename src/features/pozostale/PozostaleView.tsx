@@ -115,7 +115,7 @@ export function PozostaleView() {
     if (editingItem) {
       updatePozostaleItem(editingItem.id, { grupa: data.grupa, nazwa: data.nazwa, cena: Number(data.cena), uwagi: data.uwagi });
     } else {
-      addPozostaleItem({ ...data, included: true, cena: Number(data.cena), linki: [], alternatywy: [] });
+      addPozostaleItem({ ...data, included: true, cena: Number(data.cena), linki: [], alternatywy: [], wybranaAltId: null });
     }
     reset();
     setEditingItem(null);

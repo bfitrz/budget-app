@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -35,11 +35,13 @@ import {
   CreateNewFolder as NewGroupIcon,
   Edit as EditIcon,
   SwapHoriz as AltIcon,
+  Link as LinkIcon,
 } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { useBudgetStore } from '@/store';
-import { MebleItem, PaymentStatus } from '@/types';
+import { MebleItem, AlternativeItem, PaymentStatus } from '@/types';
 import { formatCurrency } from '@/utils';
+import { generateId } from '@/utils';
 import { LinksModal, LinksDisplay } from '@/components';
 import { AlternativesModal } from '@/components';
 
@@ -72,7 +74,9 @@ export function MebleView() {
   const [editingItem, setEditingItem] = useState<MebleItem | null>(null);
   const [presetGroupName, setPresetGroupName] = useState<string | null>(null);
   const [linksItem, setLinksItem] = useState<MebleItem | null>(null);
+  const [linksAlt, setLinksAlt] = useState<{ itemId: string; alt: AlternativeItem } | null>(null);
   const [altItem, setAltItem] = useState<MebleItem | null>(null);
+  const [payChoiceItem, setPayChoiceItem] = useState<MebleItem | null>(null);
   const [groupDialogOpen, setGroupDialogOpen] = useState(false);
   const [newGroupName, setNewGroupName] = useState('');
   const [customGroups, setCustomGroups] = useState<string[]>([]);
@@ -151,6 +155,7 @@ export function MebleView() {
         cena: Number(data.cena),
         linki: [],
         alternatywy: [],
+        wybranaAltId: null,
       });
     }
     reset();
@@ -329,25 +334,29 @@ export function MebleView() {
                         <TableCell align="right">Cena</TableCell>
                         <TableCell sx={{ width: 120 }}>Status</TableCell>
                         <TableCell>Uwagi</TableCell>
-                        <TableCell sx={{ width: 100 }}>Linki</TableCell>
-                        <TableCell sx={{ width: 80 }}></TableCell>
+                        <TableCell sx={{ width: 100 }}></TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {group.items.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={8} sx={{ py: 3 }}>
+                          <TableCell colSpan={7} sx={{ py: 3 }}>
                             <Typography variant="body2" color="text.secondary" align="center">
                               Brak pozycji w tej grupie. Dodaj pozycję z pomieszczeniem "{group.name}".
                             </Typography>
                           </TableCell>
                         </TableRow>
                       ) : (
-                        group.items.map((item) => (
-                          <TableRow
-                            key={item.id}
-                            sx={{ opacity: item.included ? 1 : 0.4 }}
-                          >
+                        group.items.map((item) => {
+                          const allPrices = [item.cena, ...(item.alternatywy || []).filter(a => a.included).map(a => a.cena)];
+                          const minPrice = Math.min(...allPrices);
+                          const maxPrice = Math.max(...allPrices);
+                          const hasRange = minPrice !== maxPrice;
+
+                          return (
+                          <React.Fragment key={item.id}>
+                          {/* Main record row */}
+                          <TableRow sx={{ opacity: item.included ? 1 : 0.4 }}>
                             <TableCell padding="checkbox">
                               <Checkbox
                                 checked={item.included}
@@ -356,93 +365,145 @@ export function MebleView() {
                               />
                             </TableCell>
                             <TableCell>
-                              <Chip
-                                label={item.kategoria}
-                                size="small"
-                                variant="outlined"
-                                sx={{ fontSize: '0.7rem' }}
-                              />
+                              <Chip label={item.kategoria} size="small" variant="outlined" sx={{ fontSize: '0.7rem' }} />
                             </TableCell>
                             <TableCell>
-                              <Typography variant="body2">{item.nazwa}</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 500 }}>{item.nazwa}</Typography>
                             </TableCell>
                             <TableCell align="right">
-                              <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace' }}>
-                                {formatCurrency(item.cena)}
-                              </Typography>
+                              {item.status === 'Opłacone' && item.wybranaAltId !== undefined ? (
+                                <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace' }}>
+                                  {formatCurrency(
+                                    item.wybranaAltId === null
+                                      ? item.cena
+                                      : (item.alternatywy || []).find(a => a.id === item.wybranaAltId)?.cena || item.cena
+                                  )}
+                                </Typography>
+                              ) : hasRange ? (
+                                <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '0.7rem' }}>
+                                  {formatCurrency(minPrice)} — {formatCurrency(maxPrice)}
+                                </Typography>
+                              ) : (
+                                <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace' }}>
+                                  {formatCurrency(item.cena)}
+                                </Typography>
+                              )}
                             </TableCell>
                             <TableCell>
                               <Chip
                                 label={item.status}
                                 size="small"
                                 sx={{
-                                  fontWeight: 600,
-                                  fontSize: '0.7rem',
-                                  cursor: 'pointer',
-                                  backgroundColor: item.status === 'Opłacone'
-                                    ? alpha(theme.palette.success.main, 0.15)
-                                    : alpha(theme.palette.warning.main, 0.15),
-                                  color: item.status === 'Opłacone'
-                                    ? theme.palette.success.main
-                                    : theme.palette.warning.main,
+                                  fontWeight: 600, fontSize: '0.7rem', cursor: 'pointer',
+                                  backgroundColor: item.status === 'Opłacone' ? alpha(theme.palette.success.main, 0.15) : alpha(theme.palette.warning.main, 0.15),
+                                  color: item.status === 'Opłacone' ? theme.palette.success.main : theme.palette.warning.main,
                                   border: 'none',
                                 }}
                                 onClick={() => {
-                                  const newStatus: PaymentStatus = item.status === 'Opłacone' ? 'Do zapłaty' : 'Opłacone';
-                                  updateMebleItem(item.id, { status: newStatus });
+                                  if (item.status === 'Opłacone') {
+                                    // Going back to unpaid — keep current main as is
+                                    updateMebleItem(item.id, { status: 'Do zapłaty' });
+                                  } else if ((item.alternatywy || []).filter(a => a.included).length > 0) {
+                                    // Has alternatives — ask which one was paid
+                                    setPayChoiceItem(item);
+                                  } else {
+                                    // No alternatives — just mark paid
+                                    updateMebleItem(item.id, { status: 'Opłacone', wybranaAltId: null });
+                                  }
                                 }}
                               />
                             </TableCell>
                             <TableCell>
-                              <TextField
-                                size="small"
-                                value={item.uwagi}
-                                onChange={(e) => handleUwagiChange(item, e.target.value)}
-                                placeholder="..."
-                                variant="standard"
-                                sx={{ '& .MuiInput-root': { fontSize: '0.8rem' } }}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <LinksDisplay links={item.linki || []} onManage={() => setLinksItem(item)} />
+                              <TextField size="small" value={item.uwagi} onChange={(e) => handleUwagiChange(item, e.target.value)} placeholder="..." variant="standard" sx={{ '& .MuiInput-root': { fontSize: '0.8rem' } }} />
                             </TableCell>
                             <TableCell>
                               <Box sx={{ display: 'flex', gap: 0.5 }}>
-                                <Tooltip title="Edytuj">
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => openEditDialog(item)}
-                                    sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.primary.main } }}
-                                  >
-                                    <EditIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                                <Tooltip title={`Alternatywy (${item.alternatywy?.length || 0})`}>
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => setAltItem(item)}
-                                    sx={{
-                                      opacity: (item.alternatywy?.length || 0) > 0 ? 0.8 : 0.4,
-                                      '&:hover': { opacity: 1, color: theme.palette.info.main },
-                                      color: (item.alternatywy?.length || 0) > 0 ? theme.palette.info.main : undefined,
-                                    }}
-                                  >
-                                    <AltIcon sx={{ fontSize: 15 }} />
-                                  </IconButton>
-                                </Tooltip>
-                                <Tooltip title="Usuń">
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => deleteMebleItem(item.id)}
-                                    sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.error.main } }}
-                                  >
-                                    <DeleteIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
+                                <Tooltip title="Edytuj"><IconButton size="small" onClick={() => openEditDialog(item)} sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.primary.main } }}><EditIcon fontSize="small" /></IconButton></Tooltip>
+                                <Tooltip title="Dodaj alternatywę"><IconButton size="small" onClick={() => setAltItem(item)} sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.info.main } }}><AltIcon sx={{ fontSize: 15 }} /></IconButton></Tooltip>
+                                <Tooltip title="Usuń"><IconButton size="small" onClick={() => deleteMebleItem(item.id)} sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.error.main } }}><DeleteIcon fontSize="small" /></IconButton></Tooltip>
                               </Box>
                             </TableCell>
                           </TableRow>
-                        ))
+
+                          {/* MAIN price sub-row */}
+                          <TableRow sx={{ opacity: item.included ? 1 : 0.35, backgroundColor: alpha(theme.palette.success.main, 0.02), '& td': { py: 0.75, borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}` } }}>
+                            <TableCell></TableCell>
+                            <TableCell><Chip label="MAIN" size="small" sx={{ fontSize: '0.5rem', height: 16, fontWeight: 700, backgroundColor: alpha(theme.palette.success.main, 0.1), color: theme.palette.success.main }} /></TableCell>
+                            <TableCell><Typography variant="body2" sx={{ fontSize: '0.7rem' }}>Cena główna</Typography></TableCell>
+                            <TableCell align="right"><Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '0.75rem' }}>{formatCurrency(item.cena)}</Typography></TableCell>
+                            <TableCell colSpan={2}>
+                              {(item.linki || []).length > 0 && (
+                                <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                                  {item.linki.map((link, li) => (
+                                    <Chip key={li} label={link.nazwa} size="small" onClick={() => window.open(link.url, '_blank')}
+                                      sx={{ fontSize: '0.55rem', height: 18, cursor: 'pointer', backgroundColor: alpha(theme.palette.primary.main, 0.06), '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.12) } }} />
+                                  ))}
+                                </Box>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <Tooltip title="Zarządzaj linkami"><IconButton size="small" onClick={() => setLinksItem(item)} sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}><LinkIcon sx={{ fontSize: 13 }} /></IconButton></Tooltip>
+                            </TableCell>
+                          </TableRow>
+
+                          {/* ALT price sub-rows */}
+                          {(item.alternatywy || []).map((alt) => (
+                            <TableRow
+                              key={alt.id}
+                              sx={{
+                                opacity: (!item.included) ? 0.35 : alt.included ? 0.9 : 0.35,
+                                backgroundColor: alpha(theme.palette.info.main, 0.02),
+                                '& td': { py: 0.75, borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}` },
+                              }}
+                            >
+                              <TableCell padding="checkbox">
+                                <Checkbox checked={alt.included} onChange={() => {
+                                  const newAlts = (item.alternatywy || []).map((a) => a.id === alt.id ? { ...a, included: !a.included } : a);
+                                  updateMebleItem(item.id, { alternatywy: newAlts });
+                                }} size="small" sx={{ '& .MuiSvgIcon-root': { fontSize: 16 } }} />
+                              </TableCell>
+                              <TableCell><Chip label="ALT" size="small" sx={{ fontSize: '0.5rem', height: 16, fontWeight: 700, backgroundColor: alpha(theme.palette.info.main, 0.1), color: theme.palette.info.main }} /></TableCell>
+                              <TableCell><Typography variant="body2" sx={{ fontSize: '0.7rem', fontStyle: 'italic' }}>{alt.nazwa}</Typography></TableCell>
+                              <TableCell align="right">
+                                <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '0.75rem', color: alt.cena <= item.cena ? theme.palette.success.main : theme.palette.warning.main }}>
+                                  {formatCurrency(alt.cena)}
+                                </Typography>
+                              </TableCell>
+                              <TableCell colSpan={2}>
+                                <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}>
+                                  {(alt.linki || []).map((link, li) => (
+                                    <Chip key={li} label={link.nazwa} size="small" onClick={() => window.open(link.url, '_blank')}
+                                      sx={{ fontSize: '0.55rem', height: 18, cursor: 'pointer', backgroundColor: alpha(theme.palette.primary.main, 0.06), '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.12) } }} />
+                                  ))}
+                                  <Tooltip title="Zarządzaj linkami"><IconButton size="small" onClick={() => setLinksAlt({ itemId: item.id, alt })} sx={{ width: 18, height: 18, opacity: 0.5, '&:hover': { opacity: 1 } }}><LinkIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                </Box>
+                              </TableCell>
+                              <TableCell>
+                                <Box sx={{ display: 'flex', gap: 0.25 }}>
+                                  <Tooltip title="Ustaw jako MAIN"><IconButton size="small" onClick={() => {
+                                    // Swap: this ALT becomes MAIN, old MAIN becomes ALT
+                                    const oldMain: AlternativeItem = {
+                                      id: generateId(),
+                                      included: true,
+                                      nazwa: 'Poprzednia opcja',
+                                      cena: item.cena,
+                                      linki: item.linki || [],
+                                      uwagi: '',
+                                    };
+                                    const newAlts = [oldMain, ...(item.alternatywy || []).filter((a) => a.id !== alt.id)];
+                                    updateMebleItem(item.id, { cena: alt.cena, linki: alt.linki || [], alternatywy: newAlts });
+                                  }} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.success.main } }}><AltIcon sx={{ fontSize: 13 }} /></IconButton></Tooltip>
+                                  <Tooltip title="Usuń alternatywę"><IconButton size="small" onClick={() => {
+                                    const newAlts = (item.alternatywy || []).filter((a) => a.id !== alt.id);
+                                    updateMebleItem(item.id, { alternatywy: newAlts });
+                                  }} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.error.main } }}><DeleteIcon sx={{ fontSize: 13 }} /></IconButton></Tooltip>
+                                </Box>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                          </React.Fragment>
+                          );
+                        })
                       )}
                     </TableBody>
                   </Table>
@@ -601,7 +662,7 @@ export function MebleView() {
         </DialogActions>
       </Dialog>
 
-      {/* Links modal */}
+      {/* Links modal for main items */}
       <LinksModal
         open={!!linksItem}
         onClose={() => setLinksItem(null)}
@@ -611,6 +672,26 @@ export function MebleView() {
           setLinksItem(null);
         }}
         itemName={linksItem?.nazwa}
+      />
+
+      {/* Links modal for alternatives */}
+      <LinksModal
+        open={!!linksAlt}
+        onClose={() => setLinksAlt(null)}
+        links={linksAlt?.alt.linki || []}
+        onSave={(linki) => {
+          if (linksAlt) {
+            const item = meble.find((m) => m.id === linksAlt.itemId);
+            if (item) {
+              const newAlts = (item.alternatywy || []).map((a) =>
+                a.id === linksAlt.alt.id ? { ...a, linki } : a
+              );
+              updateMebleItem(linksAlt.itemId, { alternatywy: newAlts });
+            }
+          }
+          setLinksAlt(null);
+        }}
+        itemName={linksAlt ? `${linksAlt.alt.nazwa} (alternatywa)` : ''}
       />
 
       {/* Alternatives modal */}
@@ -625,6 +706,89 @@ export function MebleView() {
         itemName={altItem?.nazwa}
         baseCena={altItem?.cena}
       />
+
+      {/* Payment choice dialog */}
+      <Dialog open={!!payChoiceItem} onClose={() => setPayChoiceItem(null)} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ fontWeight: 600 }}>Którą opcję opłaciłeś?</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Wybierz cenę, która została zapłacona:
+          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            {/* Main option */}
+            <Box
+              onClick={() => {
+                if (payChoiceItem) {
+                  updateMebleItem(payChoiceItem.id, { status: 'Opłacone', wybranaAltId: null });
+                  setPayChoiceItem(null);
+                }
+              }}
+              sx={{
+                p: 1.5, borderRadius: 2, cursor: 'pointer',
+                border: `1px solid ${theme.palette.divider}`,
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                '&:hover': { borderColor: theme.palette.success.main, backgroundColor: alpha(theme.palette.success.main, 0.04) },
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Chip label="MAIN" size="small" sx={{ fontSize: '0.5rem', height: 16, fontWeight: 700, backgroundColor: alpha(theme.palette.success.main, 0.1), color: theme.palette.success.main }} />
+                <Typography variant="body2">Cena główna</Typography>
+              </Box>
+              <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'monospace' }}>
+                {formatCurrency(payChoiceItem?.cena || 0)}
+              </Typography>
+            </Box>
+            {/* Alt options */}
+            {(payChoiceItem?.alternatywy || []).filter(a => a.included).map((alt) => (
+              <Box
+                key={alt.id}
+                onClick={() => {
+                  if (payChoiceItem) {
+                    // Swap: ALT becomes MAIN, old MAIN becomes ALT
+                    const oldMain: AlternativeItem = {
+                      id: payChoiceItem.id + '_old',
+                      included: true,
+                      nazwa: 'Poprzednia cena główna',
+                      cena: payChoiceItem.cena,
+                      linki: payChoiceItem.linki || [],
+                      uwagi: '',
+                    };
+                    const newAlts = [
+                      oldMain,
+                      ...(payChoiceItem.alternatywy || []).filter(a => a.id !== alt.id),
+                    ];
+                    updateMebleItem(payChoiceItem.id, {
+                      status: 'Opłacone',
+                      cena: alt.cena,
+                      linki: alt.linki || [],
+                      alternatywy: newAlts,
+                      wybranaAltId: null,
+                    });
+                    setPayChoiceItem(null);
+                  }
+                }}
+                sx={{
+                  p: 1.5, borderRadius: 2, cursor: 'pointer',
+                  border: `1px solid ${theme.palette.divider}`,
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  '&:hover': { borderColor: theme.palette.info.main, backgroundColor: alpha(theme.palette.info.main, 0.04) },
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Chip label="ALT" size="small" sx={{ fontSize: '0.5rem', height: 16, fontWeight: 700, backgroundColor: alpha(theme.palette.info.main, 0.1), color: theme.palette.info.main }} />
+                  <Typography variant="body2">{alt.nazwa}</Typography>
+                </Box>
+                <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'monospace', color: alt.cena <= (payChoiceItem?.cena || 0) ? theme.palette.success.main : theme.palette.warning.main }}>
+                  {formatCurrency(alt.cena)}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setPayChoiceItem(null)}>Anuluj</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

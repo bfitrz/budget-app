@@ -116,7 +116,7 @@ export function AGDView() {
     if (editingItem) {
       updateAGDItem(editingItem.id, { nazwa: data.nazwa, producent: data.producent, model: data.model, cena: Number(data.cena), uwagi: data.uwagi });
     } else {
-      addAGDItem({ ...data, included: true, cena: Number(data.cena), linki: [], alternatywy: [] });
+      addAGDItem({ ...data, included: true, cena: Number(data.cena), linki: [], alternatywy: [], wybranaAltId: null });
     }
     reset();
     setEditingItem(null);

@@ -81,6 +81,7 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       uwagi: row.Uwagi || '',
       linki: [],
       alternatywy: [],
+      wybranaAltId: null,
     }));
   }
 
@@ -97,6 +98,7 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       uwagi: row.Uwagi || '',
       linki: [],
       alternatywy: [],
+      wybranaAltId: null,
     }));
   }
 
@@ -114,6 +116,7 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       uwagi: row.Uwagi || '',
       linki: [],
       alternatywy: [],
+      wybranaAltId: null,
     }));
   }
 
@@ -130,6 +133,7 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       uwagi: row.Uwagi || '',
       linki: [],
       alternatywy: [],
+      wybranaAltId: null,
     }));
   }
 

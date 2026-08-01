@@ -115,7 +115,7 @@ export function WyprowadzkaView() {
     if (editingItem) {
       updateWyprowadzkaItem(editingItem.id, { grupa: data.grupa, nazwa: data.nazwa, cena: Number(data.cena), uwagi: data.uwagi });
     } else {
-      addWyprowadzkaItem({ ...data, included: true, cena: Number(data.cena), linki: [], alternatywy: [] });
+      addWyprowadzkaItem({ ...data, included: true, cena: Number(data.cena), linki: [], alternatywy: [], wybranaAltId: null });
     }
     reset();
     setEditingItem(null);

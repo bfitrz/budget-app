@@ -114,7 +114,7 @@ export function WykonczenieView() {
     if (editingItem) {
       updateWykonczenieItem(editingItem.id, { etap: data.etap, opis: data.opis, kwota: Number(data.kwota), uwagi: data.uwagi });
     } else {
-      addWykonczenieItem({ ...data, included: true, kwota: Number(data.kwota), linki: [], alternatywy: [] });
+      addWykonczenieItem({ ...data, included: true, kwota: Number(data.kwota), linki: [], alternatywy: [], wybranaAltId: null });
     }
     reset();
     setEditingItem(null);

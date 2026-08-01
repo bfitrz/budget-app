@@ -103,6 +103,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
     const migrateItem = (item: Record<string, unknown>) => ({
       linki: migrateLinki(item.linki),
       alternatywy: Array.isArray(item.alternatywy) ? item.alternatywy : [],
+      wybranaAltId: (item.wybranaAltId as string) || null,
     });
     const meble = (loaded.meble || []).map((item) => ({ ...item, ...migrateItem(item as unknown as Record<string, unknown>) }));
     const wykonczenie = (loaded.wykonczenie || []).map((item) => ({ ...item, ...migrateItem(item as unknown as Record<string, unknown>) }));

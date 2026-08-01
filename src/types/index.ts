@@ -7,6 +7,7 @@ export interface ItemLink {
 
 export interface AlternativeItem {
   id: string;
+  included: boolean;
   nazwa: string;
   cena: number;
   linki: ItemLink[];
@@ -24,6 +25,7 @@ export interface MebleItem {
   uwagi: string;
   linki: ItemLink[];
   alternatywy: AlternativeItem[];
+  wybranaAltId: string | null;
 }
 
 export interface WykonczenieItem {
@@ -36,6 +38,7 @@ export interface WykonczenieItem {
   uwagi: string;
   linki: ItemLink[];
   alternatywy: AlternativeItem[];
+  wybranaAltId: string | null;
 }
 
 export interface AGDItem {
@@ -49,6 +52,7 @@ export interface AGDItem {
   uwagi: string;
   linki: ItemLink[];
   alternatywy: AlternativeItem[];
+  wybranaAltId: string | null;
 }
 
 export interface PozostaleItem {
@@ -61,6 +65,7 @@ export interface PozostaleItem {
   uwagi: string;
   linki: ItemLink[];
   alternatywy: AlternativeItem[];
+  wybranaAltId: string | null;
 }
 
 export interface WyprowadzkaItem {
@@ -73,6 +78,7 @@ export interface WyprowadzkaItem {
   uwagi: string;
   linki: ItemLink[];
   alternatywy: AlternativeItem[];
+  wybranaAltId: string | null;
 }
 
 export interface SaldoEntry {
