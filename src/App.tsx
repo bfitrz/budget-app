@@ -12,6 +12,7 @@ import { HarmonogramView } from '@/features/harmonogram';
 import { ImportView } from '@/features/import';
 import { GuideView } from '@/features/guide';
 import { ChangelogView } from '@/features/changelog';
+import { WykluconeView } from '@/features/wykluczone';
 import { useBudgetStore } from '@/store';
 
 export type ThemeVariant = 'dark' | 'light' | 'dim' | 'unicorn';
@@ -31,7 +32,7 @@ function getStoredTheme(): ThemeVariant {
 
 const THEME_ORDER: ThemeVariant[] = ['dark', 'dim', 'light', 'unicorn'];
 
-const VALID_VIEWS = ['dashboard', 'meble', 'wykonczenie', 'agd', 'pozostale', 'wyprowadzka', 'saldo', 'harmonogram', 'import', 'guide', 'changelog'] as const;
+const VALID_VIEWS = ['dashboard', 'meble', 'wykonczenie', 'agd', 'pozostale', 'wyprowadzka', 'wykluczone', 'saldo', 'harmonogram', 'import', 'guide', 'changelog'] as const;
 type ViewId = typeof VALID_VIEWS[number];
 
 function getViewFromHash(): ViewId | null {
@@ -283,6 +284,7 @@ function App() {
       case 'agd': return <AGDView />;
       case 'pozostale': return <PozostaleView />;
       case 'wyprowadzka': return <WyprowadzkaView />;
+      case 'wykluczone': return <WykluconeView />;
       case 'saldo': return <SaldoView />;
       case 'harmonogram': return <HarmonogramView />;
       case 'import': return <ImportView />;
