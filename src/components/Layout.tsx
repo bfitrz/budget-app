@@ -50,7 +50,7 @@ const navigationItems: NavigationItem[] = [
   { id: 'dashboard', label: 'Podsumowanie', icon: <DashboardIcon />, section: 'Główne' },
   { id: 'saldo', label: 'Środki', icon: <SaldoIcon /> },
   { id: 'harmonogram', label: 'Harmonogram', icon: <ScheduleIcon /> },
-  { id: 'meble', label: 'Zakupy', icon: <ChairIcon />, section: 'Koszty' },
+  { id: 'meble', label: 'Meblowanie', icon: <ChairIcon />, section: 'Koszty' },
   { id: 'wykonczenie', label: 'Wykończenie', icon: <BuildIcon /> },
   { id: 'agd', label: 'AGD / RTV', icon: <KitchenIcon /> },
   { id: 'pozostale', label: 'Inne', icon: <MoreIcon /> },

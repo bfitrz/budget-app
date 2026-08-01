@@ -2,9 +2,9 @@ import { CostCategoryView, CostCategoryConfig, CostItem } from '@/components';
 import { useBudgetStore } from '@/store';
 
 const config: CostCategoryConfig = {
-  title: 'Zakupy',
-  subtitle: 'Meble i wyposażenie — pogrupowane wg pomieszczeń',
-  helpText: 'Tutaj wpisujesz wszystkie zakupy mebli i wyposażenia do nowego mieszkania. Grupuj wg pomieszczeń, dodawaj alternatywy cenowe z różnych sklepów i śledź statusy płatności.',
+  title: 'Meblowanie',
+  subtitle: 'Wykończenie mieszkania meblami i wyposażeniem — pogrupowane wg pomieszczeń',
+  helpText: 'Meble, oświetlenie, dekoracje i wyposażenie do nowego mieszkania. Grupuj wg pomieszczeń, dodawaj alternatywy cenowe z różnych sklepów i śledź statusy płatności.',
   groupField: 'pomieszczenie',
   nameField: 'nazwa',
   columns: [

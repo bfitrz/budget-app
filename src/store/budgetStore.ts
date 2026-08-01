@@ -421,7 +421,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
     getCategoryCosts: (): CategoryCost[] => {
       const state = get();
       const categories: CategoryCost[] = [
-        { name: 'Zakupy', value: state.meble.filter((i) => i.included).reduce((sum, i) => sum + i.cena, 0) },
+        { name: 'Meblowanie', value: state.meble.filter((i) => i.included).reduce((sum, i) => sum + i.cena, 0) },
         { name: 'Wykończenie', value: state.wykonczenie.filter((i) => i.included).reduce((sum, i) => sum + i.kwota, 0) },
         { name: 'AGD / RTV', value: state.agd.filter((i) => i.included).reduce((sum, i) => sum + i.cena, 0) },
         { name: 'Inne', value: state.pozostale.filter((i) => i.included).reduce((sum, i) => sum + i.cena, 0) },
@@ -454,7 +454,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
 
       return [
         {
-          name: 'Zakupy',
+          name: 'Meblowanie',
           zaplacono: state.meble.filter((i) => i.included && i.status === 'Opłacone').reduce((s, i) => s + i.cena, 0),
           doZaplaty: state.meble.filter((i) => i.included && i.status === 'Do zapłaty').reduce((s, i) => s + i.cena, 0),
           minKoszt: mebleRange.minTotal,
