@@ -408,19 +408,24 @@ export function HarmonogramView() {
             {milestones.length > 0 && (
               <Box sx={{ mt: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                 {milestones.map((ms) => {
-                  const saldoAtMs = getSaldoAtDate(ms.data);
-                  const bilansAtMs = saldoAtMs - summary.pozostaloDoZaplaty;
+                  const prognozowaneSrodkiNaDate = getSaldoAtDate(ms.data);
+                  const wplywDoMomentu = prognozowaneSrodkiNaDate - summary.aktualnieSrodki;
+                  const brakuje = summary.pozostaloDoZaplaty - prognozowaneSrodkiNaDate;
                   return (
                     <Tooltip key={ms.id} title={
-                      <Box sx={{ p: 0.5 }}>
-                        <Typography variant="caption" sx={{ fontWeight: 600, display: 'block' }}>📌 {ms.opis} — {formatDate(ms.data)}</Typography>
-                        <Typography variant="caption" sx={{ display: 'block' }}>Środki: {formatCurrency(saldoAtMs)}</Typography>
-                        <Typography variant="caption" sx={{ display: 'block' }}>Pozostało do zapłaty: {formatCurrency(summary.pozostaloDoZaplaty)}</Typography>
-                        <Typography variant="caption" sx={{ display: 'block', color: bilansAtMs >= 0 ? theme.palette.success.main : theme.palette.error.main, fontWeight: 600 }}>
-                          Bilans: {bilansAtMs >= 0 ? '+' : ''}{formatCurrency(bilansAtMs)}
-                        </Typography>
+                      <Box sx={{ p: 0.5, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                        <Typography variant="caption" sx={{ fontWeight: 700, display: 'block', mb: 0.5 }}>📌 {ms.opis} — {formatDate(ms.data)}</Typography>
+                        <Typography variant="caption" sx={{ display: 'block' }}>Aktualnie na stanie: {formatCurrency(summary.aktualnieSrodki)}</Typography>
+                        <Typography variant="caption" sx={{ display: 'block' }}>Przewidywane wpływy do tej daty: +{formatCurrency(wplywDoMomentu)}</Typography>
+                        <Typography variant="caption" sx={{ display: 'block', fontWeight: 600 }}>Prognoza środków: {formatCurrency(prognozowaneSrodkiNaDate)}</Typography>
+                        <Box sx={{ borderTop: `1px solid ${alpha(theme.palette.divider, 0.3)}`, mt: 0.5, pt: 0.5 }}>
+                          <Typography variant="caption" sx={{ display: 'block' }}>Łączny koszt do pokrycia: {formatCurrency(summary.pozostaloDoZaplaty)}</Typography>
+                          <Typography variant="caption" sx={{ display: 'block', fontWeight: 700, color: brakuje <= 0 ? theme.palette.success.main : theme.palette.error.main }}>
+                            {brakuje <= 0 ? `Nadwyżka: +${formatCurrency(Math.abs(brakuje))}` : `Brakuje do celu: -${formatCurrency(brakuje)}`}
+                          </Typography>
+                        </Box>
                       </Box>
-                    } arrow slotProps={{ tooltip: { sx: { backgroundColor: theme.palette.background.paper, color: theme.palette.text.primary, border: `1px solid ${theme.palette.divider}`, borderRadius: 2, p: 1.5, boxShadow: '0 4px 20px rgba(0,0,0,0.2)' } }, arrow: { sx: { color: theme.palette.background.paper } } }}>
+                    } arrow slotProps={{ tooltip: { sx: { backgroundColor: theme.palette.background.paper, color: theme.palette.text.primary, border: `1px solid ${theme.palette.divider}`, borderRadius: 2, p: 1.5, boxShadow: '0 4px 20px rgba(0,0,0,0.2)', maxWidth: 320 } }, arrow: { sx: { color: theme.palette.background.paper } } }}>
                       <Chip
                         label={`📌 ${ms.opis} (${formatDate(ms.data)})`}
                         size="small"
