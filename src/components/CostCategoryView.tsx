@@ -258,28 +258,38 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
 
       {/* Summary cards */}
       <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
-        <Card sx={{ flex: 1, minWidth: 200 }}>
-          <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-            <Typography variant="overline" color="text.secondary">Opłacone / Suma</Typography>
-            <Typography variant="h5" sx={{ fontWeight: 700 }}>{formatCurrency(paidTotal)} / {formatCurrency(totalIncluded)}</Typography>
-            <Typography variant="caption" color="text.secondary">
-              Zostało {formatCurrency(remainingTotal)}
-            </Typography>
+        <Card sx={{ flex: 1.5, minWidth: 240, background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)}, ${alpha(theme.palette.success.main, 0.05)})`, border: `1px solid ${alpha(theme.palette.primary.main, 0.15)}` }}>
+          <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
+            <Typography variant="overline" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Opłacone / Suma</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.75, mt: 0.5 }}>
+              <Typography variant="h5" sx={{ fontWeight: 700, color: theme.palette.success.main }}>{formatCurrency(paidTotal)}</Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>/</Typography>
+              <Typography variant="h6" sx={{ fontWeight: 600, opacity: 0.7 }}>{formatCurrency(totalIncluded)}</Typography>
+            </Box>
+            <Box sx={{ mt: 1.5, mb: 0.5, height: 4, borderRadius: 2, backgroundColor: alpha(theme.palette.primary.main, 0.1), overflow: 'hidden' }}>
+              <Box sx={{ height: '100%', width: `${totalIncluded > 0 ? Math.min((paidTotal / totalIncluded) * 100, 100) : 0}%`, borderRadius: 2, background: `linear-gradient(90deg, ${theme.palette.success.main}, ${theme.palette.primary.main})`, transition: 'width 0.5s ease' }} />
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.75 }}>
+              <Typography variant="caption" sx={{ color: theme.palette.warning.main, fontWeight: 500 }}>
+                Zostało {formatCurrency(remainingTotal)}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {totalIncluded > 0 ? `${Math.round((paidTotal / totalIncluded) * 100)}%` : '0%'}
+              </Typography>
+            </Box>
           </CardContent>
         </Card>
-        <Card sx={{ flex: 1, minWidth: 200 }}>
-          <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-            <Typography variant="overline" color="text.secondary">Postęp</Typography>
-            <Typography variant="h5" sx={{ fontWeight: 700 }}>{paidCount} / {totalCount}</Typography>
-            <Typography variant="caption" color="text.secondary">
-              {totalIncluded > 0 ? `${Math.round((paidTotal / totalIncluded) * 100)}% budżetu opłacone` : 'brak pozycji'}
-            </Typography>
+        <Card sx={{ flex: 1, minWidth: 160 }}>
+          <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
+            <Typography variant="overline" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Pozycje</Typography>
+            <Typography variant="h5" sx={{ fontWeight: 700, mt: 0.5 }}>{paidCount}<Typography component="span" sx={{ fontWeight: 400, opacity: 0.5, fontSize: '1rem' }}> / {totalCount}</Typography></Typography>
+            <Typography variant="caption" color="text.secondary">opłaconych</Typography>
           </CardContent>
         </Card>
-        <Card sx={{ flex: 1, minWidth: 140 }}>
-          <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-            <Typography variant="overline" color="text.secondary">Grupy</Typography>
-            <Typography variant="h5" sx={{ fontWeight: 700 }}>{groups.length}</Typography>
+        <Card sx={{ flex: 1, minWidth: 120 }}>
+          <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
+            <Typography variant="overline" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Grupy</Typography>
+            <Typography variant="h5" sx={{ fontWeight: 700, mt: 0.5 }}>{groups.length}</Typography>
           </CardContent>
         </Card>
       </Box>
