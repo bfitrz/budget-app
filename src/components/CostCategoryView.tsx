@@ -191,6 +191,13 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
   };
 
   const handleToggleGroup = (groupName: string) => {
+    const isCurrentlyDisabled = disabledGroups.has(groupName);
+    // Toggle included on all items in the group
+    const groupItems = items.filter(i => (i[config.groupField] as string) === groupName);
+    groupItems.forEach(item => {
+      updateItem(item.id, { included: isCurrentlyDisabled } as Partial<CostItem>);
+    });
+    // Track visual state
     setDisabledGroups(prev => {
       const next = new Set(prev);
       if (next.has(groupName)) next.delete(groupName);
