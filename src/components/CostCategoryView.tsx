@@ -602,10 +602,14 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
       <AlternativesModal open={!!altItem} onClose={() => setAltItem(null)} alternatives={altItem?.alternatywy || []} onSave={(alternatywy) => { if (altItem) updateItem(altItem.id, { alternatywy }); setAltItem(null); }} itemName={altItem?.[config.nameField] as string} baseCena={altItem ? getCost(altItem) : undefined} />
 
       {/* Edit MAIN price */}
-      <Dialog open={!!editingMainPrice} onClose={() => setEditingMainPrice(null)} maxWidth="xs" fullWidth>
-        <DialogTitle sx={{ fontWeight: 600 }}>Edytuj cenę główną</DialogTitle>
-        <DialogContent dividers sx={{ pt: 1, maxHeight: '70vh' }}><TextField label={costField === 'kwota' ? 'Kwota (PLN)' : 'Cena (PLN)'} type="number" defaultValue={editingMainPrice ? getCost(editingMainPrice) : 0} onChange={(e) => { if (editingMainPrice) setEditingMainPrice({ ...editingMainPrice, [costField]: Number(e.target.value) } as CostItem); }} fullWidth size="small" /></DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2, justifyContent: 'space-between' }}><Button onClick={() => setEditingMainPrice(null)}>Zamknij</Button><Button variant="contained" onClick={() => { if (editingMainPrice) { updateItem(editingMainPrice.id, { [costField]: getCost(editingMainPrice) } as Partial<CostItem>); setEditingMainPrice(null); } }}>Zapisz</Button></DialogActions>
+      <Dialog open={!!editingMainPrice} onClose={() => setEditingMainPrice(null)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontWeight: 600 }}>Edytuj MAIN — {editingMainPrice ? (editingMainPrice[config.nameField] as string) : ''}</DialogTitle>
+        <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2, maxHeight: '70vh' }}>
+          <TextField label={config.addFields[0]?.label || 'Nazwa'} defaultValue={editingMainPrice ? (editingMainPrice[config.nameField] as string) : ''} onChange={(e) => { if (editingMainPrice) setEditingMainPrice({ ...editingMainPrice, [config.nameField]: e.target.value } as CostItem); }} fullWidth size="small" />
+          <TextField label={costField === 'kwota' ? 'Kwota (PLN)' : 'Cena (PLN)'} type="number" defaultValue={editingMainPrice ? getCost(editingMainPrice) : 0} onChange={(e) => { if (editingMainPrice) setEditingMainPrice({ ...editingMainPrice, [costField]: Number(e.target.value) } as CostItem); }} fullWidth size="small" />
+          <TextField label="Uwagi" defaultValue={editingMainPrice?.uwagi || ''} onChange={(e) => { if (editingMainPrice) setEditingMainPrice({ ...editingMainPrice, uwagi: e.target.value } as CostItem); }} fullWidth size="small" multiline rows={2} />
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2, justifyContent: 'space-between' }}><Button onClick={() => setEditingMainPrice(null)}>Zamknij</Button><Button variant="contained" onClick={() => { if (editingMainPrice) { updateItem(editingMainPrice.id, { [config.nameField]: editingMainPrice[config.nameField], [costField]: getCost(editingMainPrice), uwagi: editingMainPrice.uwagi } as Partial<CostItem>); setEditingMainPrice(null); } }}>Zapisz</Button></DialogActions>
       </Dialog>
 
       {/* Edit ALT */}
@@ -752,7 +756,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
         </MenuItem>
         <MenuItem onClick={() => { if (mainMenuTarget) setEditingMainPrice(mainMenuTarget); setMainMenuAnchor(null); setMainMenuTarget(null); }}>
           <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
-          <ListItemText>Edytuj cenę</ListItemText>
+          <ListItemText>Edytuj</ListItemText>
         </MenuItem>
         {mainMenuTarget && (mainMenuTarget.alternatywy || []).length > 0 && (
           <MenuItem onClick={() => { if (mainMenuTarget) setDeleteChoiceItem(mainMenuTarget); setMainMenuAnchor(null); setMainMenuTarget(null); }} sx={{ color: theme.palette.error.main }}>
