@@ -39,6 +39,8 @@ import {
   Link as LinkIcon,
   KeyboardArrowDown as ArrowDownIcon,
   KeyboardArrowRight as ArrowRightIcon,
+  Visibility as VisibilityIcon,
+  VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { useBudgetStore } from '@/store';
@@ -336,7 +338,7 @@ export function MebleView() {
                     <TableHead>
                       <TableRow>
                         <TableCell sx={{ width: 30 }}></TableCell>
-                        <TableCell padding="checkbox" sx={{ width: 50 }}>Uwzgl.</TableCell>
+                        <TableCell padding="checkbox" sx={{ width: 50 }}></TableCell>
                         <TableCell>Kategoria</TableCell>
                         <TableCell>Nazwa</TableCell>
                         <TableCell align="right">Cena</TableCell>
@@ -377,11 +379,20 @@ export function MebleView() {
                               </IconButton>
                             </TableCell>
                             <TableCell padding="checkbox">
-                              <Checkbox
-                                checked={item.included}
-                                onChange={() => handleToggleIncluded(item)}
-                                size="small"
-                              />
+                              <Tooltip title={item.included ? 'Wyklucz z kosztów' : 'Uwzględnij w kosztach'}>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleToggleIncluded(item)}
+                                  sx={{
+                                    width: 24, height: 24,
+                                    color: item.included ? theme.palette.success.main : theme.palette.text.secondary,
+                                    opacity: item.included ? 0.7 : 0.3,
+                                    '&:hover': { opacity: 1 },
+                                  }}
+                                >
+                                  {item.included ? <VisibilityIcon sx={{ fontSize: 15 }} /> : <VisibilityOffIcon sx={{ fontSize: 15 }} />}
+                                </IconButton>
+                              </Tooltip>
                             </TableCell>
                             <TableCell>
                               <Chip label={item.kategoria} size="small" variant="outlined" sx={{ fontSize: '0.7rem' }} />
@@ -495,10 +506,14 @@ export function MebleView() {
                                       backgroundColor: alpha(theme.palette.info.main, 0.02), border: `1px solid ${alpha(theme.palette.info.main, 0.08)}`,
                                       opacity: alt.included ? 1 : 0.4,
                                     }}>
-                                      <Checkbox checked={alt.included} onChange={() => {
-                                        const newAlts = (item.alternatywy || []).map((a) => a.id === alt.id ? { ...a, included: !a.included } : a);
-                                        updateMebleItem(item.id, { alternatywy: newAlts });
-                                      }} size="small" sx={{ p: 0, '& .MuiSvgIcon-root': { fontSize: 15 } }} />
+                                      <Tooltip title={alt.included ? 'Wyklucz' : 'Uwzględnij'}>
+                                        <IconButton size="small" onClick={() => {
+                                          const newAlts = (item.alternatywy || []).map((a) => a.id === alt.id ? { ...a, included: !a.included } : a);
+                                          updateMebleItem(item.id, { alternatywy: newAlts });
+                                        }} sx={{ p: 0, width: 20, height: 20, color: alt.included ? theme.palette.success.main : theme.palette.text.secondary, opacity: alt.included ? 0.7 : 0.3, '&:hover': { opacity: 1 } }}>
+                                          {alt.included ? <VisibilityIcon sx={{ fontSize: 13 }} /> : <VisibilityOffIcon sx={{ fontSize: 13 }} />}
+                                        </IconButton>
+                                      </Tooltip>
                                       <Chip label="ALT" size="small" sx={{ fontSize: '0.5rem', height: 16, fontWeight: 700, backgroundColor: alpha(theme.palette.info.main, 0.1), color: theme.palette.info.main }} />
                                       <Typography variant="body2" sx={{ fontSize: '0.7rem', fontStyle: 'italic', flex: 1 }}>{alt.nazwa}</Typography>
                                       <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '0.75rem', color: alt.cena <= item.cena ? theme.palette.success.main : theme.palette.warning.main }}>
