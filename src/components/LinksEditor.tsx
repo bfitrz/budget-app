@@ -19,6 +19,7 @@ import {
   Link as LinkIcon,
   Delete as DeleteIcon,
   OpenInNew as OpenIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
 import { ItemLink } from '@/types';
 
@@ -75,9 +76,14 @@ export function LinksModal({ open, onClose, links, onSave, itemName }: LinksModa
       fullWidth
       TransitionProps={{ onEnter: handleOpen }}
     >
-      <DialogTitle sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <LinkIcon sx={{ fontSize: 20 }} />
-        Linki{itemName ? ` — ${itemName}` : ''}
+      <DialogTitle sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <LinkIcon sx={{ fontSize: 20 }} />
+          Linki{itemName ? ` — ${itemName}` : ''}
+        </Box>
+        <IconButton size="small" onClick={onClose} sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}>
+          <CloseIcon sx={{ fontSize: 16 }} />
+        </IconButton>
       </DialogTitle>
       <DialogContent sx={{ pt: 1 }}>
         {/* Existing links */}
@@ -193,8 +199,8 @@ export function LinksModal({ open, onClose, links, onSave, itemName }: LinksModa
           </Box>
         </Box>
       </DialogContent>
-      <DialogActions sx={{ px: 3, pb: 2.5 }}>
-        <Button onClick={onClose}>Anuluj</Button>
+      <DialogActions sx={{ px: 3, pb: 2.5, justifyContent: 'space-between' }}>
+        <Button onClick={onClose}>Zamknij</Button>
         <Button variant="contained" onClick={handleSave}>
           Zapisz ({localLinks.length})
         </Button>

@@ -821,8 +821,21 @@ export function MebleView() {
       <Dialog open={!!deleteChoiceItem} onClose={() => setDeleteChoiceItem(null)} maxWidth="xs" fullWidth>
         <DialogTitle sx={{ fontWeight: 600 }}>Wybierz nowy MAIN</DialogTitle>
         <DialogContent>
+          {/* Current MAIN info */}
+          <Box sx={{ mb: 2, p: 1.5, borderRadius: 2, backgroundColor: alpha(theme.palette.error.main, 0.04), border: `1px solid ${alpha(theme.palette.error.main, 0.15)}` }}>
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>Aktualny MAIN (do usunięcia):</Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ fontWeight: 500 }}>Cena główna</Typography>
+              <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'monospace', textDecoration: 'line-through', color: theme.palette.error.main }}>
+                {formatCurrency(deleteChoiceItem?.cena || 0)}
+              </Typography>
+            </Box>
+            {(deleteChoiceItem?.linki || []).length > 0 && (
+              <Typography variant="caption" color="text.secondary">{deleteChoiceItem?.linki.length} link{(deleteChoiceItem?.linki.length || 0) > 1 ? 'i' : ''}</Typography>
+            )}
+          </Box>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Usuwasz cenę główną. Wybierz alternatywę, która stanie się nową ceną główną:
+            Wybierz alternatywę, która stanie się nową ceną główną:
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             {(deleteChoiceItem?.alternatywy || []).map((alt) => (

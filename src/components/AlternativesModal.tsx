@@ -22,6 +22,7 @@ import {
   SwapHoriz as AltIcon,
   OpenInNew as OpenIcon,
   Link as LinkIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
 import { AlternativeItem, ItemLink } from '@/types';
 import { formatCurrency, generateId } from '@/utils';
@@ -63,16 +64,19 @@ export function AlternativesModal({ open, onClose, alternatives, onSave, itemNam
 
   const handleAddAlt = () => {
     if (!formNazwa.trim()) return;
+    const url = newLinkUrl.trim().startsWith('http') ? newLinkUrl.trim() : newLinkUrl.trim() ? `https://${newLinkUrl.trim()}` : '';
+    const pendingLinki = url ? [...formLinki, { nazwa: newLinkNazwa.trim() || url, url }] : formLinki;
     const newAlt: AlternativeItem = {
       id: generateId(),
       included: true,
       nazwa: formNazwa.trim(),
       cena: formCena,
       uwagi: formUwagi,
-      linki: formLinki,
+      linki: pendingLinki,
     };
-    setLocalAlts([...localAlts, newAlt]);
+    onSave([...alternatives, newAlt]);
     resetForm();
+    onClose();
   };
 
   const handleUpdateAlt = () => {
@@ -119,92 +123,24 @@ export function AlternativesModal({ open, onClose, alternatives, onSave, itemNam
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth TransitionProps={{ onEnter: handleOpen }}>
-      <DialogTitle sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <AltIcon sx={{ fontSize: 20 }} />
-        Alternatywy{itemName ? ` — ${itemName}` : ''}
+      <DialogTitle sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <AltIcon sx={{ fontSize: 20 }} />
+          Alternatywy{itemName ? ` — ${itemName}` : ''}
+        </Box>
+        <IconButton size="small" onClick={onClose} sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}>
+          <CloseIcon sx={{ fontSize: 16 }} />
+        </IconButton>
       </DialogTitle>
       <DialogContent sx={{ pt: 1 }}>
-        {/* Price range info */}
-        {localAlts.length > 0 && (
-          <Box sx={{ mb: 2, p: 1.5, borderRadius: 2, backgroundColor: alpha(theme.palette.info.main, 0.06), display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="caption" color="text.secondary">Przedział cenowy:</Typography>
-            <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              {formatCurrency(minPrice)} — {formatCurrency(maxPrice)}
-            </Typography>
-          </Box>
-        )}
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Dodaj nową alternatywę cenową{baseCena !== undefined ? ` (aktualna cena MAIN: ${formatCurrency(baseCena)})` : ''}.
+        </Typography>
 
-        {/* Base price */}
-        {baseCena !== undefined && (
-          <Box sx={{ mb: 2, p: 1.5, borderRadius: 2, border: `1px solid ${theme.palette.divider}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Box>
-              <Typography variant="body2" sx={{ fontWeight: 500 }}>Cena bazowa</Typography>
-              <Typography variant="caption" color="text.secondary">Aktualnie wybrana</Typography>
-            </Box>
-            <Chip label={formatCurrency(baseCena)} size="small" color="primary" variant="outlined" />
-          </Box>
-        )}
-
-        {/* Existing alternatives */}
-        {localAlts.length > 0 && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 2 }}>
-            {localAlts.map((alt) => (
-              <Box
-                key={alt.id}
-                sx={{
-                  p: 1.5,
-                  borderRadius: 2,
-                  border: `1px solid ${editingId === alt.id ? theme.palette.primary.main : theme.palette.divider}`,
-                  transition: 'border-color 0.1s ease',
-                }}
-              >
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Box>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>{alt.nazwa}</Typography>
-                    {alt.uwagi && <Typography variant="caption" color="text.secondary">{alt.uwagi}</Typography>}
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Chip
-                      label={formatCurrency(alt.cena)}
-                      size="small"
-                      sx={{
-                        fontWeight: 600,
-                        backgroundColor: alt.cena <= (baseCena || 0)
-                          ? alpha(theme.palette.success.main, 0.1)
-                          : alpha(theme.palette.warning.main, 0.1),
-                        color: alt.cena <= (baseCena || 0) ? theme.palette.success.main : theme.palette.warning.main,
-                      }}
-                    />
-                    <Tooltip title="Edytuj"><IconButton size="small" onClick={() => handleEditAlt(alt)}><EditIcon sx={{ fontSize: 14 }} /></IconButton></Tooltip>
-                    <Tooltip title="Usuń"><IconButton size="small" onClick={() => handleDeleteAlt(alt.id)} sx={{ '&:hover': { color: theme.palette.error.main } }}><DeleteIcon sx={{ fontSize: 14 }} /></IconButton></Tooltip>
-                  </Box>
-                </Box>
-                {/* Links in alternative */}
-                {alt.linki && alt.linki.length > 0 && (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 1 }}>
-                    {alt.linki.map((link, i) => (
-                      <Chip
-                        key={i}
-                        label={link.nazwa}
-                        size="small"
-                        icon={<OpenIcon sx={{ fontSize: '11px !important' }} />}
-                        onClick={() => window.open(link.url, '_blank')}
-                        sx={{ fontSize: '0.6rem', height: 20, cursor: 'pointer', backgroundColor: alpha(theme.palette.primary.main, 0.06) }}
-                      />
-                    ))}
-                  </Box>
-                )}
-              </Box>
-            ))}
-          </Box>
-        )}
-
-        <Divider sx={{ my: 2 }} />
-
-        {/* Add/Edit form */}
+        {/* Add form */}
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, p: 2, borderRadius: 2, backgroundColor: alpha(theme.palette.primary.main, 0.02), border: `1px dashed ${theme.palette.divider}` }}>
           <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
-            {editingId ? 'Edytuj alternatywę' : 'Dodaj alternatywę'}
+            Nowa alternatywa
           </Typography>
           <TextField size="small" value={formNazwa} onChange={(e) => setFormNazwa(e.target.value)} placeholder="Nazwa (np. IKEA Kallax)" fullWidth />
           <TextField size="small" value={formCena || ''} onChange={(e) => setFormCena(Number(e.target.value))} placeholder="Cena" type="number" fullWidth InputProps={{ endAdornment: <Typography variant="caption" sx={{ opacity: 0.5 }}>PLN</Typography> }} />
@@ -234,20 +170,17 @@ export function AlternativesModal({ open, onClose, alternatives, onSave, itemNam
           <Button
             variant="contained"
             size="small"
-            onClick={editingId ? handleUpdateAlt : handleAddAlt}
+            onClick={handleAddAlt}
             disabled={!formNazwa.trim()}
             sx={{ alignSelf: 'flex-start', mt: 0.5 }}
           >
-            {editingId ? 'Zapisz zmiany' : 'Dodaj alternatywę'}
+            Dodaj
           </Button>
-          {editingId && (
-            <Button size="small" onClick={resetForm} sx={{ alignSelf: 'flex-start' }}>Anuluj edycję</Button>
-          )}
         </Box>
       </DialogContent>
-      <DialogActions sx={{ px: 3, pb: 2.5 }}>
-        <Button onClick={onClose}>Anuluj</Button>
-        <Button variant="contained" onClick={handleSave}>Zapisz ({localAlts.length} alt.)</Button>
+      <DialogActions sx={{ px: 3, pb: 2.5, justifyContent: 'space-between' }}>
+        <Button onClick={onClose}>Zamknij</Button>
+        <Button variant="contained" onClick={handleAddAlt} disabled={!formNazwa.trim()}>Dodaj</Button>
       </DialogActions>
     </Dialog>
   );
