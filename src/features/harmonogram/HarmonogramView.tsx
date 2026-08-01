@@ -135,7 +135,7 @@ export function HarmonogramView() {
           <Box>
             <Typography variant="h4">Harmonogram wpływów</Typography>
             <Typography variant="body2" color="text.secondary">
-              Planuj przyszłe wpływy i sprawdź, kiedy pokryjesz wszystkie koszty
+              Zaplanuj przyszłe wpływy (wypłaty, przelewy, zwroty) i zobacz na wykresie kiedy zgromadzisz wystarczająco środków na pokrycie kosztów.
             </Typography>
           </Box>
           <Button
@@ -218,11 +218,10 @@ export function HarmonogramView() {
               Symulacja środków w czasie
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Wykres pokazuje prognozę dostępnych środków w czasie, uwzględniając zaplanowane wpływy.
-              Linia pomarańczowa = ile jeszcze musisz zapłacić.
+              Wykres pokazuje prognozę dostępnych środków w czasie. Kiedy niebieska linia przekroczy pomarańczową — masz wystarczająco na pokrycie wszystkich kosztów.
             </Typography>
-            <ResponsiveContainer width="100%" height={300}>
-              <AreaChart data={cashFlow} margin={{ top: 10, right: 30, left: 20, bottom: 10 }}>
+            <ResponsiveContainer width="100%" height={320}>
+              <AreaChart data={cashFlow.map(p => ({ ...p, cel: summary.pozostaloDoZaplaty }))} margin={{ top: 10, right: 30, left: 20, bottom: 10 }}>
                 <defs>
                   <linearGradient id="saldoGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor={theme.palette.primary.main} stopOpacity={0.3} />
@@ -246,7 +245,10 @@ export function HarmonogramView() {
                   fontSize={12}
                 />
                 <RechartsTooltip
-                  formatter={(value: number) => [formatCurrency(value), 'Dostępne środki']}
+                  formatter={(value: number, name: string) => [
+                    formatCurrency(value),
+                    name === 'saldo' ? 'Dostępne środki' : 'Cel (pozostało do zapłaty)',
+                  ]}
                   labelFormatter={(label: string) => formatDate(label)}
                   contentStyle={{
                     backgroundColor: theme.palette.background.paper,
@@ -257,19 +259,6 @@ export function HarmonogramView() {
                   itemStyle={{ color: theme.palette.text.primary }}
                   labelStyle={{ color: theme.palette.text.primary }}
                 />
-                {/* Reference line: Remaining costs */}
-                <ReferenceLine
-                  y={summary.pozostaloDoZaplaty}
-                  stroke={theme.palette.warning.main}
-                  strokeDasharray="5 5"
-                  strokeWidth={2}
-                  label={{
-                    value: `Pozostało: ${(summary.pozostaloDoZaplaty / 1000).toFixed(0)}k`,
-                    position: 'right',
-                    fill: theme.palette.warning.main,
-                    fontSize: 11,
-                  }}
-                />
                 {/* Zero line */}
                 <ReferenceLine
                   y={0}
@@ -277,32 +266,59 @@ export function HarmonogramView() {
                   strokeDasharray="3 3"
                   strokeOpacity={0.5}
                 />
+                {/* Target line: remaining costs */}
+                <Area
+                  type="stepAfter"
+                  dataKey="cel"
+                  stroke={theme.palette.warning.main}
+                  strokeWidth={2}
+                  strokeDasharray="6 4"
+                  fill="none"
+                  dot={false}
+                  activeDot={false}
+                  name="cel"
+                />
+                {/* Actual/projected funds */}
                 <Area
                   type="stepAfter"
                   dataKey="saldo"
                   stroke={theme.palette.primary.main}
-                  strokeWidth={2}
+                  strokeWidth={2.5}
                   fill="url(#saldoGradient)"
-                  dot={{
-                    r: 5,
-                    fill: theme.palette.primary.main,
-                    stroke: theme.palette.background.paper,
-                    strokeWidth: 2,
+                  dot={(props: { cx: number; cy: number; index: number; payload: { label: string } }) => {
+                    const { cx, cy, index, payload } = props;
+                    const isFirst = index === 0;
+                    return (
+                      <circle
+                        key={index}
+                        cx={cx}
+                        cy={cy}
+                        r={isFirst ? 7 : 5}
+                        fill={isFirst ? theme.palette.success.main : theme.palette.primary.main}
+                        stroke={theme.palette.background.paper}
+                        strokeWidth={2}
+                      />
+                    );
                   }}
                   activeDot={{ r: 7 }}
+                  name="saldo"
                 />
               </AreaChart>
             </ResponsiveContainer>
 
-            {/* Interpretation */}
+            {/* Legend */}
             <Box sx={{ mt: 2, display: 'flex', gap: 3, flexWrap: 'wrap' }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <Box sx={{ width: 16, height: 3, backgroundColor: theme.palette.primary.main, borderRadius: 1 }} />
-                <Typography variant="caption">Prognozowane środki</Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                <Box sx={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: theme.palette.success.main }} />
+                <Typography variant="caption">Aktualne środki: <strong>{formatCurrency(summary.aktualnieSrodki)}</strong></Typography>
               </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <Box sx={{ width: 16, height: 3, backgroundColor: theme.palette.warning.main, borderRadius: 1, borderStyle: 'dashed', borderWidth: 1, borderColor: theme.palette.warning.main, background: 'none' }} />
-                <Typography variant="caption">Pozostało do zapłaty</Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                <Box sx={{ width: 16, height: 3, backgroundColor: theme.palette.primary.main, borderRadius: 1 }} />
+                <Typography variant="caption">Prognozowane środki po wpływach</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                <Box sx={{ width: 16, height: 0, borderTop: `2px dashed ${theme.palette.warning.main}` }} />
+                <Typography variant="caption">Cel: <strong>{formatCurrency(summary.pozostaloDoZaplaty)}</strong> (tyle musisz zdobyć)</Typography>
               </Box>
             </Box>
 
@@ -318,7 +334,7 @@ export function HarmonogramView() {
               }}>
                 <WarningIcon sx={{ color: theme.palette.error.main, fontSize: 18 }} />
                 <Typography variant="body2" sx={{ color: theme.palette.error.main }}>
-                  Nawet po zaplanowanych wpływach brakuje {formatCurrency(Math.abs(pokrycie))} na pokrycie wszystkich kosztów.
+                  Nawet po zaplanowanych wpływach brakuje <strong>{formatCurrency(Math.abs(pokrycie))}</strong> na pokrycie wszystkich kosztów.
                 </Typography>
               </Box>
             )}
@@ -334,7 +350,7 @@ export function HarmonogramView() {
               }}>
                 <CheckIcon sx={{ color: theme.palette.success.main, fontSize: 18 }} />
                 <Typography variant="body2" sx={{ color: theme.palette.success.main }}>
-                  Po zaplanowanych wpływach wystarczy na pokrycie wszystkich kosztów (nadwyżka: {formatCurrency(pokrycie)}).
+                  Po zaplanowanych wpływach wystarczy na pokrycie kosztów (nadwyżka: <strong>{formatCurrency(pokrycie)}</strong>).
                 </Typography>
               </Box>
             )}
@@ -458,7 +474,7 @@ export function HarmonogramView() {
           {editingEntry ? 'Edytuj planowany wpływ' : 'Zaplanuj wpływ'}
         </DialogTitle>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
+          <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1, maxHeight: '70vh' }}>
             <Typography variant="body2" color="text.secondary">
               Dodaj przewidywany wpływ — np. przelew z oszczędności, wypłata, zwrot podatku.
             </Typography>

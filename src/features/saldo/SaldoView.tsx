@@ -101,9 +101,9 @@ export function SaldoView() {
       <Box sx={{ mb: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
           <Box>
-            <Typography variant="h4">Saldo</Typography>
+            <Typography variant="h4">Środki</Typography>
             <Typography variant="body2" color="text.secondary">
-              Wpływy i dostępne środki na wykończenie
+              Rejestruj wpływy pieniędzy do budżetu — wypłaty, oszczędności, zwroty. Suma pomniejszona o opłacone pozycje = aktualne środki.
             </Typography>
           </Box>
           <Button
@@ -263,7 +263,7 @@ export function SaldoView() {
           {editingEntry ? 'Edytuj wpis' : 'Dodaj wpływ'}
         </DialogTitle>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
+          <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1, maxHeight: '70vh' }}>
             <Controller
               name="data"
               control={control}

@@ -2,10 +2,12 @@ import { CostCategoryView, CostCategoryConfig, CostItem } from '@/components';
 import { useBudgetStore } from '@/store';
 
 const config: CostCategoryConfig = {
-  title: 'Prace wykończeniowe',
-  subtitle: 'Rozliczenia z ekipami i materiały — pogrupowane wg etapów',
+  title: 'Wykończenie',
+  subtitle: 'Ściany, płytki, armatura, prace ekip — pogrupowane wg etapów',
+  helpText: 'Prace wykończeniowe: malowanie, płytki, armatura, podłogi, instalacje itp. Pogrupowane wg etapów (np. Łazienka, Kuchnia, Elektryka). Kwoty to rozliczenia z ekipami i koszty materiałów.',
   groupField: 'etap',
   nameField: 'opis',
+  costField: 'kwota',
   columns: [
     { field: 'opis', label: 'Opis' },
   ],

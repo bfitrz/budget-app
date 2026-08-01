@@ -2,8 +2,9 @@ import { CostCategoryView, CostCategoryConfig, CostItem } from '@/components';
 import { useBudgetStore } from '@/store';
 
 const config: CostCategoryConfig = {
-  title: 'Pozostałe koszty',
+  title: 'Pozostałe',
   subtitle: 'Dodatkowe wydatki niepasujące do innych kategorii',
+  helpText: 'Wszystko co nie wchodzi do zakupów, wykończenia, AGD ani wyprowadzki — np. opłaty notarialne, ubezpieczenie, drobne zakupy, itp.',
   groupField: 'grupa',
   nameField: 'nazwa',
   columns: [

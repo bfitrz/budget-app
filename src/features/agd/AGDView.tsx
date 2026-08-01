@@ -2,8 +2,9 @@ import { CostCategoryView, CostCategoryConfig, CostItem } from '@/components';
 import { useBudgetStore } from '@/store';
 
 const config: CostCategoryConfig = {
-  title: 'Sprzęt AGD',
-  subtitle: 'Urządzenia domowe — pogrupowane wg producenta',
+  title: 'AGD / RTV',
+  subtitle: 'Sprzęt domowy i elektronika — pogrupowane wg producenta',
+  helpText: 'Sprzęt AGD (pralka, lodówka, zmywarka) i RTV (telewizor, soundbar). Pogrupowane wg producenta — łatwo porównać modele i ceny.',
   groupField: 'producent',
   nameField: 'nazwa',
   columns: [

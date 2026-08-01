@@ -132,7 +132,7 @@ export function AlternativesModal({ open, onClose, alternatives, onSave, itemNam
           <CloseIcon sx={{ fontSize: 16 }} />
         </IconButton>
       </DialogTitle>
-      <DialogContent sx={{ pt: 1 }}>
+      <DialogContent dividers sx={{ pt: 1, maxHeight: '70vh' }}>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           Dodaj nową alternatywę cenową{baseCena !== undefined ? ` (aktualna cena MAIN: ${formatCurrency(baseCena)})` : ''}.
         </Typography>

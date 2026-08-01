@@ -2,8 +2,9 @@ import { CostCategoryView, CostCategoryConfig, CostItem } from '@/components';
 import { useBudgetStore } from '@/store';
 
 const config: CostCategoryConfig = {
-  title: 'Przeprowadzka',
-  subtitle: 'Koszty związane z transportem i logistyką',
+  title: 'Wyprowadzka',
+  subtitle: 'Naprawy obecnego mieszkania i transport rzeczy',
+  helpText: 'Koszty związane z opuszczeniem obecnego mieszkania: naprawy (malowanie, łatanie ścian), transport mebli/rzeczy, utylizacja starych sprzętów.',
   groupField: 'grupa',
   nameField: 'nazwa',
   columns: [

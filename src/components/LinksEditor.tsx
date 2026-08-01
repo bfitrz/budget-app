@@ -85,7 +85,7 @@ export function LinksModal({ open, onClose, links, onSave, itemName }: LinksModa
           <CloseIcon sx={{ fontSize: 16 }} />
         </IconButton>
       </DialogTitle>
-      <DialogContent sx={{ pt: 1 }}>
+      <DialogContent dividers sx={{ pt: 1, maxHeight: '70vh' }}>
         {/* Existing links */}
         {localLinks.length > 0 ? (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 3 }}>

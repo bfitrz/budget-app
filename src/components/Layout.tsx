@@ -22,7 +22,7 @@ import {
   Kitchen as KitchenIcon,
   MoreHoriz as MoreIcon,
   AccountBalance as SaldoIcon,
-  FileUpload as ImportIcon,
+  SyncAlt as DataIcon,
   Menu as MenuIcon,
   Schedule as ScheduleIcon,
   Close as CloseIcon,
@@ -30,6 +30,7 @@ import {
   Check as CheckIcon,
   LocalShipping as ShippingIcon,
   StickyNote2 as NotesIcon,
+  HelpOutline as HelpIcon,
 } from '@mui/icons-material';
 import { ThemeVariant } from '@/App';
 import { StickyNotesPanel } from './StickyNotesPanel';
@@ -48,13 +49,14 @@ interface NavigationItem {
 const navigationItems: NavigationItem[] = [
   { id: 'dashboard', label: 'Podsumowanie', icon: <DashboardIcon />, section: 'Główne' },
   { id: 'saldo', label: 'Środki', icon: <SaldoIcon /> },
-  { id: 'harmonogram', label: 'Planowanie', icon: <ScheduleIcon /> },
-  { id: 'meble', label: 'Meble', icon: <ChairIcon />, section: 'Koszty' },
-  { id: 'wykonczenie', label: 'Prace', icon: <BuildIcon /> },
-  { id: 'agd', label: 'Sprzęt', icon: <KitchenIcon /> },
+  { id: 'harmonogram', label: 'Harmonogram', icon: <ScheduleIcon /> },
+  { id: 'meble', label: 'Zakupy', icon: <ChairIcon />, section: 'Koszty' },
+  { id: 'wykonczenie', label: 'Wykończenie', icon: <BuildIcon /> },
+  { id: 'agd', label: 'AGD / RTV', icon: <KitchenIcon /> },
   { id: 'pozostale', label: 'Inne', icon: <MoreIcon /> },
   { id: 'wyprowadzka', label: 'Wyprowadzka', icon: <ShippingIcon /> },
-  { id: 'import', label: 'Import danych', icon: <ImportIcon />, section: 'Ustawienia' },
+  { id: 'import', label: 'Import / Eksport', icon: <DataIcon />, section: 'Ustawienia' },
+  { id: 'guide', label: 'Przewodnik', icon: <HelpIcon /> },
 ];
 
 interface ThemeOption {

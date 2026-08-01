@@ -131,6 +131,9 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
           wykonczenie: data.wykonczenie.length > 0 ? data.wykonczenie : state.wykonczenie,
           agd: data.agd.length > 0 ? data.agd : state.agd,
           pozostale: data.pozostale.length > 0 ? data.pozostale : state.pozostale,
+          wyprowadzka: data.wyprowadzka.length > 0 ? data.wyprowadzka : state.wyprowadzka,
+          saldo: data.saldo.length > 0 ? data.saldo : state.saldo,
+          harmonogram: data.harmonogram.length > 0 ? data.harmonogram : state.harmonogram,
           isDataLoaded: true,
         };
         persistState(getStateSnapshot(newState as BudgetStore));
@@ -146,6 +149,9 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
           wykonczenie: data.wykonczenie,
           agd: data.agd,
           pozostale: data.pozostale,
+          wyprowadzka: data.wyprowadzka,
+          saldo: data.saldo,
+          harmonogram: data.harmonogram,
           isDataLoaded: true,
         };
         persistState(getStateSnapshot(newState as BudgetStore));
@@ -380,9 +386,9 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
     getCategoryCosts: (): CategoryCost[] => {
       const state = get();
       const categories: CategoryCost[] = [
-        { name: 'Meble', value: state.meble.filter((i) => i.included).reduce((sum, i) => sum + i.cena, 0) },
-        { name: 'Prace', value: state.wykonczenie.filter((i) => i.included).reduce((sum, i) => sum + i.kwota, 0) },
-        { name: 'Sprzęt', value: state.agd.filter((i) => i.included).reduce((sum, i) => sum + i.cena, 0) },
+        { name: 'Zakupy', value: state.meble.filter((i) => i.included).reduce((sum, i) => sum + i.cena, 0) },
+        { name: 'Wykończenie', value: state.wykonczenie.filter((i) => i.included).reduce((sum, i) => sum + i.kwota, 0) },
+        { name: 'AGD / RTV', value: state.agd.filter((i) => i.included).reduce((sum, i) => sum + i.cena, 0) },
         { name: 'Inne', value: state.pozostale.filter((i) => i.included).reduce((sum, i) => sum + i.cena, 0) },
         { name: 'Wyprowadzka', value: state.wyprowadzka.filter((i) => i.included).reduce((sum, i) => sum + i.cena, 0) },
       ];
@@ -413,21 +419,21 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
 
       return [
         {
-          name: 'Meble',
+          name: 'Zakupy',
           zaplacono: state.meble.filter((i) => i.included && i.status === 'Opłacone').reduce((s, i) => s + i.cena, 0),
           doZaplaty: state.meble.filter((i) => i.included && i.status === 'Do zapłaty').reduce((s, i) => s + i.cena, 0),
           minKoszt: mebleRange.minTotal,
           maxKoszt: mebleRange.maxTotal,
         },
         {
-          name: 'Prace',
+          name: 'Wykończenie',
           zaplacono: state.wykonczenie.filter((i) => i.included && i.status === 'Opłacone').reduce((s, i) => s + i.kwota, 0),
           doZaplaty: state.wykonczenie.filter((i) => i.included && i.status === 'Do zapłaty').reduce((s, i) => s + i.kwota, 0),
           minKoszt: praceRange.minTotal,
           maxKoszt: praceRange.maxTotal,
         },
         {
-          name: 'Sprzęt',
+          name: 'AGD / RTV',
           zaplacono: state.agd.filter((i) => i.included && i.status === 'Opłacone').reduce((s, i) => s + i.cena, 0),
           doZaplaty: state.agd.filter((i) => i.included && i.status === 'Do zapłaty').reduce((s, i) => s + i.cena, 0),
           minKoszt: sprzetRange.minTotal,
