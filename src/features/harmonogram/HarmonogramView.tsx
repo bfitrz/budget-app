@@ -172,6 +172,7 @@ export function HarmonogramView() {
           <Box sx={{ display: 'flex', gap: 1 }}>
             <Button
               variant="outlined"
+              size="small"
               startIcon={<ScheduleIcon />}
               onClick={() => { msReset({ data: new Date().toISOString().split('T')[0], opis: '' }); setMilestoneDialogOpen(true); }}
             >
@@ -179,6 +180,7 @@ export function HarmonogramView() {
             </Button>
             <Button
               variant="contained"
+              size="small"
               startIcon={<AddIcon />}
               onClick={openAddDialog}
             >
