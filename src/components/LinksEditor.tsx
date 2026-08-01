@@ -20,6 +20,8 @@ import {
   Delete as DeleteIcon,
   OpenInNew as OpenIcon,
   Close as CloseIcon,
+  Edit as EditIcon,
+  Check as SaveIcon,
 } from '@mui/icons-material';
 import { ItemLink } from '@/types';
 
@@ -36,11 +38,15 @@ export function LinksModal({ open, onClose, links, onSave, itemName }: LinksModa
   const [localLinks, setLocalLinks] = useState<ItemLink[]>(links);
   const [newNazwa, setNewNazwa] = useState('');
   const [newUrl, setNewUrl] = useState('');
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editNazwa, setEditNazwa] = useState('');
+  const [editUrl, setEditUrl] = useState('');
 
   const handleOpen = () => {
     setLocalLinks(links);
     setNewNazwa('');
     setNewUrl('');
+    setEditingIndex(null);
   };
 
   const handleAdd = () => {
@@ -54,6 +60,26 @@ export function LinksModal({ open, onClose, links, onSave, itemName }: LinksModa
 
   const handleRemove = (index: number) => {
     setLocalLinks(localLinks.filter((_, i) => i !== index));
+    if (editingIndex === index) setEditingIndex(null);
+  };
+
+  const handleStartEdit = (index: number) => {
+    setEditingIndex(index);
+    setEditNazwa(localLinks[index].nazwa);
+    setEditUrl(localLinks[index].url);
+  };
+
+  const handleSaveEdit = () => {
+    if (editingIndex === null) return;
+    if (!editUrl.trim()) return;
+    const url = editUrl.trim().startsWith('http') ? editUrl.trim() : `https://${editUrl.trim()}`;
+    const nazwa = editNazwa.trim() || url;
+    setLocalLinks(localLinks.map((l, i) => i === editingIndex ? { nazwa, url } : l));
+    setEditingIndex(null);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingIndex(null);
   };
 
   const handleSave = () => {
@@ -65,6 +91,16 @@ export function LinksModal({ open, onClose, links, onSave, itemName }: LinksModa
     if (e.key === 'Enter') {
       e.preventDefault();
       handleAdd();
+    }
+  };
+
+  const handleEditKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSaveEdit();
+    }
+    if (e.key === 'Escape') {
+      handleCancelEdit();
     }
   };
 
@@ -98,60 +134,114 @@ export function LinksModal({ open, onClose, links, onSave, itemName }: LinksModa
                   gap: 1.5,
                   p: 1.5,
                   borderRadius: 2,
-                  border: `1px solid ${theme.palette.divider}`,
+                  border: `1px solid ${editingIndex === index ? theme.palette.primary.main : theme.palette.divider}`,
                   transition: 'border-color 0.1s ease',
                   '&:hover': { borderColor: alpha(theme.palette.primary.main, 0.3) },
                 }}
               >
-                <LinkIcon sx={{ fontSize: 16, color: theme.palette.primary.main, flexShrink: 0 }} />
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 500,
-                      cursor: 'pointer',
-                      color: theme.palette.primary.main,
-                      '&:hover': { textDecoration: 'underline' },
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                    onClick={() => window.open(link.url, '_blank')}
-                  >
-                    {link.nazwa}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{
-                      display: 'block',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                      fontSize: '0.65rem',
-                    }}
-                  >
-                    {link.url}
-                  </Typography>
-                </Box>
-                <Tooltip title="Otwórz">
-                  <IconButton
-                    size="small"
-                    onClick={() => window.open(link.url, '_blank')}
-                    sx={{ opacity: 0.6, '&:hover': { opacity: 1 } }}
-                  >
-                    <OpenIcon sx={{ fontSize: 14 }} />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Usuń">
-                  <IconButton
-                    size="small"
-                    onClick={() => handleRemove(index)}
-                    sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.error.main } }}
-                  >
-                    <DeleteIcon sx={{ fontSize: 14 }} />
-                  </IconButton>
-                </Tooltip>
+                {editingIndex === index ? (
+                  <>
+                    <LinkIcon sx={{ fontSize: 16, color: theme.palette.primary.main, flexShrink: 0 }} />
+                    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      <TextField
+                        size="small"
+                        value={editNazwa}
+                        onChange={(e) => setEditNazwa(e.target.value)}
+                        placeholder="Nazwa"
+                        onKeyDown={handleEditKeyDown}
+                        autoFocus
+                        sx={{ '& .MuiOutlinedInput-root': { fontSize: '0.8125rem' } }}
+                      />
+                      <TextField
+                        size="small"
+                        value={editUrl}
+                        onChange={(e) => setEditUrl(e.target.value)}
+                        placeholder="https://..."
+                        onKeyDown={handleEditKeyDown}
+                        sx={{ '& .MuiOutlinedInput-root': { fontSize: '0.8125rem' } }}
+                      />
+                    </Box>
+                    <Tooltip title="Zapisz (Enter)">
+                      <IconButton
+                        size="small"
+                        onClick={handleSaveEdit}
+                        sx={{ color: theme.palette.success.main }}
+                      >
+                        <SaveIcon sx={{ fontSize: 16 }} />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Anuluj (Esc)">
+                      <IconButton
+                        size="small"
+                        onClick={handleCancelEdit}
+                        sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}
+                      >
+                        <CloseIcon sx={{ fontSize: 14 }} />
+                      </IconButton>
+                    </Tooltip>
+                  </>
+                ) : (
+                  <>
+                    <LinkIcon sx={{ fontSize: 16, color: theme.palette.primary.main, flexShrink: 0 }} />
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 500,
+                          cursor: 'pointer',
+                          color: theme.palette.primary.main,
+                          '&:hover': { textDecoration: 'underline' },
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                        onClick={() => window.open(link.url, '_blank')}
+                      >
+                        {link.nazwa}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{
+                          display: 'block',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                          fontSize: '0.65rem',
+                        }}
+                      >
+                        {link.url}
+                      </Typography>
+                    </Box>
+                    <Tooltip title="Otwórz">
+                      <IconButton
+                        size="small"
+                        onClick={() => window.open(link.url, '_blank')}
+                        sx={{ opacity: 0.6, '&:hover': { opacity: 1 } }}
+                      >
+                        <OpenIcon sx={{ fontSize: 14 }} />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Edytuj">
+                      <IconButton
+                        size="small"
+                        onClick={() => handleStartEdit(index)}
+                        sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.primary.main } }}
+                      >
+                        <EditIcon sx={{ fontSize: 14 }} />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Usuń">
+                      <IconButton
+                        size="small"
+                        onClick={() => handleRemove(index)}
+                        sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.error.main } }}
+                      >
+                        <DeleteIcon sx={{ fontSize: 14 }} />
+                      </IconButton>
+                    </Tooltip>
+                  </>
+                )}
               </Box>
             ))}
           </Box>
