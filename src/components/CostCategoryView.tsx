@@ -297,54 +297,55 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
             </Card>
 
             {/* Range card: min/max */}
-            <Card sx={{ flex: 1, minWidth: 180, background: `linear-gradient(135deg, ${alpha(theme.palette.info.main, 0.06)}, ${alpha(theme.palette.warning.main, 0.04)})`, border: `1px solid ${alpha(theme.palette.info.main, 0.12)}` }}>
+            <Card sx={{ flex: 1, minWidth: 180, background: `linear-gradient(135deg, ${alpha(theme.palette.info.main, 0.08)}, ${alpha(theme.palette.warning.main, 0.05)})`, border: `1px solid ${alpha(theme.palette.info.main, 0.15)}` }}>
               <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
                 <Typography variant="overline" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Rozpiętość kosztów</Typography>
                 {hasRange ? (
                   <>
                     <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.5, mt: 0.5 }}>
-                      <Typography variant="body1" sx={{ fontWeight: 700, color: theme.palette.success.main, fontFamily: 'monospace' }}>{formatCurrency(allPricesMin)}</Typography>
-                      <Typography variant="caption" color="text.secondary">—</Typography>
-                      <Typography variant="body1" sx={{ fontWeight: 700, color: theme.palette.warning.main, fontFamily: 'monospace' }}>{formatCurrency(allPricesMax)}</Typography>
+                      <Typography variant="h5" sx={{ fontWeight: 700, color: theme.palette.success.main }}>{formatCurrency(allPricesMin)}</Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>—</Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 600, color: theme.palette.warning.main }}>{formatCurrency(allPricesMax)}</Typography>
                     </Box>
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                      {altCount} alternatyw{altCount === 1 ? 'a' : altCount < 5 ? 'y' : ''} wpływa na zakres
-                    </Typography>
+                    <Box sx={{ mt: 1.5, mb: 0.5, height: 4, borderRadius: 2, backgroundColor: alpha(theme.palette.info.main, 0.1), overflow: 'hidden' }}>
+                      <Box sx={{ height: '100%', width: `${allPricesMax > 0 ? Math.min((totalIncluded / allPricesMax) * 100, 100) : 0}%`, borderRadius: 2, background: `linear-gradient(90deg, ${theme.palette.success.main}, ${theme.palette.warning.main})`, transition: 'width 0.5s ease' }} />
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.75 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Aktualny plan: {formatCurrency(totalIncluded)}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: theme.palette.info.main, fontWeight: 500 }}>
+                        {altCount} alt.
+                      </Typography>
+                    </Box>
                   </>
                 ) : (
                   <>
-                    <Typography variant="h6" sx={{ fontWeight: 700, mt: 0.5, fontFamily: 'monospace' }}>{formatCurrency(totalIncluded)}</Typography>
-                    <Typography variant="caption" color="text.secondary">brak alternatyw</Typography>
+                    <Typography variant="h5" sx={{ fontWeight: 700, mt: 0.5 }}>{formatCurrency(totalIncluded)}</Typography>
+                    <Box sx={{ mt: 1.5, mb: 0.5, height: 4, borderRadius: 2, backgroundColor: alpha(theme.palette.info.main, 0.1), overflow: 'hidden' }}>
+                      <Box sx={{ height: '100%', width: '100%', borderRadius: 2, background: theme.palette.info.main, opacity: 0.4 }} />
+                    </Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.75, display: 'block' }}>Brak alternatyw — stała kwota</Typography>
                   </>
                 )}
               </CardContent>
             </Card>
 
-            {/* Stats card: positions, hidden, groups */}
-            <Card sx={{ flex: 1, minWidth: 160, background: `linear-gradient(135deg, ${alpha(theme.palette.secondary.main, 0.05)}, ${alpha(theme.palette.primary.main, 0.04)})`, border: `1px solid ${alpha(theme.palette.secondary.main, 0.1)}` }}>
+            {/* Stats card */}
+            <Card sx={{ flex: 1, minWidth: 160, background: `linear-gradient(135deg, ${alpha(theme.palette.secondary.main, 0.07)}, ${alpha(theme.palette.primary.main, 0.05)})`, border: `1px solid ${alpha(theme.palette.secondary.main, 0.12)}` }}>
               <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
                 <Typography variant="overline" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Statystyki</Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mt: 0.75 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="caption" color="text.secondary">Pozycje</Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{paidCount}<Typography component="span" sx={{ opacity: 0.4 }}> / {totalCount}</Typography></Typography>
-                  </Box>
-                  {hiddenCount > 0 && (
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Typography variant="caption" color="text.secondary">Ukryte</Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: theme.palette.warning.main }}>{hiddenCount}</Typography>
-                    </Box>
-                  )}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="caption" color="text.secondary">Grupy</Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{groups.length}</Typography>
-                  </Box>
-                  {altCount > 0 && (
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Typography variant="caption" color="text.secondary">Alternatywy</Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: theme.palette.info.main }}>{altCount}</Typography>
-                    </Box>
-                  )}
+                <Typography variant="h5" sx={{ fontWeight: 700, mt: 0.5 }}>{totalCount} <Typography component="span" sx={{ fontSize: '0.9rem', opacity: 0.5 }}>poz.</Typography></Typography>
+                <Box sx={{ mt: 1.5, mb: 0.5, height: 4, borderRadius: 2, backgroundColor: alpha(theme.palette.secondary.main, 0.1), overflow: 'hidden' }}>
+                  <Box sx={{ height: '100%', width: `${totalCount > 0 ? Math.min((paidCount / totalCount) * 100, 100) : 0}%`, borderRadius: 2, background: `linear-gradient(90deg, ${theme.palette.secondary.main}, ${theme.palette.primary.main})`, transition: 'width 0.5s ease' }} />
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.75 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    {hiddenCount > 0 ? `${hiddenCount} ukrytych` : `${groups.length} grup`}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {altCount > 0 ? `${altCount} alt.` : `${paidCount} opł.`}
+                  </Typography>
                 </Box>
               </CardContent>
             </Card>
