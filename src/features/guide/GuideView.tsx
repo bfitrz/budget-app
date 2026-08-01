@@ -140,6 +140,8 @@ export function GuideView() {
         <Feature label="Wykres prognozowy" description="Niebieska linia = Twoje środki rosnące w czasie. Pomarańczowa linia = cel (ile łącznie musisz jeszcze zapłacić). Gdy niebieska przekroczy pomarańczową — masz wystarczająco." />
         <Feature label="Zielony punkt" description="Pierwszy punkt na wykresie = Twoje aktualne środki dziś." />
         <Feature label="Oznacz jako zrealizowane" description="Checkbox przy wpisie — zrealizowany wpływ przenosi się do środków." />
+        <Feature label="📌 Milestony" description="Deadline'y i ważne daty. Przycisk '📌 Milestone' → podaj datę i opis. Na wykresie pojawia się pionowa linia z bilansem." />
+        <Feature label="Bilans na milestone" description="Najedź na chip milestone pod wykresem — zobaczysz prognozowane środki, ile zostaje do zapłaty i bilans na tę datę." />
         <Tip>Niezrealizowane wpływy nie wliczają się do aktualnego salda — tylko do prognozy na wykresie.</Tip>
       </Section>
 
@@ -244,6 +246,7 @@ export function GuideView() {
         <Feature label="Status jednym kliknięciem" description="Kliknij chip statusu ('Do zapłaty' / 'Opłacone') żeby przełączyć." />
         <Feature label="Ikona ? przy tytule" description="Na stronach kosztowych — najedź żeby zobaczyć do czego służy dana zakładka." />
         <Feature label="Dane lokalne" description="Wszystko jest w localStorage przeglądarki. Wyczyszczenie danych przeglądarki = utrata danych. Rób eksport jako backup!" />
+        <Feature label="Changelog" description="Strona w menu 'Ustawienia' — pełna historia zmian i nowych funkcji w każdej wersji." />
       </Section>
     </Box>
   );

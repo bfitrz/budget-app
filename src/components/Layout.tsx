@@ -57,6 +57,7 @@ const navigationItems: NavigationItem[] = [
   { id: 'wyprowadzka', label: 'Wyprowadzka', icon: <ShippingIcon /> },
   { id: 'import', label: 'Import / Eksport', icon: <DataIcon />, section: 'Ustawienia' },
   { id: 'guide', label: 'Przewodnik', icon: <HelpIcon /> },
+  { id: 'changelog', label: 'Changelog', icon: <HelpIcon /> },
 ];
 
 interface ThemeOption {
