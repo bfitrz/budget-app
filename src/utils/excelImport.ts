@@ -24,6 +24,7 @@ interface RawMebleRow {
   Status?: string;
   Uwzględnij?: string;
   Uwagi?: string;
+  UwagiMain?: string;
   Linki?: string;
   Alternatywy?: string;
   WybranaAltId?: string;
@@ -36,6 +37,7 @@ interface RawWykonczenieRow {
   Status?: string;
   Uwzględnij?: string;
   Uwagi?: string;
+  UwagiMain?: string;
   Linki?: string;
   Alternatywy?: string;
   WybranaAltId?: string;
@@ -49,6 +51,7 @@ interface RawAGDRow {
   Status?: string;
   Uwzględnij?: string;
   Uwagi?: string;
+  UwagiMain?: string;
   Linki?: string;
   Alternatywy?: string;
   WybranaAltId?: string;
@@ -61,6 +64,7 @@ interface RawPozostaleRow {
   Status?: string;
   Uwzględnij?: string;
   Uwagi?: string;
+  UwagiMain?: string;
   Linki?: string;
   Alternatywy?: string;
   WybranaAltId?: string;
@@ -73,6 +77,7 @@ interface RawWyprowadzkaRow {
   Status?: string;
   Uwzględnij?: string;
   Uwagi?: string;
+  UwagiMain?: string;
   Linki?: string;
   Alternatywy?: string;
   WybranaAltId?: string;
@@ -185,6 +190,7 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       cena: Number(row.Cena) || 0,
       status: parseStatus(row.Status),
       uwagi: row.Uwagi || '',
+      uwagiMain: row.UwagiMain || '',
       linki: parseLinki(row.Linki),
       alternatywy: parseAlternatywy(row.Alternatywy),
       wybranaAltId: row.WybranaAltId || null,
@@ -204,6 +210,7 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       kwota: Number(row.Kwota) || 0,
       status: parseStatus(row.Status),
       uwagi: row.Uwagi || '',
+      uwagiMain: row.UwagiMain || '',
       linki: parseLinki(row.Linki),
       alternatywy: parseAlternatywy(row.Alternatywy),
       wybranaAltId: row.WybranaAltId || null,
@@ -224,6 +231,7 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       cena: Number(row.Cena) || 0,
       status: parseStatus(row.Status),
       uwagi: row.Uwagi || '',
+      uwagiMain: row.UwagiMain || '',
       linki: parseLinki(row.Linki),
       alternatywy: parseAlternatywy(row.Alternatywy),
       wybranaAltId: row.WybranaAltId || null,
@@ -243,6 +251,7 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       cena: Number(row.Cena) || 0,
       status: parseStatus(row.Status),
       uwagi: row.Uwagi || '',
+      uwagiMain: row.UwagiMain || '',
       linki: parseLinki(row.Linki),
       alternatywy: parseAlternatywy(row.Alternatywy),
       wybranaAltId: row.WybranaAltId || null,
@@ -261,6 +270,7 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       cena: Number(row.Cena) || 0,
       status: parseStatus(row.Status),
       uwagi: row.Uwagi || '',
+      uwagiMain: row.UwagiMain || '',
       linki: parseLinki(row.Linki),
       alternatywy: parseAlternatywy(row.Alternatywy),
       wybranaAltId: row.WybranaAltId || null,

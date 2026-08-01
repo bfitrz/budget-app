@@ -104,6 +104,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       linki: migrateLinki(item.linki),
       alternatywy: Array.isArray(item.alternatywy) ? item.alternatywy : [],
       wybranaAltId: (item.wybranaAltId as string) || null,
+      uwagiMain: (item.uwagiMain as string) || '',
     });
     const meble = (loaded.meble || []).map((item) => ({ ...item, ...migrateItem(item as unknown as Record<string, unknown>) }));
     const wykonczenie = (loaded.wykonczenie || []).map((item) => ({ ...item, ...migrateItem(item as unknown as Record<string, unknown>) }));

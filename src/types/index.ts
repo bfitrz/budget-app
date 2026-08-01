@@ -23,6 +23,7 @@ export interface MebleItem {
   cena: number;
   status: PaymentStatus;
   uwagi: string;
+  uwagiMain: string;
   linki: ItemLink[];
   alternatywy: AlternativeItem[];
   wybranaAltId: string | null;
@@ -36,6 +37,7 @@ export interface WykonczenieItem {
   kwota: number;
   status: PaymentStatus;
   uwagi: string;
+  uwagiMain: string;
   linki: ItemLink[];
   alternatywy: AlternativeItem[];
   wybranaAltId: string | null;
@@ -50,6 +52,7 @@ export interface AGDItem {
   cena: number;
   status: PaymentStatus;
   uwagi: string;
+  uwagiMain: string;
   linki: ItemLink[];
   alternatywy: AlternativeItem[];
   wybranaAltId: string | null;
@@ -63,6 +66,7 @@ export interface PozostaleItem {
   cena: number;
   status: PaymentStatus;
   uwagi: string;
+  uwagiMain: string;
   linki: ItemLink[];
   alternatywy: AlternativeItem[];
   wybranaAltId: string | null;
@@ -76,6 +80,7 @@ export interface WyprowadzkaItem {
   cena: number;
   status: PaymentStatus;
   uwagi: string;
+  uwagiMain: string;
   linki: ItemLink[];
   alternatywy: AlternativeItem[];
   wybranaAltId: string | null;

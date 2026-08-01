@@ -24,6 +24,7 @@ export interface CostItem {
   included: boolean;
   status: PaymentStatus;
   uwagi: string;
+  uwagiMain: string;
   linki: ItemLink[];
   alternatywy: AlternativeItem[];
   wybranaAltId: string | null;
@@ -172,7 +173,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
       updates.uwagi = formData.uwagi || '';
       updateItem(editingItem.id, updates as Partial<CostItem>);
     } else {
-      const newItem: Record<string, unknown> = { included: true, [costField]: Number(formData[costField]) || 0, status: 'Do zapłaty', uwagi: formData.uwagi || '', linki: [], alternatywy: [], wybranaAltId: null };
+      const newItem: Record<string, unknown> = { included: true, [costField]: Number(formData[costField]) || 0, status: 'Do zapłaty', uwagi: formData.uwagi || '', uwagiMain: '', linki: [], alternatywy: [], wybranaAltId: null };
       newItem[config.groupField] = formData[config.groupField];
       config.addFields.forEach(f => { newItem[f.field] = formData[f.field]; });
       addItem(newItem as Omit<CostItem, 'id'>);
@@ -495,7 +496,12 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                                       <Chip label="MAIN" size="small" sx={{ fontSize: '0.5rem', height: 16, fontWeight: 700, backgroundColor: alpha(theme.palette.success.main, 0.12), color: theme.palette.success.main }} />
                                       <Typography variant="body2" sx={{ fontSize: '0.7rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{(item[swapField] as string) || 'Główna'}</Typography>
                                       <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '0.75rem', textAlign: 'right' }}>{formatCurrencyOrDash(getCost(item))}</Typography>
-                                      <Box>
+                                      <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                                        {item.uwagiMain && (
+                                          <Tooltip title={item.uwagiMain} arrow slotProps={{ tooltip: { sx: { maxWidth: 280, fontSize: '0.75rem', lineHeight: 1.5, p: 1.5 } } }}>
+                                            <CommentIcon sx={{ fontSize: 13, color: theme.palette.warning.main, opacity: 0.7 }} />
+                                          </Tooltip>
+                                        )}
                                         {(item.linki || []).length > 0 && (
                                           <Tooltip title={<Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, py: 0.5 }}>{item.linki.map((link, li) => (<Typography key={li} variant="caption" sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} onClick={() => window.open(link.url, '_blank')}>🔗 {link.nazwa}</Typography>))}</Box>} arrow slotProps={{ tooltip: { sx: { backgroundColor: theme.palette.background.paper, color: theme.palette.text.primary, border: `1px solid ${theme.palette.divider}`, borderRadius: 1, px: 1.5, py: 1, boxShadow: '0 4px 20px rgba(0,0,0,0.15)' } }, arrow: { sx: { color: theme.palette.background.paper } } }}>
                                             <Chip label={`${item.linki.length} link${item.linki.length > 1 ? 'i' : ''}`} size="small" sx={{ fontSize: '0.55rem', height: 18, cursor: 'default', backgroundColor: alpha(theme.palette.primary.main, 0.08) }} />
@@ -534,7 +540,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                                           )}
                                         </Box>
                                         <Box sx={{ display: 'flex', gap: 0.25, justifyContent: 'flex-end' }}>
-                                          <Tooltip title="Ustaw jako MAIN"><IconButton size="small" onClick={() => { const oldMain: AlternativeItem = { id: generateId(), included: true, nazwa: (item[swapField] as string) || 'Poprzednia opcja', cena: getCost(item), linki: item.linki || [], uwagi: (item.uwagi as string) || '' }; const newAlts = [oldMain, ...(item.alternatywy || []).filter((a) => a.id !== alt.id)]; updateItem(item.id, { [swapField]: alt.nazwa, [costField]: alt.cena, linki: alt.linki || [], uwagi: alt.uwagi || '', alternatywy: newAlts } as Partial<CostItem>); }} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.success.main }, width: 20, height: 20 }}><AltIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                          <Tooltip title="Ustaw jako MAIN"><IconButton size="small" onClick={() => { const oldMain: AlternativeItem = { id: generateId(), included: true, nazwa: (item[swapField] as string) || 'Poprzednia opcja', cena: getCost(item), linki: item.linki || [], uwagi: (item.uwagiMain as string) || '' }; const newAlts = [oldMain, ...(item.alternatywy || []).filter((a) => a.id !== alt.id)]; updateItem(item.id, { [swapField]: alt.nazwa, [costField]: alt.cena, linki: alt.linki || [], uwagiMain: alt.uwagi || '', alternatywy: newAlts } as Partial<CostItem>); }} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.success.main }, width: 20, height: 20 }}><AltIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
                                           <Tooltip title="Linki"><IconButton size="small" onClick={() => setLinksAlt({ itemId: item.id, alt })} sx={{ opacity: 0.5, '&:hover': { opacity: 1 }, width: 20, height: 20 }}><LinkIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
                                           <Tooltip title="Edytuj"><IconButton size="small" onClick={() => setEditingAlt({ itemId: item.id, alt })} sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.primary.main }, width: 20, height: 20 }}><EditIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
                                           <Tooltip title="Usuń"><IconButton size="small" onClick={() => { const newAlts = (item.alternatywy || []).filter((a) => a.id !== alt.id); updateItem(item.id, { alternatywy: newAlts }); }} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.error.main }, width: 20, height: 20 }}><DeleteIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
@@ -612,9 +618,9 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
         <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2, maxHeight: '70vh' }}>
           <TextField label={swapField === config.nameField ? (config.addFields[0]?.label || 'Nazwa') : swapField.charAt(0).toUpperCase() + swapField.slice(1)} defaultValue={editingMainPrice ? (editingMainPrice[swapField] as string) : ''} onChange={(e) => { if (editingMainPrice) setEditingMainPrice({ ...editingMainPrice, [swapField]: e.target.value } as CostItem); }} fullWidth size="small" />
           <TextField label={costField === 'kwota' ? 'Kwota (PLN)' : 'Cena (PLN)'} type="number" defaultValue={editingMainPrice ? getCost(editingMainPrice) : 0} onChange={(e) => { if (editingMainPrice) setEditingMainPrice({ ...editingMainPrice, [costField]: Number(e.target.value) } as CostItem); }} fullWidth size="small" />
-          <TextField label="Uwagi" defaultValue={editingMainPrice?.uwagi || ''} onChange={(e) => { if (editingMainPrice) setEditingMainPrice({ ...editingMainPrice, uwagi: e.target.value } as CostItem); }} fullWidth size="small" multiline rows={2} />
+          <TextField label="Uwagi (MAIN)" defaultValue={editingMainPrice?.uwagiMain || ''} onChange={(e) => { if (editingMainPrice) setEditingMainPrice({ ...editingMainPrice, uwagiMain: e.target.value } as CostItem); }} fullWidth size="small" multiline rows={2} />
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2, justifyContent: 'space-between' }}><Button onClick={() => setEditingMainPrice(null)}>Zamknij</Button><Button variant="contained" onClick={() => { if (editingMainPrice) { updateItem(editingMainPrice.id, { [swapField]: editingMainPrice[swapField], [costField]: getCost(editingMainPrice), uwagi: editingMainPrice.uwagi } as Partial<CostItem>); setEditingMainPrice(null); } }}>Zapisz</Button></DialogActions>
+        <DialogActions sx={{ px: 3, pb: 2, justifyContent: 'space-between' }}><Button onClick={() => setEditingMainPrice(null)}>Zamknij</Button><Button variant="contained" onClick={() => { if (editingMainPrice) { updateItem(editingMainPrice.id, { [swapField]: editingMainPrice[swapField], [costField]: getCost(editingMainPrice), uwagiMain: editingMainPrice.uwagiMain } as Partial<CostItem>); setEditingMainPrice(null); } }}>Zapisz</Button></DialogActions>
       </Dialog>
 
       {/* Edit ALT */}
@@ -638,7 +644,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
               <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'monospace' }}>{formatCurrency(payChoiceItem ? getCost(payChoiceItem) : 0)}</Typography>
             </Box>
             {(payChoiceItem?.alternatywy || []).filter(a => a.included).map((alt) => (
-              <Box key={alt.id} onClick={() => { if (payChoiceItem) { const oldMain: AlternativeItem = { id: payChoiceItem.id + '_old', included: true, nazwa: (payChoiceItem[swapField] as string) || 'Poprzednia cena', cena: getCost(payChoiceItem), linki: payChoiceItem.linki || [], uwagi: (payChoiceItem.uwagi as string) || '' }; const newAlts = [oldMain, ...(payChoiceItem.alternatywy || []).filter(a => a.id !== alt.id)]; updateItem(payChoiceItem.id, { status: 'Opłacone', [swapField]: alt.nazwa, [costField]: alt.cena, linki: alt.linki || [], uwagi: alt.uwagi || '', alternatywy: newAlts, wybranaAltId: null } as Partial<CostItem>); setPayChoiceItem(null); } }} sx={{ p: 1.5, borderRadius: 2, cursor: 'pointer', border: `1px solid ${theme.palette.divider}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', '&:hover': { borderColor: theme.palette.info.main, backgroundColor: alpha(theme.palette.info.main, 0.04) } }}>
+              <Box key={alt.id} onClick={() => { if (payChoiceItem) { const oldMain: AlternativeItem = { id: payChoiceItem.id + '_old', included: true, nazwa: (payChoiceItem[swapField] as string) || 'Poprzednia cena', cena: getCost(payChoiceItem), linki: payChoiceItem.linki || [], uwagi: (payChoiceItem.uwagiMain as string) || '' }; const newAlts = [oldMain, ...(payChoiceItem.alternatywy || []).filter(a => a.id !== alt.id)]; updateItem(payChoiceItem.id, { status: 'Opłacone', [swapField]: alt.nazwa, [costField]: alt.cena, linki: alt.linki || [], uwagiMain: alt.uwagi || '', alternatywy: newAlts, wybranaAltId: null } as Partial<CostItem>); setPayChoiceItem(null); } }} sx={{ p: 1.5, borderRadius: 2, cursor: 'pointer', border: `1px solid ${theme.palette.divider}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', '&:hover': { borderColor: theme.palette.info.main, backgroundColor: alpha(theme.palette.info.main, 0.04) } }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><Chip label="ALT" size="small" sx={{ fontSize: '0.5rem', height: 16, fontWeight: 700, backgroundColor: alpha(theme.palette.info.main, 0.1), color: theme.palette.info.main }} /><Typography variant="body2">{alt.nazwa}</Typography></Box>
                 <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'monospace' }}>{formatCurrency(alt.cena)}</Typography>
               </Box>
@@ -728,7 +734,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         slotProps={{ paper: { sx: { minWidth: 180, borderRadius: 2, mt: 0.5 } } }}
       >
-        <MenuItem onClick={() => { if (altMenuTarget) { const { item, alt } = altMenuTarget; const oldMain: AlternativeItem = { id: generateId(), included: true, nazwa: (item[swapField] as string) || 'Poprzednia opcja', cena: getCost(item), linki: item.linki || [], uwagi: (item.uwagi as string) || '' }; const newAlts = [oldMain, ...(item.alternatywy || []).filter((a) => a.id !== alt.id)]; updateItem(item.id, { [swapField]: alt.nazwa, [costField]: alt.cena, linki: alt.linki || [], uwagi: alt.uwagi || '', alternatywy: newAlts } as Partial<CostItem>); } setAltMenuAnchor(null); setAltMenuTarget(null); }}>
+        <MenuItem onClick={() => { if (altMenuTarget) { const { item, alt } = altMenuTarget; const oldMain: AlternativeItem = { id: generateId(), included: true, nazwa: (item[swapField] as string) || 'Poprzednia opcja', cena: getCost(item), linki: item.linki || [], uwagi: (item.uwagiMain as string) || '' }; const newAlts = [oldMain, ...(item.alternatywy || []).filter((a) => a.id !== alt.id)]; updateItem(item.id, { [swapField]: alt.nazwa, [costField]: alt.cena, linki: alt.linki || [], uwagiMain: alt.uwagi || '', alternatywy: newAlts } as Partial<CostItem>); } setAltMenuAnchor(null); setAltMenuTarget(null); }}>
           <ListItemIcon><AltIcon fontSize="small" /></ListItemIcon>
           <ListItemText>Ustaw jako MAIN</ListItemText>
         </MenuItem>
