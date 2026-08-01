@@ -33,6 +33,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { useBudgetStore } from '@/store';
 import { SaldoEntry } from '@/types';
 import { formatCurrency, formatDate } from '@/utils';
+import { CurrencyField, DateField } from '@/components';
 
 interface SaldoFormData {
   data: string;
@@ -64,7 +65,7 @@ export function SaldoView() {
 
   const openAddDialog = () => {
     setEditingEntry(null);
-    reset({ data: new Date().toISOString().split('T')[0], opis: '', kwota: 0 });
+    reset({ data: '', opis: '', kwota: 0 });
     setDialogOpen(true);
   };
 
@@ -201,7 +202,9 @@ export function SaldoView() {
                   <TableRow key={entry.id}>
                     <TableCell>
                       <Typography variant="body2" color="text.secondary">
-                        {formatDate(entry.data)}
+                        {entry.data ? formatDate(entry.data) : (
+                          <Chip label="Start" size="small" sx={{ fontSize: '0.6rem', height: 18 }} variant="outlined" />
+                        )}
                       </Typography>
                     </TableCell>
                     <TableCell>
@@ -264,15 +267,11 @@ export function SaldoView() {
             <Controller
               name="data"
               control={control}
-              rules={{ required: 'Wymagane' }}
-              render={({ field, fieldState }) => (
-                <TextField
+              render={({ field }) => (
+                <DateField
                   {...field}
                   label="Data"
-                  type="date"
-                  InputLabelProps={{ shrink: true }}
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
+                  helperText="Opcjonalne — bez daty = saldo początkowe"
                   fullWidth
                 />
               )}
@@ -296,10 +295,9 @@ export function SaldoView() {
               control={control}
               rules={{ required: 'Wymagane' }}
               render={({ field, fieldState }) => (
-                <TextField
+                <CurrencyField
                   {...field}
-                  label="Kwota (PLN)"
-                  type="number"
+                  label="Kwota"
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message || 'Wartość ujemna = korekta w dół'}
                   fullWidth

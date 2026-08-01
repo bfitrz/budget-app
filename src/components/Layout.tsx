@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import {
-  AppBar,
-  Toolbar,
   Typography,
   Drawer,
   List,
@@ -13,9 +11,9 @@ import {
   useMediaQuery,
   useTheme,
   Tooltip,
-  PaletteMode,
-  Avatar,
   alpha,
+  Divider,
+  Popover,
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
@@ -26,240 +24,315 @@ import {
   AccountBalance as SaldoIcon,
   FileUpload as ImportIcon,
   Menu as MenuIcon,
-  DarkMode as DarkModeIcon,
-  LightMode as LightModeIcon,
-  Home as HomeIcon,
   Schedule as ScheduleIcon,
+  Close as CloseIcon,
+  Palette as PaletteIcon,
+  Check as CheckIcon,
+  LocalShipping as ShippingIcon,
 } from '@mui/icons-material';
+import { ThemeVariant } from '@/App';
 
-const DRAWER_WIDTH = 260;
+const DRAWER_WIDTH = 240;
 
 interface NavigationItem {
   id: string;
   label: string;
   icon: React.ReactNode;
+  section?: string;
 }
 
 const navigationItems: NavigationItem[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon /> },
-  { id: 'meble', label: 'Meble', icon: <ChairIcon /> },
-  { id: 'wykonczenie', label: 'Wykończenie', icon: <BuildIcon /> },
-  { id: 'agd', label: 'AGD', icon: <KitchenIcon /> },
-  { id: 'pozostale', label: 'Pozostałe', icon: <MoreIcon /> },
-  { id: 'saldo', label: 'Saldo', icon: <SaldoIcon /> },
-  { id: 'harmonogram', label: 'Harmonogram', icon: <ScheduleIcon /> },
-  { id: 'import', label: 'Import danych', icon: <ImportIcon /> },
+  { id: 'dashboard', label: 'Podsumowanie', icon: <DashboardIcon />, section: 'Główne' },
+  { id: 'saldo', label: 'Środki', icon: <SaldoIcon /> },
+  { id: 'harmonogram', label: 'Planowanie', icon: <ScheduleIcon /> },
+  { id: 'meble', label: 'Meble', icon: <ChairIcon />, section: 'Koszty' },
+  { id: 'wykonczenie', label: 'Prace', icon: <BuildIcon /> },
+  { id: 'agd', label: 'Sprzęt', icon: <KitchenIcon /> },
+  { id: 'pozostale', label: 'Inne', icon: <MoreIcon /> },
+  { id: 'wyprowadzka', label: 'Wyprowadzka', icon: <ShippingIcon /> },
+  { id: 'import', label: 'Import danych', icon: <ImportIcon />, section: 'Ustawienia' },
+];
+
+interface ThemeOption {
+  id: ThemeVariant;
+  label: string;
+  dot: string;
+  description: string;
+}
+
+const themeOptions: ThemeOption[] = [
+  { id: 'dark', label: 'Ciemny', dot: '#6366f1', description: 'Głęboka czerń' },
+  { id: 'dim', label: 'Stonowany', dot: '#7c8aff', description: 'Ciemny, cieplejszy' },
+  { id: 'light', label: 'Jasny', dot: '#4f46e5', description: 'Neutralny, stonowany' },
+  { id: 'unicorn', label: 'Unicorn', dot: '#e879f9', description: 'Neon candy 🦄' },
 ];
 
 interface LayoutProps {
   children: React.ReactNode;
   currentView: string;
   onViewChange: (view: string) => void;
-  themeMode: PaletteMode;
-  onToggleTheme: () => void;
+  themeVariant: ThemeVariant;
+  themeLabel: string;
+  onCycleTheme: () => void;
+  onSetTheme: (variant: ThemeVariant) => void;
 }
 
-export function Layout({ children, currentView, onViewChange, themeMode, onToggleTheme }: LayoutProps) {
+export function Layout({ children, currentView, onViewChange, themeVariant, themeLabel, onCycleTheme, onSetTheme }: LayoutProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
+  const [themeAnchor, setThemeAnchor] = useState<HTMLElement | null>(null);
 
   const handleNavClick = (viewId: string) => {
     onViewChange(viewId);
-    if (isMobile) {
-      setMobileOpen(false);
-    }
+    if (isMobile) setMobileOpen(false);
+  };
+
+  const handleSelectTheme = (variant: ThemeVariant) => {
+    onSetTheme(variant);
+    setThemeAnchor(null);
   };
 
   const drawerContent = (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Toolbar sx={{ px: 2.5, gap: 1.5 }}>
-        <Avatar
-          sx={{
-            width: 36,
-            height: 36,
-            background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-          }}
-        >
-          <HomeIcon sx={{ fontSize: 20 }} />
-        </Avatar>
-        <Box>
-          <Typography
-            variant="subtitle2"
-            sx={{ fontWeight: 700, lineHeight: 1.2 }}
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', px: 1.5, py: 2 }}>
+      {/* Brand */}
+      <Box sx={{ px: 1.5, mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <Box
+            sx={{
+              width: 28,
+              height: 28,
+              borderRadius: '8px',
+              background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
           >
-            Budżet
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            Wykończenie
+            <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#fff' }}>B</Typography>
+          </Box>
+          <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+            Budget
           </Typography>
         </Box>
-      </Toolbar>
+        {isMobile && (
+          <IconButton size="small" onClick={() => setMobileOpen(false)}>
+            <CloseIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+        )}
+      </Box>
 
-      <Box sx={{ px: 1, py: 1, flex: 1 }}>
+      {/* Navigation */}
+      <Box sx={{ flex: 1, overflow: 'auto' }}>
         <List disablePadding>
-          {navigationItems.map((item) => (
-            <ListItemButton
-              key={item.id}
-              selected={currentView === item.id}
-              onClick={() => handleNavClick(item.id)}
-              sx={{ py: 1.2, px: 2 }}
-            >
-              <ListItemIcon sx={{ minWidth: 40 }}>{item.icon}</ListItemIcon>
-              <ListItemText
-                primary={item.label}
-                primaryTypographyProps={{
-                  fontSize: '0.875rem',
-                  fontWeight: currentView === item.id ? 600 : 400,
-                }}
-              />
-            </ListItemButton>
+          {navigationItems.map((item, index) => (
+            <React.Fragment key={item.id}>
+              {item.section && index > 0 && <Divider sx={{ my: 1.5, mx: 1 }} />}
+              {item.section && (
+                <Typography
+                  variant="overline"
+                  sx={{
+                    px: 1.5,
+                    pt: item.section && index > 0 ? 1 : 0,
+                    pb: 0.5,
+                    display: 'block',
+                    color: 'text.secondary',
+                    fontSize: '0.6rem',
+                  }}
+                >
+                  {item.section}
+                </Typography>
+              )}
+              <ListItemButton
+                selected={currentView === item.id}
+                onClick={() => handleNavClick(item.id)}
+                sx={{ gap: 1.5 }}
+              >
+                <ListItemIcon sx={{ minWidth: 0, fontSize: 18 }}>
+                  {React.cloneElement(item.icon as React.ReactElement, { sx: { fontSize: 18 } })}
+                </ListItemIcon>
+                <ListItemText
+                  primary={item.label}
+                  primaryTypographyProps={{
+                    fontSize: '0.8125rem',
+                    fontWeight: currentView === item.id ? 500 : 400,
+                  }}
+                />
+              </ListItemButton>
+            </React.Fragment>
           ))}
         </List>
       </Box>
 
-      <Box
-        sx={{
-          p: 2,
-          borderTop: `1px solid ${theme.palette.divider}`,
-        }}
-      >
+      {/* Footer: theme selector */}
+      <Box sx={{ pt: 2, borderTop: `1px solid ${theme.palette.divider}` }}>
         <Box
+          onClick={(e) => setThemeAnchor(e.currentTarget)}
           sx={{
-            p: 2,
-            borderRadius: 2,
-            background: themeMode === 'dark'
-              ? 'rgba(88, 157, 246, 0.06)'
-              : 'rgba(59, 130, 246, 0.04)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5,
+            px: 1.5,
+            py: 1,
+            borderRadius: '10px',
+            cursor: 'pointer',
+            transition: 'background-color 0.1s ease',
+            '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.06) },
           }}
         >
-          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
-            Motyw
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <IconButton
-              size="small"
-              onClick={onToggleTheme}
-              sx={{
-                backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.2) },
-              }}
-            >
-              {themeMode === 'dark' ? (
-                <LightModeIcon sx={{ fontSize: 18 }} />
-              ) : (
-                <DarkModeIcon sx={{ fontSize: 18 }} />
-              )}
-            </IconButton>
-            <Typography variant="body2">
-              {themeMode === 'dark' ? 'Ciemny' : 'Jasny'}
+          <PaletteIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="caption" sx={{ fontWeight: 500, display: 'block', lineHeight: 1.3 }}>
+              {themeLabel}
             </Typography>
           </Box>
+          <Box
+            sx={{
+              width: 12,
+              height: 12,
+              borderRadius: '50%',
+              background: themeOptions.find((t) => t.id === themeVariant)?.dot || theme.palette.primary.main,
+              boxShadow: `0 0 0 2px ${alpha(themeOptions.find((t) => t.id === themeVariant)?.dot || theme.palette.primary.main, 0.3)}`,
+            }}
+          />
         </Box>
       </Box>
+
+      {/* Theme popover */}
+      <Popover
+        open={Boolean(themeAnchor)}
+        anchorEl={themeAnchor}
+        onClose={() => setThemeAnchor(null)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        slotProps={{
+          paper: {
+            sx: {
+              borderRadius: '14px',
+              border: `1px solid ${theme.palette.divider}`,
+              boxShadow: '0 12px 40px rgba(0,0,0,0.2)',
+              p: 1,
+              minWidth: 200,
+              backgroundColor: theme.palette.background.paper,
+            },
+          },
+        }}
+      >
+        <Typography variant="overline" sx={{ px: 1.5, pt: 0.5, pb: 1, display: 'block', color: 'text.secondary' }}>
+          Motyw
+        </Typography>
+        {themeOptions.map((opt) => (
+          <Box
+            key={opt.id}
+            onClick={() => handleSelectTheme(opt.id)}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.5,
+              px: 1.5,
+              py: 1,
+              borderRadius: '8px',
+              cursor: 'pointer',
+              transition: 'background-color 0.1s ease',
+              backgroundColor: themeVariant === opt.id ? alpha(theme.palette.primary.main, 0.08) : 'transparent',
+              '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.06) },
+            }}
+          >
+            <Box
+              sx={{
+                width: 16,
+                height: 16,
+                borderRadius: '50%',
+                background: opt.dot,
+                boxShadow: `0 0 0 2px ${alpha(opt.dot, 0.2)}`,
+                flexShrink: 0,
+              }}
+            />
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: 1.3 }}>
+                {opt.label}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.6rem' }}>
+                {opt.description}
+              </Typography>
+            </Box>
+            {themeVariant === opt.id && (
+              <CheckIcon sx={{ fontSize: 14, color: theme.palette.primary.main }} />
+            )}
+          </Box>
+        ))}
+      </Popover>
     </Box>
   );
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      <AppBar
-        position="fixed"
-        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        elevation={0}
-      >
-        <Toolbar>
-          {isMobile && (
-            <IconButton
-              color="inherit"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{ mr: 2 }}
-              aria-label="menu"
-            >
-              <MenuIcon />
-            </IconButton>
-          )}
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
+      {/* Mobile menu trigger */}
+      {isMobile && (
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 16,
+            left: 16,
+            zIndex: theme.zIndex.drawer + 1,
+          }}
+        >
+          <IconButton
+            onClick={() => setMobileOpen(true)}
             sx={{
-              flexGrow: 1,
-              fontWeight: 700,
-              background: themeMode === 'dark'
-                ? 'linear-gradient(90deg, #cdd3de, #589df6)'
-                : 'linear-gradient(90deg, #1e293b, #3b82f6)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              width: 36,
+              height: 36,
+              backgroundColor: theme.palette.background.paper,
+              border: `1px solid ${theme.palette.divider}`,
+              borderRadius: '10px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             }}
           >
-            Budżet Wykończenia Mieszkania
-          </Typography>
-          <Tooltip title={themeMode === 'dark' ? 'Tryb jasny' : 'Tryb ciemny'}>
-            <IconButton
-              onClick={onToggleTheme}
-              aria-label="toggle theme"
-              sx={{
-                color: theme.palette.text.primary,
-                backgroundColor: alpha(theme.palette.primary.main, 0.08),
-                '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.15) },
-              }}
-            >
-              {themeMode === 'dark' ? (
-                <LightModeIcon sx={{ fontSize: 20 }} />
-              ) : (
-                <DarkModeIcon sx={{ fontSize: 20 }} />
-              )}
-            </IconButton>
-          </Tooltip>
-        </Toolbar>
-      </AppBar>
+            <MenuIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+        </Box>
+      )}
 
+      {/* Sidebar */}
       {isMobile ? (
         <Drawer
           variant="temporary"
           open={mobileOpen}
-          onClose={handleDrawerToggle}
+          onClose={() => setMobileOpen(false)}
           ModalProps={{ keepMounted: true }}
           sx={{
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
-              width: DRAWER_WIDTH,
-            },
+            '& .MuiDrawer-paper': { width: DRAWER_WIDTH, boxSizing: 'border-box' },
           }}
         >
           {drawerContent}
         </Drawer>
       ) : (
-        <Drawer
-          variant="permanent"
+        <Box
           sx={{
             width: DRAWER_WIDTH,
             flexShrink: 0,
-            '& .MuiDrawer-paper': {
-              width: DRAWER_WIDTH,
-              boxSizing: 'border-box',
-            },
+            borderRight: `1px solid ${theme.palette.divider}`,
+            height: '100vh',
+            position: 'sticky',
+            top: 0,
+            overflowY: 'auto',
           }}
         >
           {drawerContent}
-        </Drawer>
+        </Box>
       )}
 
+      {/* Main content */}
       <Box
         component="main"
         sx={{
-          flexGrow: 1,
-          p: { xs: 2, sm: 3, md: 4 },
-          width: { md: `calc(100% - ${DRAWER_WIDTH}px)` },
-          maxWidth: '1400px',
+          flex: 1,
+          minWidth: 0,
+          px: { xs: 2, sm: 4, md: 5, lg: 6 },
+          py: { xs: 3, sm: 4, md: 5 },
+          maxWidth: '1280px',
         }}
       >
-        <Toolbar />
         {children}
       </Box>
     </Box>

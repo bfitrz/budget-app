@@ -79,6 +79,8 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       cena: Number(row.Cena) || 0,
       status: parseStatus(row.Status),
       uwagi: row.Uwagi || '',
+      linki: [],
+      alternatywy: [],
     }));
   }
 
@@ -93,6 +95,8 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       kwota: Number(row.Kwota) || 0,
       status: parseStatus(row.Status),
       uwagi: row.Uwagi || '',
+      linki: [],
+      alternatywy: [],
     }));
   }
 
@@ -108,6 +112,8 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       cena: Number(row.Cena) || 0,
       status: parseStatus(row.Status),
       uwagi: row.Uwagi || '',
+      linki: [],
+      alternatywy: [],
     }));
   }
 
@@ -117,10 +123,13 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
     result.pozostale = rows.map((row) => ({
       id: generateId(),
       included: parseIncluded(row['Uwzględnij']),
+      grupa: 'Ogólne',
       nazwa: row.Nazwa || '',
       cena: Number(row.Cena) || 0,
       status: parseStatus(row.Status),
       uwagi: row.Uwagi || '',
+      linki: [],
+      alternatywy: [],
     }));
   }
 

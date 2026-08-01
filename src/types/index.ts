@@ -1,5 +1,18 @@
 export type PaymentStatus = 'Opłacone' | 'Do zapłaty';
 
+export interface ItemLink {
+  nazwa: string;
+  url: string;
+}
+
+export interface AlternativeItem {
+  id: string;
+  nazwa: string;
+  cena: number;
+  linki: ItemLink[];
+  uwagi: string;
+}
+
 export interface MebleItem {
   id: string;
   included: boolean;
@@ -9,6 +22,8 @@ export interface MebleItem {
   cena: number;
   status: PaymentStatus;
   uwagi: string;
+  linki: ItemLink[];
+  alternatywy: AlternativeItem[];
 }
 
 export interface WykonczenieItem {
@@ -19,6 +34,8 @@ export interface WykonczenieItem {
   kwota: number;
   status: PaymentStatus;
   uwagi: string;
+  linki: ItemLink[];
+  alternatywy: AlternativeItem[];
 }
 
 export interface AGDItem {
@@ -30,15 +47,32 @@ export interface AGDItem {
   cena: number;
   status: PaymentStatus;
   uwagi: string;
+  linki: ItemLink[];
+  alternatywy: AlternativeItem[];
 }
 
 export interface PozostaleItem {
   id: string;
   included: boolean;
+  grupa: string;
   nazwa: string;
   cena: number;
   status: PaymentStatus;
   uwagi: string;
+  linki: ItemLink[];
+  alternatywy: AlternativeItem[];
+}
+
+export interface WyprowadzkaItem {
+  id: string;
+  included: boolean;
+  grupa: string;
+  nazwa: string;
+  cena: number;
+  status: PaymentStatus;
+  uwagi: string;
+  linki: ItemLink[];
+  alternatywy: AlternativeItem[];
 }
 
 export interface SaldoEntry {
@@ -61,6 +95,7 @@ export interface BudgetState {
   wykonczenie: WykonczenieItem[];
   agd: AGDItem[];
   pozostale: PozostaleItem[];
+  wyprowadzka: WyprowadzkaItem[];
   saldo: SaldoEntry[];
   harmonogram: ScheduleEntry[];
   isDataLoaded: boolean;
@@ -84,6 +119,8 @@ export interface CategoryBreakdown {
   name: string;
   zaplacono: number;
   doZaplaty: number;
+  minKoszt: number;
+  maxKoszt: number;
 }
 
 export interface CashFlowPoint {

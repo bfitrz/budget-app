@@ -30,7 +30,7 @@ import {
 import {
   Delete as DeleteIcon,
   Add as AddIcon,
-  Build as BuildIcon,
+  LocalShipping as ShippingIcon,
   Edit as EditIcon,
   SwapHoriz as AltIcon,
   ExpandMore as ExpandMoreIcon,
@@ -38,54 +38,54 @@ import {
 } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { useBudgetStore } from '@/store';
-import { WykonczenieItem, PaymentStatus } from '@/types';
+import { WyprowadzkaItem, PaymentStatus } from '@/types';
 import { formatCurrency } from '@/utils';
 import { LinksModal, LinksDisplay, AlternativesModal } from '@/components';
 
-interface WykonczenieFormData {
-  etap: string;
-  opis: string;
-  kwota: number;
+interface WyprowadzkaFormData {
+  grupa: string;
+  nazwa: string;
+  cena: number;
   status: PaymentStatus;
   uwagi: string;
 }
 
 interface GroupSummary {
   name: string;
-  items: WykonczenieItem[];
+  items: WyprowadzkaItem[];
   totalCost: number;
   paidCost: number;
   itemCount: number;
   paidCount: number;
 }
 
-export function WykonczenieView() {
+export function WyprowadzkaView() {
   const theme = useTheme();
-  const wykonczenie = useBudgetStore((s) => s.wykonczenie);
-  const updateWykonczenieItem = useBudgetStore((s) => s.updateWykonczenieItem);
-  const addWykonczenieItem = useBudgetStore((s) => s.addWykonczenieItem);
-  const deleteWykonczenieItem = useBudgetStore((s) => s.deleteWykonczenieItem);
+  const wyprowadzka = useBudgetStore((s) => s.wyprowadzka);
+  const updateWyprowadzkaItem = useBudgetStore((s) => s.updateWyprowadzkaItem);
+  const addWyprowadzkaItem = useBudgetStore((s) => s.addWyprowadzkaItem);
+  const deleteWyprowadzkaItem = useBudgetStore((s) => s.deleteWyprowadzkaItem);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [presetGroupName, setPresetGroupName] = useState<string | null>(null);
   const [linksItem, setLinksItem] = useState<any>(null);
   const [altItem, setAltItem] = useState<any>(null);
-  const [editingItem, setEditingItem] = useState<WykonczenieItem | null>(null);
+  const [editingItem, setEditingItem] = useState<WyprowadzkaItem | null>(null);
   const [groupDialogOpen, setGroupDialogOpen] = useState(false);
   const [newGroupName, setNewGroupName] = useState('');
   const [customGroups, setCustomGroups] = useState<string[]>([]);
 
-  const { control, handleSubmit, reset, setValue} = useForm<WykonczenieFormData>({
-    defaultValues: { etap: '', opis: '', kwota: 0, status: 'Do zapłaty', uwagi: '' },
+  const { control, handleSubmit, reset, setValue} = useForm<WyprowadzkaFormData>({
+    defaultValues: { grupa: '', nazwa: '', cena: 0, status: 'Do zapłaty', uwagi: '' },
   });
 
   const groups: GroupSummary[] = useMemo(() => {
-    const groupMap = new Map<string, WykonczenieItem[]>();
+    const groupMap = new Map<string, WyprowadzkaItem[]>();
     for (const g of customGroups) {
       if (!groupMap.has(g)) groupMap.set(g, []);
     }
-    for (const item of wykonczenie) {
-      const key = item.etap || 'Bez grupy';
+    for (const item of wyprowadzka) {
+      const key = item.grupa || 'Ogólne';
       const existing = groupMap.get(key) || [];
       existing.push(item);
       groupMap.set(key, existing);
@@ -95,26 +95,27 @@ export function WykonczenieView() {
       return {
         name,
         items,
-        totalCost: includedItems.reduce((s, i) => s + i.kwota, 0),
-        paidCost: includedItems.filter((i) => i.status === 'Opłacone').reduce((s, i) => s + i.kwota, 0),
+        totalCost: includedItems.reduce((s, i) => s + i.cena, 0),
+        paidCost: includedItems.filter((i) => i.status === 'Opłacone').reduce((s, i) => s + i.cena, 0),
         itemCount: items.length,
         paidCount: includedItems.filter((i) => i.status === 'Opłacone').length,
       };
     });
-  }, [wykonczenie, customGroups]);
+  }, [wyprowadzka, customGroups]);
 
   const allGroupNames = useMemo(() => {
     const names = new Set<string>();
-    for (const item of wykonczenie) { if (item.etap) names.add(item.etap); }
+    for (const item of wyprowadzka) { if (item.grupa) names.add(item.grupa); }
     for (const g of customGroups) names.add(g);
+    if (names.size === 0) names.add('Ogólne');
     return Array.from(names).sort();
-  }, [wykonczenie, customGroups]);
+  }, [wyprowadzka, customGroups]);
 
-  const onSubmit = (data: WykonczenieFormData) => {
+  const onSubmit = (data: WyprowadzkaFormData) => {
     if (editingItem) {
-      updateWykonczenieItem(editingItem.id, { etap: data.etap, opis: data.opis, kwota: Number(data.kwota), uwagi: data.uwagi });
+      updateWyprowadzkaItem(editingItem.id, { grupa: data.grupa, nazwa: data.nazwa, cena: Number(data.cena), uwagi: data.uwagi });
     } else {
-      addWykonczenieItem({ ...data, included: true, kwota: Number(data.kwota), linki: [], alternatywy: [] });
+      addWyprowadzkaItem({ ...data, included: true, cena: Number(data.cena), linki: [], alternatywy: [] });
     }
     reset();
     setEditingItem(null);
@@ -124,16 +125,16 @@ export function WykonczenieView() {
   const openAddDialog = (presetGroup?: string) => {
     setPresetGroupName(presetGroup || null);
     setEditingItem(null);
-    reset({ etap: presetGroup || '', opis: '', kwota: 0, status: 'Do zapłaty', uwagi: '' });
+    reset({ grupa: presetGroup || '', nazwa: '', cena: 0, status: 'Do zapłaty', uwagi: '' });
     setDialogOpen(true);
   };
 
-  const openEditDialog = (item: WykonczenieItem) => {
+  const openEditDialog = (item: WyprowadzkaItem) => {
     setEditingItem(item);
     setPresetGroupName(null);
-    setValue('etap', item.etap);
-    setValue('opis', item.opis);
-    setValue('kwota', item.kwota);
+    setValue('grupa', item.grupa);
+    setValue('nazwa', item.nazwa);
+    setValue('cena', item.cena);
     setValue('status', item.status);
     setValue('uwagi', item.uwagi);
     setDialogOpen(true);
@@ -147,27 +148,21 @@ export function WykonczenieView() {
     setGroupDialogOpen(false);
   };
 
-  const totalIncluded = wykonczenie.filter((i) => i.included).reduce((sum, i) => sum + i.kwota, 0);
-  const paidCount = wykonczenie.filter((i) => i.included && i.status === 'Opłacone').length;
-  const totalCount = wykonczenie.filter((i) => i.included).length;
+  const totalIncluded = wyprowadzka.filter((i) => i.included).reduce((sum, i) => sum + i.cena, 0);
+  const paidCount = wyprowadzka.filter((i) => i.included && i.status === 'Opłacone').length;
+  const totalCount = wyprowadzka.filter((i) => i.included).length;
 
   return (
     <Box>
       <Box sx={{ mb: 5 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <Box>
-            <Typography variant="h2">Prace</Typography>
-            <Typography variant="body1" color="text.secondary">
-              Etapy prac wykończeniowych i rozliczenia
-            </Typography>
+            <Typography variant="h2">Wyprowadzka</Typography>
+            <Typography variant="body1" color="text.secondary">Koszty związane z przeprowadzką</Typography>
           </Box>
           <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button variant="outlined" startIcon={<NewGroupIcon />} onClick={() => setGroupDialogOpen(true)} size="small">
-              Nowa grupa
-            </Button>
-            <Button variant="contained" startIcon={<AddIcon />} onClick={() => openAddDialog()}>
-              Dodaj pozycję
-            </Button>
+            <Button variant="outlined" startIcon={<NewGroupIcon />} onClick={() => setGroupDialogOpen(true)} size="small">Nowa grupa</Button>
+            <Button variant="contained" startIcon={<AddIcon />} onClick={() => openAddDialog()}>Dodaj pozycję</Button>
           </Box>
         </Box>
       </Box>
@@ -193,10 +188,10 @@ export function WykonczenieView() {
         </Card>
       </Box>
 
-      {wykonczenie.length === 0 && groups.length === 0 ? (
+      {wyprowadzka.length === 0 && groups.length === 0 ? (
         <Card>
           <CardContent sx={{ py: 8, textAlign: 'center' }}>
-            <BuildIcon sx={{ fontSize: 48, color: 'text.secondary', opacity: 0.3, mb: 1 }} />
+            <ShippingIcon sx={{ fontSize: 48, color: 'text.secondary', opacity: 0.3, mb: 1 }} />
             <Typography color="text.secondary">Brak pozycji. Dodaj lub zaimportuj dane.</Typography>
           </CardContent>
         </Card>
@@ -207,7 +202,7 @@ export function WykonczenieView() {
               <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ minHeight: 52, px: 2.5 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', mr: 2 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>Etap {group.name}</Typography>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>{group.name}</Typography>
                     <Chip label={`${group.itemCount} poz.`} size="small" sx={{ fontSize: '0.65rem', height: 20 }} />
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -228,8 +223,8 @@ export function WykonczenieView() {
                     <TableHead>
                       <TableRow>
                         <TableCell padding="checkbox" sx={{ width: 44 }}>Uwzgl.</TableCell>
-                        <TableCell>Opis</TableCell>
-                        <TableCell align="right">Kwota</TableCell>
+                        <TableCell>Nazwa</TableCell>
+                        <TableCell align="right">Cena</TableCell>
                         <TableCell sx={{ width: 110 }}>Status</TableCell>
                         <TableCell>Uwagi</TableCell>
                         <TableCell sx={{ width: 100 }}>Linki</TableCell>
@@ -247,27 +242,21 @@ export function WykonczenieView() {
                         group.items.map((item) => (
                           <TableRow key={item.id} sx={{ opacity: item.included ? 1 : 0.4 }}>
                             <TableCell padding="checkbox">
-                              <Checkbox checked={item.included} onChange={() => updateWykonczenieItem(item.id, { included: !item.included })} size="small" />
+                              <Checkbox checked={item.included} onChange={() => updateWyprowadzkaItem(item.id, { included: !item.included })} size="small" />
                             </TableCell>
-                            <TableCell><Typography variant="body2">{item.opis}</Typography></TableCell>
+                            <TableCell><Typography variant="body2" sx={{ fontWeight: 500 }}>{item.nazwa}</Typography></TableCell>
                             <TableCell align="right">
-                              <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace' }}>{formatCurrency(item.kwota)}</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace' }}>{formatCurrency(item.cena)}</Typography>
                             </TableCell>
                             <TableCell>
                               <Chip
-                                label={item.status}
-                                size="small"
-                                sx={{
-                                  fontWeight: 600, fontSize: '0.65rem', cursor: 'pointer',
-                                  backgroundColor: item.status === 'Opłacone' ? alpha(theme.palette.success.main, 0.12) : alpha(theme.palette.warning.main, 0.12),
-                                  color: item.status === 'Opłacone' ? theme.palette.success.main : theme.palette.warning.main,
-                                  border: 'none',
-                                }}
-                                onClick={() => updateWykonczenieItem(item.id, { status: item.status === 'Opłacone' ? 'Do zapłaty' : 'Opłacone' })}
+                                label={item.status} size="small"
+                                sx={{ fontWeight: 600, fontSize: '0.65rem', cursor: 'pointer', backgroundColor: item.status === 'Opłacone' ? alpha(theme.palette.success.main, 0.12) : alpha(theme.palette.warning.main, 0.12), color: item.status === 'Opłacone' ? theme.palette.success.main : theme.palette.warning.main, border: 'none' }}
+                                onClick={() => updateWyprowadzkaItem(item.id, { status: item.status === 'Opłacone' ? 'Do zapłaty' : 'Opłacone' })}
                               />
                             </TableCell>
                             <TableCell>
-                              <TextField size="small" value={item.uwagi} onChange={(e) => updateWykonczenieItem(item.id, { uwagi: e.target.value })} placeholder="..." variant="standard" sx={{ '& .MuiInput-root': { fontSize: '0.8rem' } }} />
+                              <TextField size="small" value={item.uwagi} onChange={(e) => updateWyprowadzkaItem(item.id, { uwagi: e.target.value })} placeholder="..." variant="standard" sx={{ '& .MuiInput-root': { fontSize: '0.8rem' } }} />
                             </TableCell>
                             <TableCell>
                               <LinksDisplay links={item.linki || []} onManage={() => setLinksItem(item)} />
@@ -276,7 +265,7 @@ export function WykonczenieView() {
                               <Box sx={{ display: 'flex', gap: 0.5 }}>
                                 <Tooltip title="Edytuj"><IconButton size="small" onClick={() => openEditDialog(item)} sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.primary.main } }}><EditIcon fontSize="small" /></IconButton></Tooltip>
                                 <Tooltip title="Alternatywy"><IconButton size="small" onClick={() => setAltItem(item)} sx={{ opacity: (item.alternatywy?.length || 0) > 0 ? 0.8 : 0.4, "&:hover": { opacity: 1, color: theme.palette.info.main }, color: (item.alternatywy?.length || 0) > 0 ? theme.palette.info.main : undefined }}><AltIcon sx={{ fontSize: 15 }} /></IconButton></Tooltip>
-                                <Tooltip title="Usuń"><IconButton size="small" onClick={() => deleteWykonczenieItem(item.id)} sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.error.main } }}><DeleteIcon fontSize="small" /></IconButton></Tooltip>
+                                <Tooltip title="Usuń"><IconButton size="small" onClick={() => deleteWyprowadzkaItem(item.id)} sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.error.main } }}><DeleteIcon fontSize="small" /></IconButton></Tooltip>
                               </Box>
                             </TableCell>
                           </TableRow>
@@ -285,6 +274,7 @@ export function WykonczenieView() {
                     </TableBody>
                   </Table>
                 </TableContainer>
+                {/* Group footer with add button */}
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 2.5, py: 1.5, borderTop: `1px solid ${theme.palette.divider}` }}>
                   <Button size="small" startIcon={<AddIcon />} onClick={() => openAddDialog(group.name)} sx={{ fontSize: '0.75rem', opacity: 0.7, '&:hover': { opacity: 1 } }}>
                     Dodaj do "{group.name}"
@@ -302,32 +292,23 @@ export function WykonczenieView() {
 
       {/* Add/Edit dialog */}
       <Dialog open={dialogOpen} onClose={() => { setDialogOpen(false); setEditingItem(null); }} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontWeight: 600 }}>{editingItem ? 'Edytuj pozycję — Prace' : 'Dodaj pozycję — Prace'}</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 600 }}>{editingItem ? 'Edytuj pozycję — Wyprowadzka' : 'Dodaj pozycję — Wyprowadzka'}</DialogTitle>
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
             {!presetGroupName && (
-              <Controller
-                name="etap"
-                control={control}
-                rules={{ required: 'Wymagane' }}
+              <Controller name="grupa" control={control} rules={{ required: 'Wymagane' }}
                 render={({ field, fieldState }) => (
-                  <Autocomplete
-                    freeSolo
-                    options={allGroupNames}
-                    value={field.value}
-                    onInputChange={(_, value) => field.onChange(value)}
-                    renderInput={(params) => (
-                      <TextField {...params} label="Grupa (etap)" error={!!fieldState.error} helperText={fieldState.error?.message || 'Wybierz istniejącą lub wpisz nową'} />
-                    )}
+                  <Autocomplete freeSolo options={allGroupNames} value={field.value} onInputChange={(_, value) => field.onChange(value)}
+                    renderInput={(params) => <TextField {...params} label="Grupa" error={!!fieldState.error} helperText={fieldState.error?.message || 'Wybierz lub wpisz nową'} />}
                   />
                 )}
               />
             )}
-            <Controller name="opis" control={control} rules={{ required: 'Wymagane' }}
-              render={({ field, fieldState }) => <TextField {...field} label="Opis" error={!!fieldState.error} helperText={fieldState.error?.message} fullWidth />}
+            <Controller name="nazwa" control={control} rules={{ required: 'Wymagane' }}
+              render={({ field, fieldState }) => <TextField {...field} label="Nazwa" error={!!fieldState.error} helperText={fieldState.error?.message} fullWidth />}
             />
-            <Controller name="kwota" control={control} rules={{ required: 'Wymagane', min: { value: 0, message: 'Min 0' } }}
-              render={({ field, fieldState }) => <TextField {...field} label="Kwota (PLN)" type="number" error={!!fieldState.error} helperText={fieldState.error?.message} fullWidth />}
+            <Controller name="cena" control={control} rules={{ required: 'Wymagane', min: { value: 0, message: 'Min 0' } }}
+              render={({ field, fieldState }) => <TextField {...field} label="Cena (PLN)" type="number" error={!!fieldState.error} helperText={fieldState.error?.message} fullWidth />}
             />
             <Controller name="uwagi" control={control}
               render={({ field }) => <TextField {...field} label="Uwagi" fullWidth multiline rows={2} />}
@@ -344,8 +325,8 @@ export function WykonczenieView() {
       <Dialog open={groupDialogOpen} onClose={() => setGroupDialogOpen(false)} maxWidth="xs" fullWidth>
         <DialogTitle sx={{ fontWeight: 600 }}>Nowa grupa</DialogTitle>
         <DialogContent sx={{ pt: 1 }}>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>Utwórz nową grupę (np. etap prac).</Typography>
-          <TextField label="Nazwa grupy" value={newGroupName} onChange={(e) => setNewGroupName(e.target.value)} placeholder="np. Instalacje, Malowanie..." fullWidth autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddGroup(); } }} />
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>Utwórz nową grupę dla pozostałych kosztów.</Typography>
+          <TextField label="Nazwa grupy" value={newGroupName} onChange={(e) => setNewGroupName(e.target.value)} placeholder="np. Firma przeprowadzkowa, Pakowanie..." fullWidth autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddGroup(); } }} />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2.5 }}>
           <Button onClick={() => setGroupDialogOpen(false)}>Anuluj</Button>
@@ -360,11 +341,11 @@ export function WykonczenieView() {
         onClose={() => setAltItem(null)}
         alternatives={altItem?.alternatywy || []}
         onSave={(alternatywy) => {
-          if (altItem) updateWykonczenieItem(altItem.id, { alternatywy });
+          if (altItem) updateWyprowadzkaItem(altItem.id, { alternatywy });
           setAltItem(null);
         }}
-        itemName={altItem?.opis}
-        baseCena={altItem?.kwota}
+        itemName={altItem?.nazwa}
+        baseCena={altItem?.cena}
       />
       {/* Links modal */}
       <LinksModal
@@ -372,10 +353,10 @@ export function WykonczenieView() {
         onClose={() => setLinksItem(null)}
         links={linksItem?.linki || []}
         onSave={(linki) => {
-          if (linksItem) updateWykonczenieItem(linksItem.id, { linki });
+          if (linksItem) updateWyprowadzkaItem(linksItem.id, { linki });
           setLinksItem(null);
         }}
-        itemName={linksItem?.opis}
+        itemName={linksItem?.nazwa}
       />
     </Box>
   );

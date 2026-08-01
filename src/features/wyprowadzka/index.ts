@@ -1,0 +1,1 @@
+export { WyprowadzkaView } from './WyprowadzkaView';

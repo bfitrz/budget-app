@@ -9,14 +9,16 @@ import {
   CircularProgress,
   alpha,
   useTheme,
+  Divider,
 } from '@mui/material';
 import {
   FileUpload as UploadIcon,
   CloudUpload as CloudIcon,
   CheckCircle as CheckIcon,
+  FileDownload as DownloadIcon,
 } from '@mui/icons-material';
 import { useBudgetStore } from '@/store';
-import { importExcelFile } from '@/utils';
+import { importExcelFile, exportToExcel } from '@/utils';
 
 export function ImportView() {
   const theme = useTheme();
@@ -215,6 +217,28 @@ export function ImportView() {
           </Box>
         </CardContent>
       </Card>
+
+      {/* Export section */}
+      {isDataLoaded && (
+        <Card sx={{ maxWidth: 640, mt: 3 }}>
+          <CardContent sx={{ p: 4 }}>
+            <Typography variant="h6" sx={{ mb: 1 }}>Eksport danych</Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Wyeksportuj aktualne dane do pliku Excel (.xlsx) w formacie kompatybilnym z importem.
+            </Typography>
+            <Button
+              variant="outlined"
+              startIcon={<DownloadIcon />}
+              onClick={() => {
+                const state = useBudgetStore.getState();
+                exportToExcel(state);
+              }}
+            >
+              Pobierz plik .xlsx
+            </Button>
+          </CardContent>
+        </Card>
+      )}
     </Box>
   );
 }

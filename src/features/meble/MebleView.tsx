@@ -34,11 +34,14 @@ import {
   ExpandMore as ExpandMoreIcon,
   CreateNewFolder as NewGroupIcon,
   Edit as EditIcon,
+  SwapHoriz as AltIcon,
 } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { useBudgetStore } from '@/store';
 import { MebleItem, PaymentStatus } from '@/types';
 import { formatCurrency } from '@/utils';
+import { LinksModal, LinksDisplay } from '@/components';
+import { AlternativesModal } from '@/components';
 
 interface MebleFormData {
   pomieszczenie: string;
@@ -67,11 +70,14 @@ export function MebleView() {
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MebleItem | null>(null);
+  const [presetGroupName, setPresetGroupName] = useState<string | null>(null);
+  const [linksItem, setLinksItem] = useState<MebleItem | null>(null);
+  const [altItem, setAltItem] = useState<MebleItem | null>(null);
   const [groupDialogOpen, setGroupDialogOpen] = useState(false);
   const [newGroupName, setNewGroupName] = useState('');
   const [customGroups, setCustomGroups] = useState<string[]>([]);
 
-  const { control, handleSubmit, reset, setValue } = useForm<MebleFormData>({
+  const { control, handleSubmit, reset, setValue} = useForm<MebleFormData>({
     defaultValues: {
       pomieszczenie: '',
       kategoria: '',
@@ -143,6 +149,8 @@ export function MebleView() {
         ...data,
         included: true,
         cena: Number(data.cena),
+        linki: [],
+        alternatywy: [],
       });
     }
     reset();
@@ -150,14 +158,16 @@ export function MebleView() {
     setDialogOpen(false);
   };
 
-  const openAddDialog = () => {
+  const openAddDialog = (presetGroup?: string) => {
     setEditingItem(null);
-    reset({ pomieszczenie: '', kategoria: '', nazwa: '', cena: 0, status: 'Do zapłaty', uwagi: '' });
+    setPresetGroupName(presetGroup || null);
+    reset({ pomieszczenie: presetGroup || '', kategoria: '', nazwa: '', cena: 0, status: 'Do zapłaty', uwagi: '' });
     setDialogOpen(true);
   };
 
   const openEditDialog = (item: MebleItem) => {
     setEditingItem(item);
+    setPresetGroupName(null);
     setValue('pomieszczenie', item.pomieszczenie);
     setValue('kategoria', item.kategoria);
     setValue('nazwa', item.nazwa);
@@ -201,7 +211,7 @@ export function MebleView() {
             <Button
               variant="contained"
               startIcon={<AddIcon />}
-              onClick={openAddDialog}
+              onClick={() => openAddDialog()}
             >
               Dodaj pozycję
             </Button>
@@ -319,13 +329,14 @@ export function MebleView() {
                         <TableCell align="right">Cena</TableCell>
                         <TableCell sx={{ width: 120 }}>Status</TableCell>
                         <TableCell>Uwagi</TableCell>
+                        <TableCell sx={{ width: 100 }}>Linki</TableCell>
                         <TableCell sx={{ width: 80 }}></TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {group.items.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={7} sx={{ py: 3 }}>
+                          <TableCell colSpan={8} sx={{ py: 3 }}>
                             <Typography variant="body2" color="text.secondary" align="center">
                               Brak pozycji w tej grupie. Dodaj pozycję z pomieszczeniem "{group.name}".
                             </Typography>
@@ -393,6 +404,9 @@ export function MebleView() {
                               />
                             </TableCell>
                             <TableCell>
+                              <LinksDisplay links={item.linki || []} onManage={() => setLinksItem(item)} />
+                            </TableCell>
+                            <TableCell>
                               <Box sx={{ display: 'flex', gap: 0.5 }}>
                                 <Tooltip title="Edytuj">
                                   <IconButton
@@ -401,6 +415,19 @@ export function MebleView() {
                                     sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.primary.main } }}
                                   >
                                     <EditIcon fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                                <Tooltip title={`Alternatywy (${item.alternatywy?.length || 0})`}>
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => setAltItem(item)}
+                                    sx={{
+                                      opacity: (item.alternatywy?.length || 0) > 0 ? 0.8 : 0.4,
+                                      '&:hover': { opacity: 1, color: theme.palette.info.main },
+                                      color: (item.alternatywy?.length || 0) > 0 ? theme.palette.info.main : undefined,
+                                    }}
+                                  >
+                                    <AltIcon sx={{ fontSize: 15 }} />
                                   </IconButton>
                                 </Tooltip>
                                 <Tooltip title="Usuń">
@@ -424,23 +451,25 @@ export function MebleView() {
                 <Box
                   sx={{
                     display: 'flex',
-                    justifyContent: 'flex-end',
-                    gap: 3,
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
                     px: 2,
                     py: 1.5,
                     borderTop: `1px solid ${theme.palette.divider}`,
                     backgroundColor: alpha(theme.palette.background.default, 0.5),
                   }}
                 >
-                  <Typography variant="caption" color="text.secondary">
-                    Opłacone: <strong>{formatCurrency(group.paidCost)}</strong>
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Do zapłaty: <strong>{formatCurrency(group.totalCost - group.paidCost)}</strong>
-                  </Typography>
-                  <Typography variant="caption" sx={{ fontWeight: 700 }}>
-                    Razem: {formatCurrency(group.totalCost)}
-                  </Typography>
+                  <Button size="small" startIcon={<AddIcon />} onClick={() => openAddDialog(group.name)} sx={{ fontSize: '0.75rem', opacity: 0.7, '&:hover': { opacity: 1 } }}>
+                    Dodaj do "{group.name}"
+                  </Button>
+                  <Box sx={{ display: 'flex', gap: 3 }}>
+                    <Typography variant="caption" color="text.secondary">
+                      Opłacone: <strong>{formatCurrency(group.paidCost)}</strong>
+                    </Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                      Razem: {formatCurrency(group.totalCost)}
+                    </Typography>
+                  </Box>
                 </Box>
               </AccordionDetails>
             </Accordion>
@@ -455,27 +484,29 @@ export function MebleView() {
         </DialogTitle>
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
-            <Controller
-              name="pomieszczenie"
-              control={control}
-              rules={{ required: 'Wymagane' }}
-              render={({ field, fieldState }) => (
-                <Autocomplete
-                  freeSolo
-                  options={allGroupNames}
-                  value={field.value}
-                  onInputChange={(_, value) => field.onChange(value)}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Grupa (pomieszczenie)"
-                      error={!!fieldState.error}
-                      helperText={fieldState.error?.message || 'Wybierz istniejącą lub wpisz nową'}
-                    />
-                  )}
-                />
-              )}
-            />
+            {!presetGroupName && (
+              <Controller
+                name="pomieszczenie"
+                control={control}
+                rules={{ required: 'Wymagane' }}
+                render={({ field, fieldState }) => (
+                  <Autocomplete
+                    freeSolo
+                    options={allGroupNames}
+                    value={field.value}
+                    onInputChange={(_, value) => field.onChange(value)}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Grupa (pomieszczenie)"
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message || 'Wybierz istniejącą lub wpisz nową'}
+                      />
+                    )}
+                  />
+                )}
+              />
+            )}
             <Controller
               name="kategoria"
               control={control}
@@ -569,6 +600,31 @@ export function MebleView() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Links modal */}
+      <LinksModal
+        open={!!linksItem}
+        onClose={() => setLinksItem(null)}
+        links={linksItem?.linki || []}
+        onSave={(linki) => {
+          if (linksItem) updateMebleItem(linksItem.id, { linki });
+          setLinksItem(null);
+        }}
+        itemName={linksItem?.nazwa}
+      />
+
+      {/* Alternatives modal */}
+      <AlternativesModal
+        open={!!altItem}
+        onClose={() => setAltItem(null)}
+        alternatives={altItem?.alternatywy || []}
+        onSave={(alternatywy) => {
+          if (altItem) updateMebleItem(altItem.id, { alternatywy });
+          setAltItem(null);
+        }}
+        itemName={altItem?.nazwa}
+        baseCena={altItem?.cena}
+      />
     </Box>
   );
 }

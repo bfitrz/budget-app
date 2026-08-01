@@ -46,6 +46,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { useBudgetStore } from '@/store';
 import { ScheduleEntry } from '@/types';
 import { formatCurrency, formatDate } from '@/utils';
+import { CurrencyField, DateField } from '@/components';
 
 interface ScheduleFormData {
   data: string;
@@ -463,11 +464,9 @@ export function HarmonogramView() {
               control={control}
               rules={{ required: 'Wymagane' }}
               render={({ field, fieldState }) => (
-                <TextField
+                <DateField
                   {...field}
                   label="Planowana data wpływu"
-                  type="date"
-                  InputLabelProps={{ shrink: true }}
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
                   fullWidth
@@ -494,10 +493,9 @@ export function HarmonogramView() {
               control={control}
               rules={{ required: 'Wymagane', min: { value: 1, message: 'Min 1 zł' } }}
               render={({ field, fieldState }) => (
-                <TextField
+                <CurrencyField
                   {...field}
-                  label="Kwota wpływu (PLN)"
-                  type="number"
+                  label="Kwota wpływu"
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
                   fullWidth
