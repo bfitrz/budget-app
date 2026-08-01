@@ -203,12 +203,11 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
     if (!editingGroupName) return;
     const { oldName, newName } = editingGroupName;
     if (newName.trim() && newName.trim() !== oldName) {
-      // Rename group on all items
-      for (const item of items) {
-        if ((item[config.groupField] as string) === oldName) {
-          updateItem(item.id, { [config.groupField]: newName.trim() } as Partial<CostItem>);
-        }
-      }
+      // Rename group on all items - collect IDs first then update
+      const itemsToUpdate = items.filter(item => (item[config.groupField] as string) === oldName);
+      itemsToUpdate.forEach(item => {
+        updateItem(item.id, { [config.groupField]: newName.trim() } as Partial<CostItem>);
+      });
       // Update disabledGroups
       setDisabledGroups(prev => {
         const next = new Set(prev);
@@ -807,7 +806,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
       {/* Rename group */}
       <Dialog open={!!editingGroupName} onClose={() => setEditingGroupName(null)} maxWidth="xs" fullWidth>
         <DialogTitle sx={{ fontWeight: 600 }}>Zmień nazwę grupy</DialogTitle>
-        <DialogContent dividers sx={{ pt: 1, maxHeight: '70vh' }}>
+        <DialogContent dividers sx={{ pt: 2, maxHeight: '70vh' }}>
           <TextField
             label="Nowa nazwa"
             value={editingGroupName?.newName || ''}
