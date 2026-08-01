@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { Layout } from '@/components';
 import { DashboardView } from '@/features/dashboard';
@@ -29,11 +29,41 @@ function getStoredTheme(): ThemeVariant {
 
 const THEME_ORDER: ThemeVariant[] = ['dark', 'dim', 'light', 'unicorn'];
 
+const VALID_VIEWS = ['dashboard', 'meble', 'wykonczenie', 'agd', 'pozostale', 'wyprowadzka', 'saldo', 'harmonogram', 'import'] as const;
+type ViewId = typeof VALID_VIEWS[number];
+
+function getViewFromHash(): ViewId | null {
+  const hash = window.location.hash.replace('#/', '').replace('#', '');
+  if (VALID_VIEWS.includes(hash as ViewId)) return hash as ViewId;
+  return null;
+}
+
 function App() {
   const isDataLoaded = useBudgetStore((s) => s.isDataLoaded);
-  const [currentView, setCurrentView] = useState(() => {
+  const [currentView, setCurrentView] = useState<string>(() => {
+    const hashView = getViewFromHash();
+    if (hashView) return hashView;
     return isDataLoaded ? 'dashboard' : 'import';
   });
+
+  const navigateTo = useCallback((view: string) => {
+    setCurrentView(view);
+    window.location.hash = `#/${view}`;
+  }, []);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hashView = getViewFromHash();
+      if (hashView) setCurrentView(hashView);
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    // Set initial hash if empty
+    if (!window.location.hash) {
+      window.location.hash = `#/${isDataLoaded ? 'dashboard' : 'import'}`;
+    }
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [isDataLoaded]);
+
   const [themeVariant, setThemeVariant] = useState<ThemeVariant>(getStoredTheme);
 
   const setTheme = (variant: ThemeVariant) => {
@@ -255,7 +285,7 @@ function App() {
       <CssBaseline />
       <Layout
         currentView={currentView}
-        onViewChange={setCurrentView}
+        onViewChange={navigateTo}
         themeVariant={themeVariant}
         themeLabel={THEME_LABELS[themeVariant]}
         onCycleTheme={cycleTheme}
