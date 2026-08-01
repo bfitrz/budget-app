@@ -166,16 +166,6 @@ export function AlternativesModal({ open, onClose, alternatives, onSave, itemNam
               <IconButton size="small" onClick={handleAddLink} disabled={!newLinkUrl.trim()} color="primary"><AddIcon sx={{ fontSize: 16 }} /></IconButton>
             </Box>
           </Box>
-
-          <Button
-            variant="contained"
-            size="small"
-            onClick={handleAddAlt}
-            disabled={!formNazwa.trim()}
-            sx={{ alignSelf: 'flex-start', mt: 0.5 }}
-          >
-            Dodaj
-          </Button>
         </Box>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2.5, justifyContent: 'space-between' }}>
