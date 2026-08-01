@@ -257,42 +257,100 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
       </Box>
 
       {/* Summary cards */}
-      <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
-        <Card sx={{ flex: 1.5, minWidth: 240, background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)}, ${alpha(theme.palette.success.main, 0.05)})`, border: `1px solid ${alpha(theme.palette.primary.main, 0.15)}` }}>
-          <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
-            <Typography variant="overline" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Opłacone / Suma</Typography>
-            <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.75, mt: 0.5 }}>
-              <Typography variant="h5" sx={{ fontWeight: 700, color: theme.palette.success.main }}>{formatCurrency(paidTotal)}</Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>/</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 600, opacity: 0.7 }}>{formatCurrency(totalIncluded)}</Typography>
-            </Box>
-            <Box sx={{ mt: 1.5, mb: 0.5, height: 4, borderRadius: 2, backgroundColor: alpha(theme.palette.primary.main, 0.1), overflow: 'hidden' }}>
-              <Box sx={{ height: '100%', width: `${totalIncluded > 0 ? Math.min((paidTotal / totalIncluded) * 100, 100) : 0}%`, borderRadius: 2, background: `linear-gradient(90deg, ${theme.palette.success.main}, ${theme.palette.primary.main})`, transition: 'width 0.5s ease' }} />
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.75 }}>
-              <Typography variant="caption" sx={{ color: theme.palette.warning.main, fontWeight: 500 }}>
-                Zostało {formatCurrency(remainingTotal)}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {totalIncluded > 0 ? `${Math.round((paidTotal / totalIncluded) * 100)}%` : '0%'}
-              </Typography>
-            </Box>
-          </CardContent>
-        </Card>
-        <Card sx={{ flex: 1, minWidth: 160 }}>
-          <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
-            <Typography variant="overline" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Pozycje</Typography>
-            <Typography variant="h5" sx={{ fontWeight: 700, mt: 0.5 }}>{paidCount}<Typography component="span" sx={{ fontWeight: 400, opacity: 0.5, fontSize: '1rem' }}> / {totalCount}</Typography></Typography>
-            <Typography variant="caption" color="text.secondary">opłaconych</Typography>
-          </CardContent>
-        </Card>
-        <Card sx={{ flex: 1, minWidth: 120 }}>
-          <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
-            <Typography variant="overline" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Grupy</Typography>
-            <Typography variant="h5" sx={{ fontWeight: 700, mt: 0.5 }}>{groups.length}</Typography>
-          </CardContent>
-        </Card>
-      </Box>
+      {(() => {
+        const activeItems = items.filter((i) => { const grp = (i[config.groupField] as string) || 'Bez grupy'; return i.included && !disabledGroups.has(grp); });
+        const hiddenCount = items.length - activeItems.length;
+        const altCount = items.reduce((s, i) => s + (i.alternatywy || []).length, 0);
+        const allPricesMin = activeItems.reduce((s, i) => {
+          const prices = [getCost(i), ...(i.alternatywy || []).filter(a => a.included).map(a => a.cena)];
+          return s + Math.min(...prices);
+        }, 0);
+        const allPricesMax = activeItems.reduce((s, i) => {
+          const prices = [getCost(i), ...(i.alternatywy || []).filter(a => a.included).map(a => a.cena)];
+          return s + Math.max(...prices);
+        }, 0);
+        const hasRange = allPricesMin !== allPricesMax;
+
+        return (
+          <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
+            {/* Main card: paid / total */}
+            <Card sx={{ flex: 1.5, minWidth: 260, background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)}, ${alpha(theme.palette.success.main, 0.05)})`, border: `1px solid ${alpha(theme.palette.primary.main, 0.15)}` }}>
+              <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
+                <Typography variant="overline" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Opłacone / Suma</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.75, mt: 0.5 }}>
+                  <Typography variant="h5" sx={{ fontWeight: 700, color: theme.palette.success.main }}>{formatCurrency(paidTotal)}</Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>/</Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 600, opacity: 0.7 }}>{formatCurrency(totalIncluded)}</Typography>
+                </Box>
+                <Box sx={{ mt: 1.5, mb: 0.5, height: 4, borderRadius: 2, backgroundColor: alpha(theme.palette.primary.main, 0.1), overflow: 'hidden' }}>
+                  <Box sx={{ height: '100%', width: `${totalIncluded > 0 ? Math.min((paidTotal / totalIncluded) * 100, 100) : 0}%`, borderRadius: 2, background: `linear-gradient(90deg, ${theme.palette.success.main}, ${theme.palette.primary.main})`, transition: 'width 0.5s ease' }} />
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.75 }}>
+                  <Typography variant="caption" sx={{ color: theme.palette.warning.main, fontWeight: 500 }}>
+                    Zostało {formatCurrency(remainingTotal)}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {totalIncluded > 0 ? `${Math.round((paidTotal / totalIncluded) * 100)}%` : '0%'}
+                  </Typography>
+                </Box>
+              </CardContent>
+            </Card>
+
+            {/* Range card: min/max */}
+            <Card sx={{ flex: 1, minWidth: 180, background: hasRange ? `linear-gradient(135deg, ${alpha(theme.palette.info.main, 0.06)}, ${alpha(theme.palette.warning.main, 0.04)})` : undefined, border: hasRange ? `1px solid ${alpha(theme.palette.info.main, 0.12)}` : undefined }}>
+              <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
+                <Typography variant="overline" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Rozpiętość kosztów</Typography>
+                {hasRange ? (
+                  <>
+                    <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.5, mt: 0.5 }}>
+                      <Typography variant="body1" sx={{ fontWeight: 700, color: theme.palette.success.main, fontFamily: 'monospace' }}>{formatCurrency(allPricesMin)}</Typography>
+                      <Typography variant="caption" color="text.secondary">—</Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 700, color: theme.palette.warning.main, fontFamily: 'monospace' }}>{formatCurrency(allPricesMax)}</Typography>
+                    </Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                      {altCount} alternatyw{altCount === 1 ? 'a' : altCount < 5 ? 'y' : ''} wpływa na zakres
+                    </Typography>
+                  </>
+                ) : (
+                  <>
+                    <Typography variant="h6" sx={{ fontWeight: 700, mt: 0.5, fontFamily: 'monospace' }}>{formatCurrency(totalIncluded)}</Typography>
+                    <Typography variant="caption" color="text.secondary">brak alternatyw</Typography>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Stats card: positions, hidden, groups */}
+            <Card sx={{ flex: 1, minWidth: 160 }}>
+              <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
+                <Typography variant="overline" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Statystyki</Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mt: 0.75 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="caption" color="text.secondary">Pozycje</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{paidCount}<Typography component="span" sx={{ opacity: 0.4 }}> / {totalCount}</Typography></Typography>
+                  </Box>
+                  {hiddenCount > 0 && (
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="caption" color="text.secondary">Ukryte</Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: theme.palette.text.secondary }}>{hiddenCount}</Typography>
+                    </Box>
+                  )}
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="caption" color="text.secondary">Grupy</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{groups.length}</Typography>
+                  </Box>
+                  {altCount > 0 && (
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="caption" color="text.secondary">Alternatywy</Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: theme.palette.info.main }}>{altCount}</Typography>
+                    </Box>
+                  )}
+                </Box>
+              </CardContent>
+            </Card>
+          </Box>
+        );
+      })()}
 
       {/* Groups */}
       {items.length === 0 && groups.length === 0 ? (
