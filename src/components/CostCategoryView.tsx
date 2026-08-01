@@ -83,6 +83,8 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
   const [groupMenuTarget, setGroupMenuTarget] = useState<string | null>(null);
   const [itemMenuAnchor, setItemMenuAnchor] = useState<null | HTMLElement>(null);
   const [itemMenuTarget, setItemMenuTarget] = useState<CostItem | null>(null);
+  const [altMenuAnchor, setAltMenuAnchor] = useState<null | HTMLElement>(null);
+  const [altMenuTarget, setAltMenuTarget] = useState<{ item: CostItem; alt: AlternativeItem } | null>(null);
 
   // Grouping
   const groups = useMemo(() => {
@@ -528,10 +530,9 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                                           )}
                                         </Box>
                                         <Box sx={{ display: 'flex', gap: 0.25, justifyContent: 'flex-end' }}>
-                                          <Tooltip title="Ustaw jako MAIN"><IconButton size="small" onClick={() => { const oldMain: AlternativeItem = { id: generateId(), included: true, nazwa: (item[config.nameField] as string) || 'Poprzednia opcja', cena: getCost(item), linki: item.linki || [], uwagi: '' }; const newAlts = [oldMain, ...(item.alternatywy || []).filter((a) => a.id !== alt.id)]; updateItem(item.id, { [costField]: alt.cena, linki: alt.linki || [], alternatywy: newAlts } as Partial<CostItem>); }} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.success.main }, width: 20, height: 20 }}><AltIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
-                                          <Tooltip title="Linki"><IconButton size="small" onClick={() => setLinksAlt({ itemId: item.id, alt })} sx={{ opacity: 0.5, '&:hover': { opacity: 1 }, width: 20, height: 20 }}><LinkIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
-                                          <Tooltip title="Edytuj"><IconButton size="small" onClick={() => setEditingAlt({ itemId: item.id, alt })} sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.primary.main }, width: 20, height: 20 }}><EditIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
-                                          <Tooltip title="Usuń"><IconButton size="small" onClick={() => { const newAlts = (item.alternatywy || []).filter((a) => a.id !== alt.id); updateItem(item.id, { alternatywy: newAlts }); }} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.error.main }, width: 20, height: 20 }}><DeleteIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                          <IconButton size="small" onClick={(e) => { setAltMenuAnchor(e.currentTarget); setAltMenuTarget({ item, alt }); }} sx={{ opacity: 0.4, '&:hover': { opacity: 1 }, width: 20, height: 20 }}>
+                                            <MoreIcon sx={{ fontSize: 14 }} />
+                                          </IconButton>
                                         </Box>
                                       </Box>
                                     ))}
@@ -704,6 +705,33 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
           <ListItemText>Alternatywy</ListItemText>
         </MenuItem>
         <MenuItem onClick={() => { if (itemMenuTarget) setDeleteConfirmItem(itemMenuTarget); setItemMenuAnchor(null); setItemMenuTarget(null); }} sx={{ color: theme.palette.error.main }}>
+          <ListItemIcon><DeleteIcon fontSize="small" sx={{ color: theme.palette.error.main }} /></ListItemIcon>
+          <ListItemText>Usuń</ListItemText>
+        </MenuItem>
+      </Menu>
+
+      {/* Alt context menu */}
+      <Menu
+        anchorEl={altMenuAnchor}
+        open={!!altMenuAnchor}
+        onClose={() => { setAltMenuAnchor(null); setAltMenuTarget(null); }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        slotProps={{ paper: { sx: { minWidth: 180, borderRadius: 2, mt: 0.5 } } }}
+      >
+        <MenuItem onClick={() => { if (altMenuTarget) { const { item, alt } = altMenuTarget; const oldMain: AlternativeItem = { id: generateId(), included: true, nazwa: (item[config.nameField] as string) || 'Poprzednia opcja', cena: getCost(item), linki: item.linki || [], uwagi: '' }; const newAlts = [oldMain, ...(item.alternatywy || []).filter((a) => a.id !== alt.id)]; updateItem(item.id, { [costField]: alt.cena, linki: alt.linki || [], alternatywy: newAlts } as Partial<CostItem>); } setAltMenuAnchor(null); setAltMenuTarget(null); }}>
+          <ListItemIcon><AltIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>Ustaw jako MAIN</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => { if (altMenuTarget) setLinksAlt({ itemId: altMenuTarget.item.id, alt: altMenuTarget.alt }); setAltMenuAnchor(null); setAltMenuTarget(null); }}>
+          <ListItemIcon><LinkIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>Linki</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => { if (altMenuTarget) setEditingAlt({ itemId: altMenuTarget.item.id, alt: altMenuTarget.alt }); setAltMenuAnchor(null); setAltMenuTarget(null); }}>
+          <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>Edytuj</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => { if (altMenuTarget) { const { item, alt } = altMenuTarget; const newAlts = (item.alternatywy || []).filter((a) => a.id !== alt.id); updateItem(item.id, { alternatywy: newAlts }); } setAltMenuAnchor(null); setAltMenuTarget(null); }} sx={{ color: theme.palette.error.main }}>
           <ListItemIcon><DeleteIcon fontSize="small" sx={{ color: theme.palette.error.main }} /></ListItemIcon>
           <ListItemText>Usuń</ListItemText>
         </MenuItem>
