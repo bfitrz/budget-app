@@ -297,7 +297,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
             </Card>
 
             {/* Range card: min/max */}
-            <Card sx={{ flex: 1, minWidth: 180, background: hasRange ? `linear-gradient(135deg, ${alpha(theme.palette.info.main, 0.06)}, ${alpha(theme.palette.warning.main, 0.04)})` : undefined, border: hasRange ? `1px solid ${alpha(theme.palette.info.main, 0.12)}` : undefined }}>
+            <Card sx={{ flex: 1, minWidth: 180, background: `linear-gradient(135deg, ${alpha(theme.palette.info.main, 0.06)}, ${alpha(theme.palette.warning.main, 0.04)})`, border: `1px solid ${alpha(theme.palette.info.main, 0.12)}` }}>
               <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
                 <Typography variant="overline" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Rozpiętość kosztów</Typography>
                 {hasRange ? (
@@ -321,7 +321,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
             </Card>
 
             {/* Stats card: positions, hidden, groups */}
-            <Card sx={{ flex: 1, minWidth: 160 }}>
+            <Card sx={{ flex: 1, minWidth: 160, background: `linear-gradient(135deg, ${alpha(theme.palette.secondary.main, 0.05)}, ${alpha(theme.palette.primary.main, 0.04)})`, border: `1px solid ${alpha(theme.palette.secondary.main, 0.1)}` }}>
               <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
                 <Typography variant="overline" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Statystyki</Typography>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mt: 0.75 }}>
@@ -332,7 +332,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                   {hiddenCount > 0 && (
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <Typography variant="caption" color="text.secondary">Ukryte</Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: theme.palette.text.secondary }}>{hiddenCount}</Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: theme.palette.warning.main }}>{hiddenCount}</Typography>
                     </Box>
                   )}
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
