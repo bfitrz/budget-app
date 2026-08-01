@@ -488,7 +488,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                                 <Collapse in={expandedItems.has(item.id)} timeout="auto" unmountOnExit>
                                   <Box sx={{ pl: 2, pr: 2, pb: 1.5, pt: 0.5, display: 'flex', flexDirection: 'column', gap: 0.75 }}>
                                     {/* MAIN */}
-                                    <Box sx={{ display: 'grid', gridTemplateColumns: '24px 50px 1fr 120px 80px 40px', alignItems: 'center', gap: 2, px: 1.5, py: 0.75, borderRadius: 1.5, backgroundColor: alpha(theme.palette.success.main, 0.03), border: `1px solid ${alpha(theme.palette.success.main, 0.1)}` }}>
+                                    <Box sx={{ display: 'grid', gridTemplateColumns: '24px 50px 1fr 120px 80px auto', alignItems: 'center', gap: 2, px: 1.5, py: 0.75, borderRadius: 1.5, backgroundColor: alpha(theme.palette.success.main, 0.03), border: `1px solid ${alpha(theme.palette.success.main, 0.1)}` }}>
                                       <Box></Box>
                                       <Chip label="MAIN" size="small" sx={{ fontSize: '0.5rem', height: 16, fontWeight: 700, backgroundColor: alpha(theme.palette.success.main, 0.12), color: theme.palette.success.main }} />
                                       <Typography variant="body2" sx={{ fontSize: '0.7rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{(item[config.nameField] as string) || 'Główna'}</Typography>
@@ -500,10 +500,12 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                                           </Tooltip>
                                         )}
                                       </Box>
-                                      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                        <IconButton size="small" onClick={(e) => { setMainMenuAnchor(e.currentTarget); setMainMenuTarget(item); }} sx={{ opacity: 0.4, '&:hover': { opacity: 1 }, width: 20, height: 20 }}>
-                                          <MoreIcon sx={{ fontSize: 14 }} />
-                                        </IconButton>
+                                      <Box sx={{ display: 'flex', gap: 0.25, justifyContent: 'flex-end' }}>
+                                        <Tooltip title="Linki"><IconButton size="small" onClick={() => setLinksItem(item)} sx={{ opacity: 0.5, '&:hover': { opacity: 1 }, width: 20, height: 20 }}><LinkIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                        <Tooltip title="Edytuj"><IconButton size="small" onClick={() => setEditingMainPrice(item)} sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.primary.main }, width: 20, height: 20 }}><EditIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                        {(item.alternatywy || []).length > 0 && (
+                                          <Tooltip title="Zastąp inną opcją"><IconButton size="small" onClick={() => setDeleteChoiceItem(item)} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.error.main }, width: 20, height: 20 }}><DeleteIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                        )}
                                       </Box>
                                     </Box>
                                     {/* ALTs */}
