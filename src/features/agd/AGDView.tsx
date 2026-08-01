@@ -2,8 +2,8 @@ import { CostCategoryView, CostCategoryConfig, CostItem } from '@/components';
 import { useBudgetStore } from '@/store';
 
 const config: CostCategoryConfig = {
-  title: 'Sprzęt',
-  subtitle: 'Sprzęt AGD — pogrupowany wg producenta',
+  title: 'Sprzęt AGD',
+  subtitle: 'Urządzenia domowe — pogrupowane wg producenta',
   groupField: 'producent',
   nameField: 'nazwa',
   columns: [

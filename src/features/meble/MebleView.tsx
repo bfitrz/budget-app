@@ -3,7 +3,7 @@ import { useBudgetStore } from '@/store';
 
 const config: CostCategoryConfig = {
   title: 'Meble',
-  subtitle: 'Zarządzaj kosztami mebli i wyposażenia',
+  subtitle: 'Wyposażenie mieszkania — pogrupowane wg pomieszczeń',
   groupField: 'pomieszczenie',
   nameField: 'nazwa',
   columns: [

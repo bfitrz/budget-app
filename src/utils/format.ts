@@ -7,6 +7,11 @@ export function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
+export function formatCurrencyOrDash(amount: number): string {
+  if (!amount) return '–';
+  return formatCurrency(amount);
+}
+
 export function formatDate(dateString: string): string {
   if (!dateString) return '';
   const date = new Date(dateString);

@@ -137,7 +137,7 @@ export function SaldoView() {
               </Box>
               <Box>
                 <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.65rem' }}>
-                  Aktualne środki (wpływy − zapłacone)
+                  Aktualne środki (wpływy minus wydatki)
                 </Typography>
                 <Typography
                   variant="h5"
@@ -192,7 +192,7 @@ export function SaldoView() {
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
                       <TrendingUpIcon sx={{ fontSize: 48, color: 'text.secondary', opacity: 0.4 }} />
                       <Typography color="text.secondary">
-                        Brak wpisów. Dodaj wpływ, aby ustawić dostępne środki.
+                        Brak wpisów. Dodaj wpływ, aby śledzić dostępne środki.
                       </Typography>
                     </Box>
                   </TableCell>

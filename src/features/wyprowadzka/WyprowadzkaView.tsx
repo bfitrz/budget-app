@@ -2,8 +2,8 @@ import { CostCategoryView, CostCategoryConfig, CostItem } from '@/components';
 import { useBudgetStore } from '@/store';
 
 const config: CostCategoryConfig = {
-  title: 'Wyprowadzka',
-  subtitle: 'Koszty związane z przeprowadzką',
+  title: 'Przeprowadzka',
+  subtitle: 'Koszty związane z transportem i logistyką',
   groupField: 'grupa',
   nameField: 'nazwa',
   columns: [

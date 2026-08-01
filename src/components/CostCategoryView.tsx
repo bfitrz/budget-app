@@ -14,7 +14,7 @@ import {
   Close as CloseIcon,
 } from '@mui/icons-material';
 import { AlternativeItem, ItemLink, PaymentStatus } from '@/types';
-import { formatCurrency, generateId } from '@/utils';
+import { formatCurrency, formatCurrencyOrDash, generateId } from '@/utils';
 import { LinksModal } from './LinksEditor';
 import { AlternativesModal } from './AlternativesModal';
 
@@ -178,7 +178,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
 
       {/* Groups */}
       {items.length === 0 && groups.length === 0 ? (
-        <Card><CardContent sx={{ py: 8, textAlign: 'center' }}><Typography color="text.secondary">Brak pozycji. Dodaj lub zaimportuj dane.</Typography></CardContent></Card>
+        <Card><CardContent sx={{ py: 8, textAlign: 'center' }}><Typography color="text.secondary">Brak pozycji — dodaj nową lub zaimportuj dane z Excela.</Typography></CardContent></Card>
       ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
           {groups.map((group) => (
@@ -191,7 +191,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Chip label={`${group.paidCount}/${group.totalCount} opłacone`} size="small" sx={{ fontSize: '0.65rem', height: 20, backgroundColor: alpha(theme.palette.success.main, 0.1), color: theme.palette.success.main, fontWeight: 600 }} />
-                    <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'monospace', minWidth: 90, textAlign: 'right' }}>{formatCurrency(group.totalCost)}</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'monospace', minWidth: 90, textAlign: 'right' }}>{formatCurrencyOrDash(group.totalCost)}</Typography>
                   </Box>
                 </Box>
               </AccordionSummary>
@@ -238,14 +238,14 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                               ))}
                               <TableCell align="right">
                                 {item.status === 'Opłacone' ? (
-                                  <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace' }}>{formatCurrency(item.cena)}</Typography>
+                                  <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace' }}>{formatCurrencyOrDash(item.cena)}</Typography>
                                 ) : hasRange ? (
                                   <Box sx={{ textAlign: 'right' }}>
-                                    <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace' }}>{formatCurrency(item.cena)}</Typography>
-                                    <Typography variant="caption" sx={{ fontFamily: 'monospace', fontSize: '0.6rem', color: 'text.secondary' }}>{formatCurrency(minPrice)} — {formatCurrency(maxPrice)}</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace' }}>{formatCurrencyOrDash(item.cena)}</Typography>
+                                    <Typography variant="caption" sx={{ fontFamily: 'monospace', fontSize: '0.6rem', color: 'text.secondary' }}>{formatCurrencyOrDash(minPrice)} — {formatCurrencyOrDash(maxPrice)}</Typography>
                                   </Box>
                                 ) : (
-                                  <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace' }}>{formatCurrency(item.cena)}</Typography>
+                                  <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace' }}>{formatCurrencyOrDash(item.cena)}</Typography>
                                 )}
                               </TableCell>
                               <TableCell>
@@ -281,7 +281,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                                       <Box></Box>
                                       <Chip label="MAIN" size="small" sx={{ fontSize: '0.5rem', height: 16, fontWeight: 700, backgroundColor: alpha(theme.palette.success.main, 0.12), color: theme.palette.success.main }} />
                                       <Typography variant="body2" sx={{ fontSize: '0.7rem' }}>Cena główna</Typography>
-                                      <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '0.75rem', textAlign: 'right' }}>{formatCurrency(item.cena)}</Typography>
+                                      <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '0.75rem', textAlign: 'right' }}>{formatCurrencyOrDash(item.cena)}</Typography>
                                       <Box>
                                         {(item.linki || []).length > 0 && (
                                           <Tooltip title={<Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, py: 0.5 }}>{item.linki.map((link, li) => (<Typography key={li} variant="caption" sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} onClick={() => window.open(link.url, '_blank')}>🔗 {link.nazwa}</Typography>))}</Box>} arrow slotProps={{ tooltip: { sx: { backgroundColor: theme.palette.background.paper, color: theme.palette.text.primary, border: `1px solid ${theme.palette.divider}`, borderRadius: 1, px: 1.5, py: 1, boxShadow: '0 4px 20px rgba(0,0,0,0.15)' } }, arrow: { sx: { color: theme.palette.background.paper } } }}>
@@ -311,7 +311,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                                           {alt.cena < item.cena && <ArrowDownPriceIcon sx={{ fontSize: 12, color: theme.palette.success.main }} />}
                                           {alt.cena > item.cena && <ArrowUpIcon sx={{ fontSize: 12, color: theme.palette.warning.main }} />}
                                           {alt.cena === item.cena && <DragHandleIcon sx={{ fontSize: 12, color: theme.palette.text.secondary, opacity: 0.5 }} />}
-                                          <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '0.75rem', color: alt.cena < item.cena ? theme.palette.success.main : alt.cena > item.cena ? theme.palette.warning.main : theme.palette.text.primary }}>{formatCurrency(alt.cena)}</Typography>
+                                          <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '0.75rem', color: alt.cena < item.cena ? theme.palette.success.main : alt.cena > item.cena ? theme.palette.warning.main : theme.palette.text.primary }}>{formatCurrencyOrDash(alt.cena)}</Typography>
                                         </Box>
                                         <Box>
                                           {(alt.linki || []).length > 0 && (
@@ -341,8 +341,8 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 2.5, py: 1.5, borderTop: `1px solid ${theme.palette.divider}` }}>
                   <Button size="small" startIcon={<AddIcon />} onClick={() => openAddDialog(group.name)} sx={{ fontSize: '0.75rem', opacity: 0.7, '&:hover': { opacity: 1 } }}>Dodaj do "{group.name}"</Button>
                   <Box sx={{ display: 'flex', gap: 3 }}>
-                    <Typography variant="caption" color="text.secondary">Opłacone: <strong>{formatCurrency(group.paidCost)}</strong></Typography>
-                    <Typography variant="caption" sx={{ fontWeight: 700 }}>Razem: {formatCurrency(group.totalCost)}</Typography>
+                    <Typography variant="caption" color="text.secondary">Opłacone: <strong>{formatCurrencyOrDash(group.paidCost)}</strong></Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 700 }}>Razem: {formatCurrencyOrDash(group.totalCost)}</Typography>
                   </Box>
                 </Box>
               </AccordionDetails>

@@ -227,6 +227,14 @@ function App() {
               borderRadius: 20,
               border: `1px solid ${isDarkMode ? 'rgba(255,255,255,0.08)' : palette.divider}`,
               boxShadow: isDarkMode ? '0 24px 48px rgba(0,0,0,0.6)' : '0 24px 48px rgba(0,0,0,0.12)',
+              maxHeight: '85vh',
+            },
+          },
+        },
+        MuiDialogContent: {
+          styleOverrides: {
+            root: {
+              overflowY: 'auto',
             },
           },
         },

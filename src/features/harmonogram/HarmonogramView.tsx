@@ -218,7 +218,7 @@ export function HarmonogramView() {
               Symulacja środków w czasie
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Wykres pokazuje jak rosną Twoje dostępne środki wraz z planowanymi wpływami.
+              Wykres pokazuje prognozę dostępnych środków w czasie, uwzględniając zaplanowane wpływy.
               Linia pomarańczowa = ile jeszcze musisz zapłacić.
             </Typography>
             <ResponsiveContainer width="100%" height={300}>
@@ -250,9 +250,12 @@ export function HarmonogramView() {
                   labelFormatter={(label: string) => formatDate(label)}
                   contentStyle={{
                     backgroundColor: theme.palette.background.paper,
+                    color: theme.palette.text.primary,
                     border: `1px solid ${theme.palette.divider}`,
                     borderRadius: 8,
                   }}
+                  itemStyle={{ color: theme.palette.text.primary }}
+                  labelStyle={{ color: theme.palette.text.primary }}
                 />
                 {/* Reference line: Remaining costs */}
                 <ReferenceLine

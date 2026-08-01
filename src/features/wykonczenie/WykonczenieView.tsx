@@ -2,8 +2,8 @@ import { CostCategoryView, CostCategoryConfig, CostItem } from '@/components';
 import { useBudgetStore } from '@/store';
 
 const config: CostCategoryConfig = {
-  title: 'Prace',
-  subtitle: 'Etapy prac wykończeniowych i rozliczenia',
+  title: 'Prace wykończeniowe',
+  subtitle: 'Rozliczenia z ekipami i materiały — pogrupowane wg etapów',
   groupField: 'etap',
   nameField: 'opis',
   columns: [

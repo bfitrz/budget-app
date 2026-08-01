@@ -2,8 +2,8 @@ import { CostCategoryView, CostCategoryConfig, CostItem } from '@/components';
 import { useBudgetStore } from '@/store';
 
 const config: CostCategoryConfig = {
-  title: 'Inne',
-  subtitle: 'Dodatkowe koszty i wydatki',
+  title: 'Pozostałe koszty',
+  subtitle: 'Dodatkowe wydatki niepasujące do innych kategorii',
   groupField: 'grupa',
   nameField: 'nazwa',
   columns: [
