@@ -508,7 +508,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                                     </Box>
                                     {/* ALTs */}
                                     {(item.alternatywy || []).map((alt) => (
-                                      <Box key={alt.id} sx={{ display: 'grid', gridTemplateColumns: '24px 50px 1fr 120px 80px 40px', alignItems: 'center', gap: 2, px: 1.5, py: 0.75, borderRadius: 1.5, backgroundColor: alpha(theme.palette.info.main, 0.02), border: `1px solid ${alpha(theme.palette.info.main, 0.08)}`, opacity: alt.included ? 1 : 0.4 }}>
+                                      <Box key={alt.id} sx={{ display: 'grid', gridTemplateColumns: '24px 50px 1fr 120px 80px auto', alignItems: 'center', gap: 2, px: 1.5, py: 0.75, borderRadius: 1.5, backgroundColor: alpha(theme.palette.info.main, 0.02), border: `1px solid ${alpha(theme.palette.info.main, 0.08)}`, opacity: alt.included ? 1 : 0.4 }}>
                                         <Tooltip title={alt.included ? 'Kliknij aby wykluczyć z budżetu' : 'Kliknij aby wliczyć do budżetu'}>
                                           <IconButton size="small" onClick={() => { const newAlts = (item.alternatywy || []).map((a) => a.id === alt.id ? { ...a, included: !a.included } : a); updateItem(item.id, { alternatywy: newAlts }); }} sx={{ p: 0, width: 20, height: 20, color: alt.included ? theme.palette.success.main : theme.palette.text.secondary, opacity: alt.included ? 0.7 : 0.3, '&:hover': { opacity: 1 } }}>
                                             {alt.included ? <IncludedIcon sx={{ fontSize: 13 }} /> : <ExcludedIcon sx={{ fontSize: 13 }} />}
@@ -530,9 +530,10 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                                           )}
                                         </Box>
                                         <Box sx={{ display: 'flex', gap: 0.25, justifyContent: 'flex-end' }}>
-                                          <IconButton size="small" onClick={(e) => { setAltMenuAnchor(e.currentTarget); setAltMenuTarget({ item, alt }); }} sx={{ opacity: 0.4, '&:hover': { opacity: 1 }, width: 20, height: 20 }}>
-                                            <MoreIcon sx={{ fontSize: 14 }} />
-                                          </IconButton>
+                                          <Tooltip title="Ustaw jako MAIN"><IconButton size="small" onClick={() => { const oldMain: AlternativeItem = { id: generateId(), included: true, nazwa: (item[config.nameField] as string) || 'Poprzednia opcja', cena: getCost(item), linki: item.linki || [], uwagi: (item.uwagi as string) || '' }; const newAlts = [oldMain, ...(item.alternatywy || []).filter((a) => a.id !== alt.id)]; updateItem(item.id, { [config.nameField]: alt.nazwa, [costField]: alt.cena, linki: alt.linki || [], uwagi: alt.uwagi || '', alternatywy: newAlts } as Partial<CostItem>); }} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.success.main }, width: 20, height: 20 }}><AltIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                          <Tooltip title="Linki"><IconButton size="small" onClick={() => setLinksAlt({ itemId: item.id, alt })} sx={{ opacity: 0.5, '&:hover': { opacity: 1 }, width: 20, height: 20 }}><LinkIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                          <Tooltip title="Edytuj"><IconButton size="small" onClick={() => setEditingAlt({ itemId: item.id, alt })} sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.primary.main }, width: 20, height: 20 }}><EditIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                          <Tooltip title="Usuń"><IconButton size="small" onClick={() => { const newAlts = (item.alternatywy || []).filter((a) => a.id !== alt.id); updateItem(item.id, { alternatywy: newAlts }); }} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.error.main }, width: 20, height: 20 }}><DeleteIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
                                         </Box>
                                       </Box>
                                     ))}
