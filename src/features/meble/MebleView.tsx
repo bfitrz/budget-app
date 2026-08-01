@@ -26,6 +26,7 @@ import {
   AccordionSummary,
   AccordionDetails,
   Autocomplete,
+  Collapse,
 } from '@mui/material';
 import {
   Delete as DeleteIcon,
@@ -36,6 +37,8 @@ import {
   Edit as EditIcon,
   SwapHoriz as AltIcon,
   Link as LinkIcon,
+  KeyboardArrowDown as ArrowDownIcon,
+  KeyboardArrowRight as ArrowRightIcon,
 } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { useBudgetStore } from '@/store';
@@ -77,6 +80,7 @@ export function MebleView() {
   const [linksAlt, setLinksAlt] = useState<{ itemId: string; alt: AlternativeItem } | null>(null);
   const [altItem, setAltItem] = useState<MebleItem | null>(null);
   const [payChoiceItem, setPayChoiceItem] = useState<MebleItem | null>(null);
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const [groupDialogOpen, setGroupDialogOpen] = useState(false);
   const [newGroupName, setNewGroupName] = useState('');
   const [customGroups, setCustomGroups] = useState<string[]>([]);
@@ -328,6 +332,7 @@ export function MebleView() {
                   <Table size="small">
                     <TableHead>
                       <TableRow>
+                        <TableCell sx={{ width: 30 }}></TableCell>
                         <TableCell padding="checkbox" sx={{ width: 50 }}>Uwzgl.</TableCell>
                         <TableCell>Kategoria</TableCell>
                         <TableCell>Nazwa</TableCell>
@@ -340,7 +345,7 @@ export function MebleView() {
                     <TableBody>
                       {group.items.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={7} sx={{ py: 3 }}>
+                          <TableCell colSpan={8} sx={{ py: 3 }}>
                             <Typography variant="body2" color="text.secondary" align="center">
                               Brak pozycji w tej grupie. Dodaj pozycję z pomieszczeniem "{group.name}".
                             </Typography>
@@ -357,6 +362,17 @@ export function MebleView() {
                           <React.Fragment key={item.id}>
                           {/* Main record row */}
                           <TableRow sx={{ opacity: item.included ? 1 : 0.4 }}>
+                            <TableCell sx={{ width: 30, p: 0.5 }}>
+                              <IconButton size="small" onClick={() => {
+                                setExpandedItems(prev => {
+                                  const next = new Set(prev);
+                                  if (next.has(item.id)) next.delete(item.id); else next.add(item.id);
+                                  return next;
+                                });
+                              }} sx={{ width: 22, height: 22 }}>
+                                {expandedItems.has(item.id) ? <ArrowDownIcon sx={{ fontSize: 14 }} /> : <ArrowRightIcon sx={{ fontSize: 14 }} />}
+                              </IconButton>
+                            </TableCell>
                             <TableCell padding="checkbox">
                               <Checkbox
                                 checked={item.included}
@@ -425,82 +441,58 @@ export function MebleView() {
                             </TableCell>
                           </TableRow>
 
-                          {/* MAIN price sub-row */}
-                          <TableRow sx={{ opacity: item.included ? 1 : 0.35, backgroundColor: alpha(theme.palette.success.main, 0.02), '& td': { py: 0.75, borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}` } }}>
-                            <TableCell></TableCell>
-                            <TableCell><Chip label="MAIN" size="small" sx={{ fontSize: '0.5rem', height: 16, fontWeight: 700, backgroundColor: alpha(theme.palette.success.main, 0.1), color: theme.palette.success.main }} /></TableCell>
-                            <TableCell><Typography variant="body2" sx={{ fontSize: '0.7rem' }}>Cena główna</Typography></TableCell>
-                            <TableCell align="right"><Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '0.75rem' }}>{formatCurrency(item.cena)}</Typography></TableCell>
-                            <TableCell colSpan={2}>
-                              {(item.linki || []).length > 0 && (
-                                <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                                  {item.linki.map((link, li) => (
-                                    <Chip key={li} label={link.nazwa} size="small" onClick={() => window.open(link.url, '_blank')}
-                                      sx={{ fontSize: '0.55rem', height: 18, cursor: 'pointer', backgroundColor: alpha(theme.palette.primary.main, 0.06), '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.12) } }} />
+                          {/* Collapsible MAIN + ALT section */}
+                          <TableRow sx={{ opacity: item.included ? 1 : 0.35 }}>
+                            <TableCell colSpan={8} sx={{ py: 0, px: 0, border: 'none' }}>
+                              <Collapse in={expandedItems.has(item.id)} timeout="auto" unmountOnExit>
+                                <Box sx={{ pl: 6, pr: 2, pb: 1.5, pt: 0.5, display: 'flex', flexDirection: 'column', gap: 0.75 }}>
+                                  {/* MAIN entry */}
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, px: 1.5, py: 0.75, borderRadius: 1.5, backgroundColor: alpha(theme.palette.success.main, 0.03), border: `1px solid ${alpha(theme.palette.success.main, 0.1)}` }}>
+                                    <Chip label="MAIN" size="small" sx={{ fontSize: '0.5rem', height: 16, fontWeight: 700, backgroundColor: alpha(theme.palette.success.main, 0.12), color: theme.palette.success.main }} />
+                                    <Typography variant="body2" sx={{ fontSize: '0.7rem', flex: 1 }}>Cena główna</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '0.75rem' }}>{formatCurrency(item.cena)}</Typography>
+                                    {(item.linki || []).map((link, li) => (
+                                      <Chip key={li} label={link.nazwa} size="small" onClick={() => window.open(link.url, '_blank')}
+                                        sx={{ fontSize: '0.55rem', height: 18, cursor: 'pointer', backgroundColor: alpha(theme.palette.primary.main, 0.06), '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.12) } }} />
+                                    ))}
+                                    <Tooltip title="Zarządzaj linkami"><IconButton size="small" onClick={() => setLinksItem(item)} sx={{ opacity: 0.5, '&:hover': { opacity: 1 }, width: 20, height: 20 }}><LinkIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                  </Box>
+                                  {/* ALT entries */}
+                                  {(item.alternatywy || []).map((alt) => (
+                                    <Box key={alt.id} sx={{
+                                      display: 'flex', alignItems: 'center', gap: 1.5, px: 1.5, py: 0.75, borderRadius: 1.5,
+                                      backgroundColor: alpha(theme.palette.info.main, 0.02), border: `1px solid ${alpha(theme.palette.info.main, 0.08)}`,
+                                      opacity: alt.included ? 1 : 0.4,
+                                    }}>
+                                      <Checkbox checked={alt.included} onChange={() => {
+                                        const newAlts = (item.alternatywy || []).map((a) => a.id === alt.id ? { ...a, included: !a.included } : a);
+                                        updateMebleItem(item.id, { alternatywy: newAlts });
+                                      }} size="small" sx={{ p: 0, '& .MuiSvgIcon-root': { fontSize: 15 } }} />
+                                      <Chip label="ALT" size="small" sx={{ fontSize: '0.5rem', height: 16, fontWeight: 700, backgroundColor: alpha(theme.palette.info.main, 0.1), color: theme.palette.info.main }} />
+                                      <Typography variant="body2" sx={{ fontSize: '0.7rem', fontStyle: 'italic', flex: 1 }}>{alt.nazwa}</Typography>
+                                      <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '0.75rem', color: alt.cena <= item.cena ? theme.palette.success.main : theme.palette.warning.main }}>
+                                        {formatCurrency(alt.cena)}
+                                      </Typography>
+                                      {(alt.linki || []).map((link, li) => (
+                                        <Chip key={li} label={link.nazwa} size="small" onClick={() => window.open(link.url, '_blank')}
+                                          sx={{ fontSize: '0.55rem', height: 18, cursor: 'pointer', backgroundColor: alpha(theme.palette.primary.main, 0.06), '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.12) } }} />
+                                      ))}
+                                      <Tooltip title="Linki"><IconButton size="small" onClick={() => setLinksAlt({ itemId: item.id, alt })} sx={{ opacity: 0.5, '&:hover': { opacity: 1 }, width: 20, height: 20 }}><LinkIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                      <Tooltip title="Ustaw jako MAIN"><IconButton size="small" onClick={() => {
+                                        const oldMain: AlternativeItem = { id: generateId(), included: true, nazwa: 'Poprzednia opcja', cena: item.cena, linki: item.linki || [], uwagi: '' };
+                                        const newAlts = [oldMain, ...(item.alternatywy || []).filter((a) => a.id !== alt.id)];
+                                        updateMebleItem(item.id, { cena: alt.cena, linki: alt.linki || [], alternatywy: newAlts });
+                                      }} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.success.main }, width: 20, height: 20 }}><AltIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                      <Tooltip title="Usuń"><IconButton size="small" onClick={() => {
+                                        const newAlts = (item.alternatywy || []).filter((a) => a.id !== alt.id);
+                                        updateMebleItem(item.id, { alternatywy: newAlts });
+                                      }} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.error.main }, width: 20, height: 20 }}><DeleteIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                    </Box>
                                   ))}
                                 </Box>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              <Tooltip title="Zarządzaj linkami"><IconButton size="small" onClick={() => setLinksItem(item)} sx={{ opacity: 0.5, '&:hover': { opacity: 1 } }}><LinkIcon sx={{ fontSize: 13 }} /></IconButton></Tooltip>
+                              </Collapse>
                             </TableCell>
                           </TableRow>
-
-                          {/* ALT price sub-rows */}
-                          {(item.alternatywy || []).map((alt) => (
-                            <TableRow
-                              key={alt.id}
-                              sx={{
-                                opacity: (!item.included) ? 0.35 : alt.included ? 0.9 : 0.35,
-                                backgroundColor: alpha(theme.palette.info.main, 0.02),
-                                '& td': { py: 0.75, borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}` },
-                              }}
-                            >
-                              <TableCell padding="checkbox">
-                                <Checkbox checked={alt.included} onChange={() => {
-                                  const newAlts = (item.alternatywy || []).map((a) => a.id === alt.id ? { ...a, included: !a.included } : a);
-                                  updateMebleItem(item.id, { alternatywy: newAlts });
-                                }} size="small" sx={{ '& .MuiSvgIcon-root': { fontSize: 16 } }} />
-                              </TableCell>
-                              <TableCell><Chip label="ALT" size="small" sx={{ fontSize: '0.5rem', height: 16, fontWeight: 700, backgroundColor: alpha(theme.palette.info.main, 0.1), color: theme.palette.info.main }} /></TableCell>
-                              <TableCell><Typography variant="body2" sx={{ fontSize: '0.7rem', fontStyle: 'italic' }}>{alt.nazwa}</Typography></TableCell>
-                              <TableCell align="right">
-                                <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '0.75rem', color: alt.cena <= item.cena ? theme.palette.success.main : theme.palette.warning.main }}>
-                                  {formatCurrency(alt.cena)}
-                                </Typography>
-                              </TableCell>
-                              <TableCell colSpan={2}>
-                                <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}>
-                                  {(alt.linki || []).map((link, li) => (
-                                    <Chip key={li} label={link.nazwa} size="small" onClick={() => window.open(link.url, '_blank')}
-                                      sx={{ fontSize: '0.55rem', height: 18, cursor: 'pointer', backgroundColor: alpha(theme.palette.primary.main, 0.06), '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.12) } }} />
-                                  ))}
-                                  <Tooltip title="Zarządzaj linkami"><IconButton size="small" onClick={() => setLinksAlt({ itemId: item.id, alt })} sx={{ width: 18, height: 18, opacity: 0.5, '&:hover': { opacity: 1 } }}><LinkIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
-                                </Box>
-                              </TableCell>
-                              <TableCell>
-                                <Box sx={{ display: 'flex', gap: 0.25 }}>
-                                  <Tooltip title="Ustaw jako MAIN"><IconButton size="small" onClick={() => {
-                                    // Swap: this ALT becomes MAIN, old MAIN becomes ALT
-                                    const oldMain: AlternativeItem = {
-                                      id: generateId(),
-                                      included: true,
-                                      nazwa: 'Poprzednia opcja',
-                                      cena: item.cena,
-                                      linki: item.linki || [],
-                                      uwagi: '',
-                                    };
-                                    const newAlts = [oldMain, ...(item.alternatywy || []).filter((a) => a.id !== alt.id)];
-                                    updateMebleItem(item.id, { cena: alt.cena, linki: alt.linki || [], alternatywy: newAlts });
-                                  }} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.success.main } }}><AltIcon sx={{ fontSize: 13 }} /></IconButton></Tooltip>
-                                  <Tooltip title="Usuń alternatywę"><IconButton size="small" onClick={() => {
-                                    const newAlts = (item.alternatywy || []).filter((a) => a.id !== alt.id);
-                                    updateMebleItem(item.id, { alternatywy: newAlts });
-                                  }} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.error.main } }}><DeleteIcon sx={{ fontSize: 13 }} /></IconButton></Tooltip>
-                                </Box>
-                              </TableCell>
-                            </TableRow>
-                          ))}
                           </React.Fragment>
                           );
                         })
