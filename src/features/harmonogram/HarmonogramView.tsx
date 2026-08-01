@@ -260,7 +260,21 @@ export function HarmonogramView() {
               Wykres pokazuje prognozę dostępnych środków w czasie. Kiedy niebieska linia przekroczy pomarańczową — masz wystarczająco na pokrycie wszystkich kosztów.
             </Typography>
             <ResponsiveContainer width="100%" height={320}>
-              <AreaChart data={cashFlow.map(p => ({ ...p, cel: summary.pozostaloDoZaplaty }))} margin={{ top: 10, right: 30, left: 20, bottom: 10 }}>
+              <AreaChart data={(() => {
+                // Merge cashFlow with milestone dates for ReferenceLine to work
+                const baseData = cashFlow.map(p => ({ ...p, cel: summary.pozostaloDoZaplaty }));
+                const existingDates = new Set(baseData.map(p => p.data));
+                // Add milestone dates that don't exist in cashFlow
+                for (const ms of milestones) {
+                  if (!existingDates.has(ms.data)) {
+                    const saldo = getSaldoAtDate(ms.data);
+                    baseData.push({ data: ms.data, label: ms.opis, saldo, cel: summary.pozostaloDoZaplaty });
+                  }
+                }
+                // Sort by date
+                baseData.sort((a, b) => a.data.localeCompare(b.data));
+                return baseData;
+              })()} margin={{ top: 20, right: 30, left: 20, bottom: 10 }}>
                 <defs>
                   <linearGradient id="saldoGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor={theme.palette.primary.main} stopOpacity={0.3} />
@@ -343,21 +357,26 @@ export function HarmonogramView() {
                   name="saldo"
                 />
                 {/* Milestones */}
-                {milestones.map((ms) => (
-                  <ReferenceLine
-                    key={ms.id}
-                    x={ms.data}
-                    stroke={theme.palette.error.main}
-                    strokeDasharray="4 4"
-                    strokeWidth={1.5}
-                    label={{
-                      value: `📌 ${ms.opis}`,
-                      position: 'top',
-                      fill: theme.palette.error.main,
-                      fontSize: 10,
-                    }}
-                  />
-                ))}
+                {milestones.map((ms) => {
+                  const saldoAtMs = getSaldoAtDate(ms.data);
+                  const bilansAtMs = saldoAtMs - summary.pozostaloDoZaplaty;
+                  return (
+                    <ReferenceLine
+                      key={ms.id}
+                      x={ms.data}
+                      stroke={theme.palette.error.main}
+                      strokeDasharray="4 4"
+                      strokeWidth={2}
+                      label={{
+                        value: `📌 ${ms.opis} (${bilansAtMs >= 0 ? '+' : ''}${(bilansAtMs / 1000).toFixed(1)}k)`,
+                        position: 'top',
+                        fill: bilansAtMs >= 0 ? theme.palette.success.main : theme.palette.error.main,
+                        fontSize: 10,
+                        fontWeight: 600,
+                      }}
+                    />
+                  );
+                })}
               </AreaChart>
             </ResponsiveContainer>
 
