@@ -471,7 +471,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                                 <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center', justifyContent: 'flex-end' }}>
                                   {item.uwagi && (
                                     <Tooltip title={item.uwagi} arrow slotProps={{ tooltip: { sx: { maxWidth: 280, fontSize: '0.75rem', lineHeight: 1.5, p: 1.5 } } }}>
-                                      <Chip icon={<CommentIcon sx={{ fontSize: '12px !important' }} />} label="uwagi" size="small" sx={{ fontSize: '0.55rem', height: 20, backgroundColor: alpha(theme.palette.warning.main, 0.1), color: theme.palette.warning.main, cursor: 'default' }} />
+                                      <CommentIcon sx={{ fontSize: 14, color: theme.palette.warning.main, opacity: 0.7 }} />
                                     </Tooltip>
                                   )}
                                   {(() => { const t = (item.linki || []).length + (item.alternatywy || []).reduce((s, a) => s + (a.linki || []).length, 0); return t > 0 ? <Chip label={`${t} 🔗`} size="small" sx={{ fontSize: '0.55rem', height: 20, backgroundColor: alpha(theme.palette.primary.main, 0.08) }} /> : null; })()}
