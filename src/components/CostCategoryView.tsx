@@ -532,7 +532,12 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                                           {alt.cena === getCost(item) && <DragHandleIcon sx={{ fontSize: 12, color: theme.palette.text.secondary, opacity: 0.5 }} />}
                                           <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '0.75rem', color: alt.cena < getCost(item) ? theme.palette.success.main : alt.cena > getCost(item) ? theme.palette.warning.main : theme.palette.text.primary }}>{formatCurrencyOrDash(alt.cena)}</Typography>
                                         </Box>
-                                        <Box>
+                                        <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                                          {alt.uwagi && (
+                                            <Tooltip title={alt.uwagi} arrow slotProps={{ tooltip: { sx: { maxWidth: 280, fontSize: '0.75rem', lineHeight: 1.5, p: 1.5 } } }}>
+                                              <CommentIcon sx={{ fontSize: 13, color: theme.palette.warning.main, opacity: 0.7 }} />
+                                            </Tooltip>
+                                          )}
                                           {(alt.linki || []).length > 0 && (
                                             <Tooltip title={<Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, py: 0.5 }}>{alt.linki.map((link, li) => (<Typography key={li} variant="caption" sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }} onClick={() => window.open(link.url, '_blank')}>🔗 {link.nazwa}</Typography>))}</Box>} arrow slotProps={{ tooltip: { sx: { backgroundColor: theme.palette.background.paper, color: theme.palette.text.primary, border: `1px solid ${theme.palette.divider}`, borderRadius: 1, px: 1.5, py: 1, boxShadow: '0 4px 20px rgba(0,0,0,0.15)' } }, arrow: { sx: { color: theme.palette.background.paper } } }}>
                                               <Chip label={`${alt.linki.length} link${alt.linki.length > 1 ? 'i' : ''}`} size="small" sx={{ fontSize: '0.55rem', height: 18, cursor: 'default', backgroundColor: alpha(theme.palette.primary.main, 0.08) }} />
