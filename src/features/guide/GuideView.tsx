@@ -239,6 +239,17 @@ export function GuideView() {
         <Tip>Wygaszanie jest odwracalne — nic nie jest usuwane. Przydatne do tymczasowego wykluczania opcjonalnych wydatków z analiz.</Tip>
       </Section>
 
+      {/* Pominięte */}
+      <Section title="Pominięte" icon={<DisableIcon sx={{ fontSize: 18 }} />}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.7 }}>
+          Strona zbierająca wszystkie pozycje wykluczone z budżetu — w jednym miejscu widzisz co pominąłeś i ile zaoszczędziłeś.
+        </Typography>
+        <Feature label="Lista wyklucz. pozycji" description="Tabela pogrupowana wg kategorii (Meblowanie, Wykończenie, AGD...) z grupą, nazwą i kwotą." />
+        <Feature label="Kafelek 'Zaoszczędzone'" description="Suma wszystkich pominiętych pozycji — ile nie wydasz." />
+        <Feature label="Przywróć do budżetu" description="Ikonka ⊕ przy każdej pozycji — klik przywraca ją do budżetu (included = true)." />
+        <Tip>Pominięte pozycje nie znikają z systemu — zawsze możesz je przywrócić jednym kliknięciem.</Tip>
+      </Section>
+
       {/* Skróty */}
       <Section title="Skróty i wskazówki" icon={<MoneyIcon sx={{ fontSize: 18 }} />}>
         <Feature label="Logo → Podsumowanie" description="Kliknij 'Budget' w sidebarze żeby wrócić na stronę główną." />

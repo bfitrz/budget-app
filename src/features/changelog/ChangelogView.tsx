@@ -16,6 +16,19 @@ interface ChangeEntry {
 
 const changelog: ChangeEntry[] = [
   {
+    version: '1.6.0',
+    date: '2026-08-02',
+    changes: [
+      { type: 'feat', text: 'Strona "Pominięte" — lista wyklucz. pozycji z kwotami i przyciskiem przywracania' },
+      { type: 'feat', text: 'Przycisk "Przywróć do budżetu" na stronie Pominięte' },
+      { type: 'feat', text: 'Wygaszenie grupy faktycznie aktualizuje bilans (included na itemach)' },
+      { type: 'feat', text: 'Strona Changelog z historią wersji' },
+      { type: 'refactor', text: 'Zakupy → Meblowanie (wykończenie mieszkania meblami)' },
+      { type: 'fix', text: 'Milestone tooltip — pełne info: stan, wpływy, prognoza, cel, brakuje/nadwyżka' },
+      { type: 'style', text: 'Kompaktowe przyciski w harmonogramie' },
+    ],
+  },
+  {
     version: '1.5.0',
     date: '2026-08-02',
     changes: [
