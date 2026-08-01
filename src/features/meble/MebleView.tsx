@@ -79,7 +79,9 @@ export function MebleView() {
   const [linksItem, setLinksItem] = useState<MebleItem | null>(null);
   const [linksAlt, setLinksAlt] = useState<{ itemId: string; alt: AlternativeItem } | null>(null);
   const [altItem, setAltItem] = useState<MebleItem | null>(null);
+  const [editingAlt, setEditingAlt] = useState<{ itemId: string; alt: AlternativeItem } | null>(null);
   const [payChoiceItem, setPayChoiceItem] = useState<MebleItem | null>(null);
+  const [deleteChoiceItem, setDeleteChoiceItem] = useState<MebleItem | null>(null);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const [groupDialogOpen, setGroupDialogOpen] = useState(false);
   const [newGroupName, setNewGroupName] = useState('');
@@ -433,10 +435,33 @@ export function MebleView() {
                               <TextField size="small" value={item.uwagi} onChange={(e) => handleUwagiChange(item, e.target.value)} placeholder="..." variant="standard" sx={{ '& .MuiInput-root': { fontSize: '0.8rem' } }} />
                             </TableCell>
                             <TableCell>
-                              <Box sx={{ display: 'flex', gap: 0.5 }}>
+                              <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                                {/* Aggregated links count */}
+                                {(() => {
+                                  const totalLinks = (item.linki || []).length + (item.alternatywy || []).reduce((s, a) => s + (a.linki || []).length, 0);
+                                  return totalLinks > 0 ? (
+                                    <Chip
+                                      label={`${totalLinks} 🔗`}
+                                      size="small"
+                                      sx={{ fontSize: '0.55rem', height: 20, backgroundColor: alpha(theme.palette.primary.main, 0.08) }}
+                                    />
+                                  ) : null;
+                                })()}
+                                {/* Alternatives indicator */}
+                                {(item.alternatywy || []).length > 0 && (
+                                  <Chip
+                                    label={`${(item.alternatywy || []).length} alt`}
+                                    size="small"
+                                    sx={{ fontSize: '0.55rem', height: 20, backgroundColor: alpha(theme.palette.info.main, 0.1), color: theme.palette.info.main, fontWeight: 600 }}
+                                  />
+                                )}
                                 <Tooltip title="Edytuj"><IconButton size="small" onClick={() => openEditDialog(item)} sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.primary.main } }}><EditIcon fontSize="small" /></IconButton></Tooltip>
                                 <Tooltip title="Dodaj alternatywę"><IconButton size="small" onClick={() => setAltItem(item)} sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.info.main } }}><AltIcon sx={{ fontSize: 15 }} /></IconButton></Tooltip>
-                                <Tooltip title="Usuń"><IconButton size="small" onClick={() => deleteMebleItem(item.id)} sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.error.main } }}><DeleteIcon fontSize="small" /></IconButton></Tooltip>
+                                <Tooltip title="Usuń"><IconButton size="small" onClick={() => {
+                                  if (window.confirm(`Usunąć "${item.nazwa}" wraz ze wszystkimi alternatywami?`)) {
+                                    deleteMebleItem(item.id);
+                                  }
+                                }} sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.error.main } }}><DeleteIcon fontSize="small" /></IconButton></Tooltip>
                               </Box>
                             </TableCell>
                           </TableRow>
@@ -451,11 +476,16 @@ export function MebleView() {
                                     <Chip label="MAIN" size="small" sx={{ fontSize: '0.5rem', height: 16, fontWeight: 700, backgroundColor: alpha(theme.palette.success.main, 0.12), color: theme.palette.success.main }} />
                                     <Typography variant="body2" sx={{ fontSize: '0.7rem', flex: 1 }}>Cena główna</Typography>
                                     <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '0.75rem' }}>{formatCurrency(item.cena)}</Typography>
-                                    {(item.linki || []).map((link, li) => (
-                                      <Chip key={li} label={link.nazwa} size="small" onClick={() => window.open(link.url, '_blank')}
-                                        sx={{ fontSize: '0.55rem', height: 18, cursor: 'pointer', backgroundColor: alpha(theme.palette.primary.main, 0.06), '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.12) } }} />
-                                    ))}
-                                    <Tooltip title="Zarządzaj linkami"><IconButton size="small" onClick={() => setLinksItem(item)} sx={{ opacity: 0.5, '&:hover': { opacity: 1 }, width: 20, height: 20 }}><LinkIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                    {(item.linki || []).length > 0 && (
+                                      <Chip label={`${item.linki.length} link${item.linki.length > 1 ? 'i' : ''}`} size="small"
+                                        onClick={() => setLinksItem(item)}
+                                        sx={{ fontSize: '0.55rem', height: 18, cursor: 'pointer', backgroundColor: alpha(theme.palette.primary.main, 0.08), '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.14) } }} />
+                                    )}
+                                    <Tooltip title="Linki"><IconButton size="small" onClick={() => setLinksItem(item)} sx={{ opacity: 0.5, '&:hover': { opacity: 1 }, width: 20, height: 20 }}><LinkIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                    <Tooltip title="Edytuj"><IconButton size="small" onClick={() => openEditDialog(item)} sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.primary.main }, width: 20, height: 20 }}><EditIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                    {(item.alternatywy || []).length > 0 && (
+                                      <Tooltip title="Usuń MAIN (wybierz nowy)"><IconButton size="small" onClick={() => setDeleteChoiceItem(item)} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.error.main }, width: 20, height: 20 }}><DeleteIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                    )}
                                   </Box>
                                   {/* ALT entries */}
                                   {(item.alternatywy || []).map((alt) => (
@@ -473,16 +503,18 @@ export function MebleView() {
                                       <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '0.75rem', color: alt.cena <= item.cena ? theme.palette.success.main : theme.palette.warning.main }}>
                                         {formatCurrency(alt.cena)}
                                       </Typography>
-                                      {(alt.linki || []).map((link, li) => (
-                                        <Chip key={li} label={link.nazwa} size="small" onClick={() => window.open(link.url, '_blank')}
-                                          sx={{ fontSize: '0.55rem', height: 18, cursor: 'pointer', backgroundColor: alpha(theme.palette.primary.main, 0.06), '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.12) } }} />
-                                      ))}
-                                      <Tooltip title="Linki"><IconButton size="small" onClick={() => setLinksAlt({ itemId: item.id, alt })} sx={{ opacity: 0.5, '&:hover': { opacity: 1 }, width: 20, height: 20 }}><LinkIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                      {(alt.linki || []).length > 0 && (
+                                        <Chip label={`${alt.linki.length} link${alt.linki.length > 1 ? 'i' : ''}`} size="small"
+                                          onClick={() => setLinksAlt({ itemId: item.id, alt })}
+                                          sx={{ fontSize: '0.55rem', height: 18, cursor: 'pointer', backgroundColor: alpha(theme.palette.primary.main, 0.08), '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.14) } }} />
+                                      )}
                                       <Tooltip title="Ustaw jako MAIN"><IconButton size="small" onClick={() => {
                                         const oldMain: AlternativeItem = { id: generateId(), included: true, nazwa: 'Poprzednia opcja', cena: item.cena, linki: item.linki || [], uwagi: '' };
                                         const newAlts = [oldMain, ...(item.alternatywy || []).filter((a) => a.id !== alt.id)];
                                         updateMebleItem(item.id, { cena: alt.cena, linki: alt.linki || [], alternatywy: newAlts });
                                       }} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.success.main }, width: 20, height: 20 }}><AltIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                      <Tooltip title="Linki"><IconButton size="small" onClick={() => setLinksAlt({ itemId: item.id, alt })} sx={{ opacity: 0.5, '&:hover': { opacity: 1 }, width: 20, height: 20 }}><LinkIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
+                                      <Tooltip title="Edytuj"><IconButton size="small" onClick={() => setEditingAlt({ itemId: item.id, alt })} sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.primary.main }, width: 20, height: 20 }}><EditIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
                                       <Tooltip title="Usuń"><IconButton size="small" onClick={() => {
                                         const newAlts = (item.alternatywy || []).filter((a) => a.id !== alt.id);
                                         updateMebleItem(item.id, { alternatywy: newAlts });
@@ -779,6 +811,89 @@ export function MebleView() {
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={() => setPayChoiceItem(null)}>Anuluj</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete MAIN choice dialog — pick new MAIN */}
+      <Dialog open={!!deleteChoiceItem} onClose={() => setDeleteChoiceItem(null)} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ fontWeight: 600 }}>Wybierz nowy MAIN</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Usuwasz cenę główną. Wybierz alternatywę, która stanie się nową ceną główną:
+          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            {(deleteChoiceItem?.alternatywy || []).map((alt) => (
+              <Box
+                key={alt.id}
+                onClick={() => {
+                  if (deleteChoiceItem) {
+                    const newAlts = (deleteChoiceItem.alternatywy || []).filter(a => a.id !== alt.id);
+                    updateMebleItem(deleteChoiceItem.id, {
+                      cena: alt.cena,
+                      linki: alt.linki || [],
+                      alternatywy: newAlts,
+                    });
+                    setDeleteChoiceItem(null);
+                  }
+                }}
+                sx={{
+                  p: 1.5, borderRadius: 2, cursor: 'pointer',
+                  border: `1px solid ${theme.palette.divider}`,
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  '&:hover': { borderColor: theme.palette.success.main, backgroundColor: alpha(theme.palette.success.main, 0.04) },
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Chip label="→ MAIN" size="small" sx={{ fontSize: '0.5rem', height: 16, fontWeight: 700, backgroundColor: alpha(theme.palette.success.main, 0.1), color: theme.palette.success.main }} />
+                  <Typography variant="body2">{alt.nazwa}</Typography>
+                </Box>
+                <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'monospace' }}>
+                  {formatCurrency(alt.cena)}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setDeleteChoiceItem(null)}>Anuluj</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit ALT dialog */}
+      <Dialog open={!!editingAlt} onClose={() => setEditingAlt(null)} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ fontWeight: 600 }}>Edytuj alternatywę</DialogTitle>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
+          <TextField
+            label="Nazwa"
+            defaultValue={editingAlt?.alt.nazwa || ''}
+            onChange={(e) => { if (editingAlt) setEditingAlt({ ...editingAlt, alt: { ...editingAlt.alt, nazwa: e.target.value } }); }}
+            fullWidth size="small"
+          />
+          <TextField
+            label="Cena (PLN)"
+            type="number"
+            defaultValue={editingAlt?.alt.cena || 0}
+            onChange={(e) => { if (editingAlt) setEditingAlt({ ...editingAlt, alt: { ...editingAlt.alt, cena: Number(e.target.value) } }); }}
+            fullWidth size="small"
+          />
+          <TextField
+            label="Uwagi"
+            defaultValue={editingAlt?.alt.uwagi || ''}
+            onChange={(e) => { if (editingAlt) setEditingAlt({ ...editingAlt, alt: { ...editingAlt.alt, uwagi: e.target.value } }); }}
+            fullWidth size="small" multiline rows={2}
+          />
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setEditingAlt(null)}>Anuluj</Button>
+          <Button variant="contained" onClick={() => {
+            if (editingAlt) {
+              const newAlts = (meble.find(m => m.id === editingAlt.itemId)?.alternatywy || []).map((a) =>
+                a.id === editingAlt.alt.id ? { ...a, nazwa: editingAlt.alt.nazwa, cena: editingAlt.alt.cena, uwagi: editingAlt.alt.uwagi } : a
+              );
+              updateMebleItem(editingAlt.itemId, { alternatywy: newAlts });
+              setEditingAlt(null);
+            }
+          }}>Zapisz</Button>
         </DialogActions>
       </Dialog>
     </Box>
