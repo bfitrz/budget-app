@@ -85,6 +85,8 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
   const [itemMenuTarget, setItemMenuTarget] = useState<CostItem | null>(null);
   const [altMenuAnchor, setAltMenuAnchor] = useState<null | HTMLElement>(null);
   const [altMenuTarget, setAltMenuTarget] = useState<{ item: CostItem; alt: AlternativeItem } | null>(null);
+  const [mainMenuAnchor, setMainMenuAnchor] = useState<null | HTMLElement>(null);
+  const [mainMenuTarget, setMainMenuTarget] = useState<CostItem | null>(null);
 
   // Grouping
   const groups = useMemo(() => {
@@ -486,10 +488,10 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                                 <Collapse in={expandedItems.has(item.id)} timeout="auto" unmountOnExit>
                                   <Box sx={{ pl: 2, pr: 2, pb: 1.5, pt: 0.5, display: 'flex', flexDirection: 'column', gap: 0.75 }}>
                                     {/* MAIN */}
-                                    <Box sx={{ display: 'grid', gridTemplateColumns: '24px 50px 1fr 120px 80px 100px', alignItems: 'center', gap: 2, px: 1.5, py: 0.75, borderRadius: 1.5, backgroundColor: alpha(theme.palette.success.main, 0.03), border: `1px solid ${alpha(theme.palette.success.main, 0.1)}` }}>
+                                    <Box sx={{ display: 'grid', gridTemplateColumns: '24px 50px 1fr 120px 80px 40px', alignItems: 'center', gap: 2, px: 1.5, py: 0.75, borderRadius: 1.5, backgroundColor: alpha(theme.palette.success.main, 0.03), border: `1px solid ${alpha(theme.palette.success.main, 0.1)}` }}>
                                       <Box></Box>
                                       <Chip label="MAIN" size="small" sx={{ fontSize: '0.5rem', height: 16, fontWeight: 700, backgroundColor: alpha(theme.palette.success.main, 0.12), color: theme.palette.success.main }} />
-                                      <Typography variant="body2" sx={{ fontSize: '0.7rem' }}>Cena główna</Typography>
+                                      <Typography variant="body2" sx={{ fontSize: '0.7rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{(item[config.nameField] as string) || 'Główna'}</Typography>
                                       <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: 'monospace', fontSize: '0.75rem', textAlign: 'right' }}>{formatCurrencyOrDash(getCost(item))}</Typography>
                                       <Box>
                                         {(item.linki || []).length > 0 && (
@@ -498,17 +500,15 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                                           </Tooltip>
                                         )}
                                       </Box>
-                                      <Box sx={{ display: 'flex', gap: 0.25, justifyContent: 'flex-end' }}>
-                                        <Tooltip title="Linki"><IconButton size="small" onClick={() => setLinksItem(item)} sx={{ opacity: 0.5, '&:hover': { opacity: 1 }, width: 20, height: 20 }}><LinkIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
-                                        <Tooltip title="Edytuj cenę"><IconButton size="small" onClick={() => setEditingMainPrice(item)} sx={{ opacity: 0.5, '&:hover': { opacity: 1, color: theme.palette.primary.main }, width: 20, height: 20 }}><EditIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
-                                        {(item.alternatywy || []).length > 0 && (
-                                          <Tooltip title="Usuń MAIN (wybierz nowy)"><IconButton size="small" onClick={() => setDeleteChoiceItem(item)} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.error.main }, width: 20, height: 20 }}><DeleteIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
-                                        )}
+                                      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                        <IconButton size="small" onClick={(e) => { setMainMenuAnchor(e.currentTarget); setMainMenuTarget(item); }} sx={{ opacity: 0.4, '&:hover': { opacity: 1 }, width: 20, height: 20 }}>
+                                          <MoreIcon sx={{ fontSize: 14 }} />
+                                        </IconButton>
                                       </Box>
                                     </Box>
                                     {/* ALTs */}
                                     {(item.alternatywy || []).map((alt) => (
-                                      <Box key={alt.id} sx={{ display: 'grid', gridTemplateColumns: '24px 50px 1fr 120px 80px 100px', alignItems: 'center', gap: 2, px: 1.5, py: 0.75, borderRadius: 1.5, backgroundColor: alpha(theme.palette.info.main, 0.02), border: `1px solid ${alpha(theme.palette.info.main, 0.08)}`, opacity: alt.included ? 1 : 0.4 }}>
+                                      <Box key={alt.id} sx={{ display: 'grid', gridTemplateColumns: '24px 50px 1fr 120px 80px 40px', alignItems: 'center', gap: 2, px: 1.5, py: 0.75, borderRadius: 1.5, backgroundColor: alpha(theme.palette.info.main, 0.02), border: `1px solid ${alpha(theme.palette.info.main, 0.08)}`, opacity: alt.included ? 1 : 0.4 }}>
                                         <Tooltip title={alt.included ? 'Kliknij aby wykluczyć z budżetu' : 'Kliknij aby wliczyć do budżetu'}>
                                           <IconButton size="small" onClick={() => { const newAlts = (item.alternatywy || []).map((a) => a.id === alt.id ? { ...a, included: !a.included } : a); updateItem(item.id, { alternatywy: newAlts }); }} sx={{ p: 0, width: 20, height: 20, color: alt.included ? theme.palette.success.main : theme.palette.text.secondary, opacity: alt.included ? 0.7 : 0.3, '&:hover': { opacity: 1 } }}>
                                             {alt.included ? <IncludedIcon sx={{ fontSize: 13 }} /> : <ExcludedIcon sx={{ fontSize: 13 }} />}
@@ -735,6 +735,31 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
           <ListItemIcon><DeleteIcon fontSize="small" sx={{ color: theme.palette.error.main }} /></ListItemIcon>
           <ListItemText>Usuń</ListItemText>
         </MenuItem>
+      </Menu>
+
+      {/* MAIN context menu */}
+      <Menu
+        anchorEl={mainMenuAnchor}
+        open={!!mainMenuAnchor}
+        onClose={() => { setMainMenuAnchor(null); setMainMenuTarget(null); }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        slotProps={{ paper: { sx: { minWidth: 180, borderRadius: 2, mt: 0.5 } } }}
+      >
+        <MenuItem onClick={() => { if (mainMenuTarget) setLinksItem(mainMenuTarget); setMainMenuAnchor(null); setMainMenuTarget(null); }}>
+          <ListItemIcon><LinkIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>Linki</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => { if (mainMenuTarget) setEditingMainPrice(mainMenuTarget); setMainMenuAnchor(null); setMainMenuTarget(null); }}>
+          <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>Edytuj cenę</ListItemText>
+        </MenuItem>
+        {mainMenuTarget && (mainMenuTarget.alternatywy || []).length > 0 && (
+          <MenuItem onClick={() => { if (mainMenuTarget) setDeleteChoiceItem(mainMenuTarget); setMainMenuAnchor(null); setMainMenuTarget(null); }} sx={{ color: theme.palette.error.main }}>
+            <ListItemIcon><DeleteIcon fontSize="small" sx={{ color: theme.palette.error.main }} /></ListItemIcon>
+            <ListItemText>Zastąp inną opcją</ListItemText>
+          </MenuItem>
+        )}
       </Menu>
 
       {/* Delete item confirmation */}
