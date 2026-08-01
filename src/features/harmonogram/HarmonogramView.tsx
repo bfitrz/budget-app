@@ -44,7 +44,7 @@ import {
 } from 'recharts';
 import { useForm, Controller } from 'react-hook-form';
 import { useBudgetStore } from '@/store';
-import { ScheduleEntry } from '@/types';
+import { ScheduleEntry, MilestoneEntry } from '@/types';
 import { formatCurrency, formatDate } from '@/utils';
 import { CurrencyField, DateField } from '@/components';
 
@@ -52,6 +52,11 @@ interface ScheduleFormData {
   data: string;
   opis: string;
   kwota: number;
+}
+
+interface MilestoneFormData {
+  data: string;
+  opis: string;
 }
 
 export function HarmonogramView() {
@@ -63,6 +68,9 @@ export function HarmonogramView() {
   const toggleScheduleRealized = useBudgetStore((s) => s.toggleScheduleRealized);
   const getCashFlowProjection = useBudgetStore((s) => s.getCashFlowProjection);
   const getDashboardSummary = useBudgetStore((s) => s.getDashboardSummary);
+  const milestones = useBudgetStore((s) => s.milestones);
+  const addMilestone = useBudgetStore((s) => s.addMilestone);
+  const deleteMilestone = useBudgetStore((s) => s.deleteMilestone);
 
   const summary = getDashboardSummary();
   const cashFlow = getCashFlowProjection();
@@ -80,6 +88,7 @@ export function HarmonogramView() {
   const pokrycie = prognozowaneSaldo - summary.pozostaloDoZaplaty;
 
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [milestoneDialogOpen, setMilestoneDialogOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<ScheduleEntry | null>(null);
   const { control, handleSubmit, reset, setValue } = useForm<ScheduleFormData>({
     defaultValues: {
@@ -88,6 +97,28 @@ export function HarmonogramView() {
       kwota: 0,
     },
   });
+  const { control: msControl, handleSubmit: msHandleSubmit, reset: msReset } = useForm<MilestoneFormData>({
+    defaultValues: { data: new Date().toISOString().split('T')[0], opis: '' },
+  });
+
+  const onMilestoneSubmit = (data: MilestoneFormData) => {
+    addMilestone({ data: data.data, opis: data.opis });
+    msReset();
+    setMilestoneDialogOpen(false);
+  };
+
+  // Calculate saldo at a given date for milestones
+  const getSaldoAtDate = (date: string): number => {
+    let saldo = summary.aktualnieSrodki;
+    const futureEntries = [...harmonogram]
+      .filter((e) => !e.zrealizowane)
+      .sort((a, b) => a.data.localeCompare(b.data));
+    for (const entry of futureEntries) {
+      if (entry.data <= date) saldo += entry.kwota;
+      else break;
+    }
+    return saldo;
+  };
 
   const onSubmit = (data: ScheduleFormData) => {
     if (editingEntry) {
@@ -138,14 +169,22 @@ export function HarmonogramView() {
               Zaplanuj przyszłe wpływy (wypłaty, przelewy, zwroty) i zobacz na wykresie kiedy zgromadzisz wystarczająco środków na pokrycie kosztów.
             </Typography>
           </Box>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={openAddDialog}
-            sx={{ mt: 0.5 }}
-          >
-            Zaplanuj wpływ
-          </Button>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => { msReset({ data: new Date().toISOString().split('T')[0], opis: '' }); setMilestoneDialogOpen(true); }}
+            >
+              📌 Milestone
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={openAddDialog}
+            >
+              Zaplanuj wpływ
+            </Button>
+          </Box>
         </Box>
       </Box>
 
@@ -303,6 +342,22 @@ export function HarmonogramView() {
                   activeDot={{ r: 7 }}
                   name="saldo"
                 />
+                {/* Milestones */}
+                {milestones.map((ms) => (
+                  <ReferenceLine
+                    key={ms.id}
+                    x={ms.data}
+                    stroke={theme.palette.error.main}
+                    strokeDasharray="4 4"
+                    strokeWidth={1.5}
+                    label={{
+                      value: `📌 ${ms.opis}`,
+                      position: 'top',
+                      fill: theme.palette.error.main,
+                      fontSize: 10,
+                    }}
+                  />
+                ))}
               </AreaChart>
             </ResponsiveContainer>
 
@@ -320,7 +375,42 @@ export function HarmonogramView() {
                 <Box sx={{ width: 16, height: 0, borderTop: `2px dashed ${theme.palette.warning.main}` }} />
                 <Typography variant="caption">Cel: <strong>{formatCurrency(summary.pozostaloDoZaplaty)}</strong> (tyle musisz zdobyć)</Typography>
               </Box>
+              {milestones.length > 0 && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                  <Box sx={{ width: 16, height: 0, borderTop: `2px dashed ${theme.palette.error.main}` }} />
+                  <Typography variant="caption">📌 Milestony ({milestones.length})</Typography>
+                </Box>
+              )}
             </Box>
+
+            {/* Milestones info */}
+            {milestones.length > 0 && (
+              <Box sx={{ mt: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                {milestones.map((ms) => {
+                  const saldoAtMs = getSaldoAtDate(ms.data);
+                  const bilansAtMs = saldoAtMs - summary.pozostaloDoZaplaty;
+                  return (
+                    <Tooltip key={ms.id} title={
+                      <Box sx={{ p: 0.5 }}>
+                        <Typography variant="caption" sx={{ fontWeight: 600, display: 'block' }}>📌 {ms.opis} — {formatDate(ms.data)}</Typography>
+                        <Typography variant="caption" sx={{ display: 'block' }}>Środki: {formatCurrency(saldoAtMs)}</Typography>
+                        <Typography variant="caption" sx={{ display: 'block' }}>Pozostało do zapłaty: {formatCurrency(summary.pozostaloDoZaplaty)}</Typography>
+                        <Typography variant="caption" sx={{ display: 'block', color: bilansAtMs >= 0 ? theme.palette.success.main : theme.palette.error.main, fontWeight: 600 }}>
+                          Bilans: {bilansAtMs >= 0 ? '+' : ''}{formatCurrency(bilansAtMs)}
+                        </Typography>
+                      </Box>
+                    } arrow slotProps={{ tooltip: { sx: { backgroundColor: theme.palette.background.paper, color: theme.palette.text.primary, border: `1px solid ${theme.palette.divider}`, borderRadius: 2, p: 1.5, boxShadow: '0 4px 20px rgba(0,0,0,0.2)' } }, arrow: { sx: { color: theme.palette.background.paper } } }}>
+                      <Chip
+                        label={`📌 ${ms.opis} (${formatDate(ms.data)})`}
+                        size="small"
+                        onDelete={() => deleteMilestone(ms.id)}
+                        sx={{ fontSize: '0.7rem', backgroundColor: alpha(theme.palette.error.main, 0.08), color: theme.palette.error.main, fontWeight: 500 }}
+                      />
+                    </Tooltip>
+                  );
+                })}
+              </Box>
+            )}
 
             {pokrycie < 0 && cashFlow.length > 1 && (
               <Box sx={{
@@ -527,6 +617,51 @@ export function HarmonogramView() {
             <Button type="submit" variant="contained">
               {editingEntry ? 'Zapisz' : 'Zaplanuj'}
             </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
+
+      {/* Milestone dialog */}
+      <Dialog open={milestoneDialogOpen} onClose={() => setMilestoneDialogOpen(false)} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ fontWeight: 600 }}>📌 Dodaj milestone</DialogTitle>
+        <form onSubmit={msHandleSubmit(onMilestoneSubmit)}>
+          <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 2, maxHeight: '70vh' }}>
+            <Typography variant="body2" color="text.secondary">
+              Milestone to deadline lub ważna data — pojawi się jako pionowa linia na wykresie z informacją o prognozowanym saldzie.
+            </Typography>
+            <Controller
+              name="data"
+              control={msControl}
+              rules={{ required: 'Wymagane' }}
+              render={({ field, fieldState }) => (
+                <DateField
+                  {...field}
+                  label="Data milestone"
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                  fullWidth
+                />
+              )}
+            />
+            <Controller
+              name="opis"
+              control={msControl}
+              rules={{ required: 'Wymagane' }}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label="Opis"
+                  placeholder="np. Termin oddania kluczy"
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                  fullWidth
+                />
+              )}
+            />
+          </DialogContent>
+          <DialogActions sx={{ px: 3, pb: 2.5 }}>
+            <Button onClick={() => setMilestoneDialogOpen(false)}>Anuluj</Button>
+            <Button type="submit" variant="contained">Dodaj</Button>
           </DialogActions>
         </form>
       </Dialog>

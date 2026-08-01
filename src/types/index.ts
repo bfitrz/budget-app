@@ -101,6 +101,12 @@ export interface ScheduleEntry {
   zrealizowane: boolean;
 }
 
+export interface MilestoneEntry {
+  id: string;
+  data: string;
+  opis: string;
+}
+
 export interface BudgetState {
   meble: MebleItem[];
   wykonczenie: WykonczenieItem[];
@@ -109,6 +115,7 @@ export interface BudgetState {
   wyprowadzka: WyprowadzkaItem[];
   saldo: SaldoEntry[];
   harmonogram: ScheduleEntry[];
+  milestones: MilestoneEntry[];
   isDataLoaded: boolean;
 }
 

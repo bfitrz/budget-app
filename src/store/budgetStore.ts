@@ -8,6 +8,7 @@ import {
   WyprowadzkaItem,
   SaldoEntry,
   ScheduleEntry,
+  MilestoneEntry,
   DashboardSummary,
   CategoryCost,
   CategoryBreakdown,
@@ -50,6 +51,10 @@ interface BudgetActions {
   updateScheduleEntry: (id: string, updates: Partial<ScheduleEntry>) => void;
   toggleScheduleRealized: (id: string) => void;
 
+  addMilestone: (entry: Omit<MilestoneEntry, 'id'>) => void;
+  deleteMilestone: (id: string) => void;
+  updateMilestone: (id: string, updates: Partial<MilestoneEntry>) => void;
+
   getDashboardSummary: () => DashboardSummary;
   getCategoryCosts: () => CategoryCost[];
   getCategoryBreakdown: () => CategoryBreakdown[];
@@ -67,6 +72,7 @@ const initialState: BudgetState = {
   wyprowadzka: [],
   saldo: [],
   harmonogram: [],
+  milestones: [],
   isDataLoaded: false,
 };
 
@@ -83,6 +89,7 @@ function getStateSnapshot(state: BudgetStore): BudgetState {
     wyprowadzka: state.wyprowadzka,
     saldo: state.saldo,
     harmonogram: state.harmonogram,
+    milestones: state.milestones,
     isDataLoaded: state.isDataLoaded,
   };
 }
@@ -116,7 +123,8 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
     }));
     const wyprowadzka = (((loaded as unknown as Record<string, unknown>).wyprowadzka as BudgetState['wyprowadzka']) || []).map((item) => ({ ...item, ...migrateItem(item as unknown as Record<string, unknown>) }));
     const harmonogram = loaded.harmonogram || [];
-    init = { ...initialState, ...loaded, meble, wykonczenie, agd, pozostale, wyprowadzka, harmonogram };
+    const milestones = ((loaded as unknown as Record<string, unknown>).milestones as BudgetState['milestones']) || [];
+    init = { ...initialState, ...loaded, meble, wykonczenie, agd, pozostale, wyprowadzka, harmonogram, milestones };
   } else {
     init = initialState;
   }
@@ -349,6 +357,32 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         const newState = { ...state, harmonogram };
         persistState(getStateSnapshot(newState as BudgetStore));
         return { harmonogram };
+      });
+    },
+
+    // Milestones
+    addMilestone: (entry) => {
+      set((state) => {
+        const milestones = [...state.milestones, { ...entry, id: generateId() }];
+        const newState = { ...state, milestones };
+        persistState(getStateSnapshot(newState as BudgetStore));
+        return { milestones };
+      });
+    },
+    deleteMilestone: (id) => {
+      set((state) => {
+        const milestones = state.milestones.filter((e) => e.id !== id);
+        const newState = { ...state, milestones };
+        persistState(getStateSnapshot(newState as BudgetStore));
+        return { milestones };
+      });
+    },
+    updateMilestone: (id, updates) => {
+      set((state) => {
+        const milestones = state.milestones.map((e) => e.id === id ? { ...e, ...updates } : e);
+        const newState = { ...state, milestones };
+        persistState(getStateSnapshot(newState as BudgetStore));
+        return { milestones };
       });
     },
 
