@@ -260,10 +260,10 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
       <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
         <Card sx={{ flex: 1, minWidth: 200 }}>
           <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-            <Typography variant="overline" color="text.secondary">Suma</Typography>
-            <Typography variant="h5" sx={{ fontWeight: 700 }}>{formatCurrency(totalIncluded)}</Typography>
+            <Typography variant="overline" color="text.secondary">Opłacone / Suma</Typography>
+            <Typography variant="h5" sx={{ fontWeight: 700 }}>{formatCurrency(paidTotal)} / {formatCurrency(totalIncluded)}</Typography>
             <Typography variant="caption" color="text.secondary">
-              Opłacone {formatCurrency(paidTotal)} · Zostało {formatCurrency(remainingTotal)}
+              Zostało {formatCurrency(remainingTotal)}
             </Typography>
           </CardContent>
         </Card>
