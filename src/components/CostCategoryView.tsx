@@ -12,7 +12,7 @@ import {
   AttachMoney as IncludedIcon, MoneyOff as ExcludedIcon,
   TrendingDown as ArrowDownPriceIcon, TrendingUp as ArrowUpIcon, DragHandle as DragHandleIcon,
   Close as CloseIcon, VisibilityOff as DisableGroupIcon, Visibility as EnableGroupIcon,
-  MoreVert as MoreIcon, HelpOutline as HelpIcon,
+  MoreVert as MoreIcon, HelpOutline as HelpIcon, Comment as CommentIcon,
 } from '@mui/icons-material';
 import { AlternativeItem, ItemLink, PaymentStatus } from '@/types';
 import { formatCurrency, formatCurrencyOrDash, generateId } from '@/utils';
@@ -264,6 +264,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
         const activeItems = items.filter((i) => { const grp = (i[config.groupField] as string) || 'Bez grupy'; return i.included && !disabledGroups.has(grp); });
         const hiddenCount = items.length - activeItems.length;
         const altCount = items.reduce((s, i) => s + (i.alternatywy || []).length, 0);
+        const commentCount = items.filter((i) => i.uwagi).length;
         const allPricesMin = activeItems.reduce((s, i) => {
           const prices = [getCost(i), ...(i.alternatywy || []).filter(a => a.included).map(a => a.cena)];
           return s + Math.min(...prices);
@@ -359,6 +360,12 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                       <Typography variant="body2" sx={{ fontWeight: 600, color: theme.palette.info.main }}>{altCount}</Typography>
                     </Box>
                   )}
+                  {commentCount > 0 && (
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="caption" color="text.secondary">Komentarze</Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: theme.palette.warning.main }}>{commentCount}</Typography>
+                    </Box>
+                  )}
                 </Box>
               </CardContent>
             </Card>
@@ -407,7 +414,6 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                         {config.columns.map(col => <TableCell key={col.field}>{col.label}</TableCell>)}
                         <TableCell align="right">Cena</TableCell>
                         <TableCell sx={{ width: 120 }}>Status</TableCell>
-                        <TableCell>Uwagi</TableCell>
                         <TableCell sx={{ width: 110 }}></TableCell>
                       </TableRow>
                     </TableHead>
@@ -457,9 +463,13 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                                     else { updateItem(item.id, { status: 'Opłacone', wybranaAltId: null }); }
                                   }} />
                               </TableCell>
-                              <TableCell><TextField size="small" value={item.uwagi} onChange={(e) => updateItem(item.id, { uwagi: e.target.value })} placeholder="..." variant="standard" sx={{ '& .MuiInput-root': { fontSize: '0.8rem' } }} /></TableCell>
                               <TableCell>
                                 <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center', justifyContent: 'flex-end' }}>
+                                  {item.uwagi && (
+                                    <Tooltip title={item.uwagi} arrow slotProps={{ tooltip: { sx: { maxWidth: 280, fontSize: '0.75rem', lineHeight: 1.5, p: 1.5 } } }}>
+                                      <Chip icon={<CommentIcon sx={{ fontSize: '12px !important' }} />} label="uwagi" size="small" sx={{ fontSize: '0.55rem', height: 20, backgroundColor: alpha(theme.palette.warning.main, 0.1), color: theme.palette.warning.main, cursor: 'default' }} />
+                                    </Tooltip>
+                                  )}
                                   {(() => { const t = (item.linki || []).length + (item.alternatywy || []).reduce((s, a) => s + (a.linki || []).length, 0); return t > 0 ? <Chip label={`${t} 🔗`} size="small" sx={{ fontSize: '0.55rem', height: 20, backgroundColor: alpha(theme.palette.primary.main, 0.08) }} /> : null; })()}
                                   {(item.alternatywy || []).length > 0 && <Chip label={`${(item.alternatywy || []).length} alt`} size="small" sx={{ fontSize: '0.55rem', height: 20, backgroundColor: alpha(theme.palette.info.main, 0.1), color: theme.palette.info.main, fontWeight: 600 }} />}
                                   <IconButton size="small" onClick={(e) => { setItemMenuAnchor(e.currentTarget); setItemMenuTarget(item); }} sx={{ opacity: 0.4, '&:hover': { opacity: 1 }, ml: 0.5 }}>
@@ -470,7 +480,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                             </TableRow>
                             {/* Collapsible MAIN + ALT */}
                             <TableRow sx={{ opacity: item.included ? 1 : 0.35 }}>
-                              <TableCell colSpan={8 + config.columns.length} sx={{ py: 0, px: 0, border: 'none' }}>
+                              <TableCell colSpan={7 + config.columns.length} sx={{ py: 0, px: 0, border: 'none' }}>
                                 <Collapse in={expandedItems.has(item.id)} timeout="auto" unmountOnExit>
                                   <Box sx={{ pl: 2, pr: 2, pb: 1.5, pt: 0.5, display: 'flex', flexDirection: 'column', gap: 0.75 }}>
                                     {/* MAIN */}
