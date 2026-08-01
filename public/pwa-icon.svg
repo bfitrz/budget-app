@@ -1,4 +1,75 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="64" fill="#6366f1"/>
-  <text x="256" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="240" font-weight="bold" fill="white">B</text>
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e1b4b"/>
+      <stop offset="50%" style="stop-color:#312e81"/>
+      <stop offset="100%" style="stop-color:#1e1b4b"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fbbf24"/>
+      <stop offset="40%" style="stop-color:#f59e0b"/>
+      <stop offset="70%" style="stop-color:#d97706"/>
+      <stop offset="100%" style="stop-color:#fbbf24"/>
+    </linearGradient>
+    <linearGradient id="goldShine" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fef3c7;stop-opacity:0.9"/>
+      <stop offset="50%" style="stop-color:#f59e0b;stop-opacity:0.6"/>
+      <stop offset="100%" style="stop-color:#92400e;stop-opacity:0.8"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#818cf8"/>
+      <stop offset="100%" style="stop-color:#a78bfa"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bgGrad)"/>
+  
+  <!-- Subtle border -->
+  <rect x="2" y="2" width="508" height="508" rx="94" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" opacity="0.3"/>
+
+  <!-- Inner decorative ring -->
+  <circle cx="256" cy="256" r="180" fill="none" stroke="url(#goldGrad)" stroke-width="0.75" opacity="0.2"/>
+  
+  <!-- Diamond shape accent behind letter -->
+  <path d="M256 100 L350 256 L256 412 L162 256 Z" fill="none" stroke="url(#accentGrad)" stroke-width="1" opacity="0.15"/>
+
+  <!-- Main letter B with gold gradient -->
+  <g filter="url(#shadow)">
+    <!-- B letter path - custom premium design -->
+    <path d="M192 148 L192 364 L280 364 C320 364 348 340 348 308 C348 284 332 264 308 258 C328 252 340 234 340 212 C340 180 316 148 276 148 L192 148 Z
+             M232 182 L272 182 C296 182 308 196 308 212 C308 228 296 242 272 242 L232 242 L232 182 Z
+             M232 272 L280 272 C308 272 316 288 316 306 C316 324 304 332 280 332 L232 332 L232 272 Z"
+          fill="url(#goldShine)" filter="url(#glow)"/>
+  </g>
+
+  <!-- Small crown above B -->
+  <g transform="translate(256, 108)" filter="url(#glow)">
+    <path d="M-24 0 L-18 -16 L-8 -6 L0 -20 L8 -6 L18 -16 L24 0 Z" 
+          fill="url(#goldGrad)" opacity="0.9"/>
+    <!-- Crown dots -->
+    <circle cx="-18" cy="-18" r="2.5" fill="#fef3c7"/>
+    <circle cx="0" cy="-22" r="2.5" fill="#fef3c7"/>
+    <circle cx="18" cy="-18" r="2.5" fill="#fef3c7"/>
+  </g>
+
+  <!-- Decorative lines bottom -->
+  <line x1="200" y1="388" x2="312" y2="388" stroke="url(#goldGrad)" stroke-width="1.5" opacity="0.5"/>
+  <line x1="220" y1="396" x2="292" y2="396" stroke="url(#goldGrad)" stroke-width="1" opacity="0.3"/>
+
+  <!-- Corner accents -->
+  <path d="M40 80 L40 50 L70 50" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" opacity="0.4" stroke-linecap="round"/>
+  <path d="M472 80 L472 50 L442 50" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" opacity="0.4" stroke-linecap="round"/>
+  <path d="M40 432 L40 462 L70 462" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" opacity="0.4" stroke-linecap="round"/>
+  <path d="M472 432 L472 462 L442 462" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" opacity="0.4" stroke-linecap="round"/>
 </svg>
