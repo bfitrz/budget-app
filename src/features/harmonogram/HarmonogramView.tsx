@@ -235,8 +235,8 @@ export function HarmonogramView() {
               <Typography variant="h6" sx={{ fontWeight: 700 }}>
                 {formatCurrency(summary.aktualnieSrodki)}
               </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.6rem' }}>
-                + wpływy = {formatCurrency(prognozowaneSaldo)}
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.55rem', display: 'block', mt: 0.25 }}>
+                Wpływy {formatCurrency(summary.wplywy)} − Wydane {formatCurrency(summary.zaplacono)}
               </Typography>
             </CardContent>
           </Card>
