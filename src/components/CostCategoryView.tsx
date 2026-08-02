@@ -519,7 +519,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
               </AccordionSummary>
               <AccordionDetails sx={{ p: 0 }}>
                 {/* Per-group sort & filter controls */}
-                {group.allItems.length > 2 && (
+                {group.allItems.length > 1 && (
                   <Box sx={{ display: 'flex', gap: 1, px: 2.5, py: 1, alignItems: 'center', borderBottom: `1px solid ${theme.palette.divider}`, flexWrap: 'wrap' }}>
                     <ToggleButtonGroup
                       value={statusFilter[group.name] || 'all'}
