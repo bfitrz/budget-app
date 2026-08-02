@@ -323,19 +323,30 @@ export function HarmonogramView() {
                   fontSize={12}
                 />
                 <RechartsTooltip
-                  formatter={(value: number, name: string) => [
-                    formatCurrency(value),
-                    name === 'saldo' ? 'Prognozowane środki' : name === 'cel' ? 'Cel (pozostało do zapłaty)' : 'Cel z pominięte',
-                  ]}
-                  labelFormatter={(label: string) => formatDate(label)}
-                  contentStyle={{
-                    backgroundColor: theme.palette.background.paper,
-                    color: theme.palette.text.primary,
-                    border: `1px solid ${theme.palette.divider}`,
-                    borderRadius: 8,
+                  content={({ active, payload, label }) => {
+                    if (!active || !payload || payload.length === 0) return null;
+                    const saldo = payload.find(p => p.dataKey === 'saldo')?.value as number || 0;
+                    const cel = payload.find(p => p.dataKey === 'cel')?.value as number || 0;
+                    const celFull = payload.find(p => p.dataKey === 'celFull')?.value as number || 0;
+                    const dateStr = label as string;
+                    const wplywyDoTeraz = saldo - summary.aktualnieSrodki;
+                    const brakuje = cel - saldo;
+                    return (
+                      <Box sx={{ p: 1.5, backgroundColor: theme.palette.background.paper, border: `1px solid ${theme.palette.divider}`, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column', gap: 0.5, maxWidth: 300 }}>
+                        <Typography variant="caption" sx={{ fontWeight: 700 }}>{formatDate(dateStr)}</Typography>
+                        <Typography variant="caption" sx={{ display: 'block' }}>Aktualnie na stanie: {formatCurrency(summary.aktualnieSrodki)}</Typography>
+                        {wplywyDoTeraz > 0 && <Typography variant="caption" sx={{ display: 'block' }}>Wpływy do tej daty: +{formatCurrency(wplywyDoTeraz)}</Typography>}
+                        <Typography variant="caption" sx={{ display: 'block', fontWeight: 600 }}>Prognoza środków: {formatCurrency(saldo)}</Typography>
+                        <Box sx={{ borderTop: `1px solid ${alpha(theme.palette.divider, 0.3)}`, mt: 0.5, pt: 0.5 }}>
+                          <Typography variant="caption" sx={{ display: 'block' }}>Cel (do zapłaty): {formatCurrency(cel)}</Typography>
+                          {celFull > cel && <Typography variant="caption" sx={{ display: 'block' }}>Cel z pominięte: {formatCurrency(celFull)}</Typography>}
+                          <Typography variant="caption" sx={{ display: 'block', fontWeight: 700, color: brakuje <= 0 ? theme.palette.success.main : theme.palette.error.main }}>
+                            {brakuje <= 0 ? `Nadwyżka: +${formatCurrency(Math.abs(brakuje))}` : `Brakuje: -${formatCurrency(brakuje)}`}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    );
                   }}
-                  itemStyle={{ color: theme.palette.text.primary }}
-                  labelStyle={{ color: theme.palette.text.primary }}
                 />
                 {/* Zero line */}
                 <ReferenceLine
