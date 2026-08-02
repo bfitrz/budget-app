@@ -153,12 +153,10 @@ export function StorageSetup({
           {/* Dropbox */}
           <Card
             sx={{
-              cursor: 'pointer',
               border: `1px solid ${theme.palette.divider}`,
-              transition: 'all 0.15s ease',
-              '&:hover': { borderColor: theme.palette.primary.main, transform: 'translateY(-2px)', boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.15)}` },
+              opacity: 0.5,
+              pointerEvents: 'none',
             }}
-            onClick={handleDropboxClick}
           >
             <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 2.5 }}>
               <Box sx={{ width: 44, height: 44, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: alpha('#0061FF', 0.1) }}>
@@ -170,8 +168,8 @@ export function StorageSetup({
                   Synchronizacja z plikiem .xlsx na Dropbox. Współdzielenie z partnerem przez folder.
                 </Typography>
               </Box>
-              <Typography variant="caption" sx={{ px: 1.5, py: 0.5, borderRadius: 1, backgroundColor: alpha(theme.palette.success.main, 0.1), color: theme.palette.success.main, fontWeight: 600, fontSize: '0.6rem' }}>
-                ZALECANE
+              <Typography variant="caption" sx={{ px: 1.5, py: 0.5, borderRadius: 1, backgroundColor: alpha(theme.palette.text.secondary, 0.1), color: theme.palette.text.secondary, fontWeight: 600, fontSize: '0.6rem' }}>
+                WKRÓTCE
               </Typography>
             </CardContent>
           </Card>

@@ -3,7 +3,7 @@ import {
   Box, Typography, Button, Alert, Card, CardContent, CircularProgress,
   alpha, useTheme, Snackbar, Chip, Switch, FormControlLabel, TextField,
   Dialog, DialogTitle, DialogContent, DialogActions, Divider, Select, MenuItem,
-  List, ListItemButton, ListItemText, Link, IconButton, Slider,
+  List, ListItemButton, ListItemText, Link, IconButton, Slider, Tooltip,
 } from '@mui/material';
 import {
   FileUpload as UploadIcon, CloudUpload as CloudIcon, FileDownload as DownloadIcon,
@@ -321,15 +321,19 @@ export function ImportView() {
             Zmień połączenie
           </Typography>
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-            <Button
-              size="small"
-              variant={config?.provider === 'dropbox' ? 'contained' : 'outlined'}
-              startIcon={<DropboxIcon />}
-              onClick={() => handleSwitchProvider('dropbox')}
-              sx={{ textTransform: 'none', fontSize: '0.75rem' }}
-            >
-              Dropbox
-            </Button>
+            <Tooltip title="Wkrótce dostępne">
+              <span>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  startIcon={<DropboxIcon />}
+                  disabled
+                  sx={{ textTransform: 'none', fontSize: '0.75rem' }}
+                >
+                  Dropbox
+                </Button>
+              </span>
+            </Tooltip>
             <Button
               size="small"
               variant={config?.provider === 'google-drive' ? 'contained' : 'outlined'}
