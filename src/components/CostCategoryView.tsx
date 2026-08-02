@@ -4,7 +4,7 @@ import {
   Chip, IconButton, TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions,
   Card, CardContent, alpha, useTheme, Tooltip, Accordion, AccordionSummary, AccordionDetails,
   Autocomplete, Collapse, Menu, MenuItem, ListItemIcon, ListItemText, Select, FormControl,
-  InputAdornment, ToggleButton, ToggleButtonGroup,
+  InputAdornment,
 } from '@mui/material';
 import {
   Delete as DeleteIcon, Add as AddIcon, ExpandMore as ExpandMoreIcon,
@@ -520,25 +520,38 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
               <AccordionDetails sx={{ p: 0 }}>
                 {/* Per-group sort & filter controls */}
                 {group.allItems.length > 1 && (
-                  <Box sx={{ display: 'flex', gap: 1, px: 2.5, py: 1, alignItems: 'center', borderBottom: `1px solid ${theme.palette.divider}`, flexWrap: 'wrap' }}>
-                    <ToggleButtonGroup
-                      value={statusFilter[group.name] || 'all'}
-                      exclusive
-                      onChange={(_, val) => { if (val !== null) setStatusFilter(prev => ({ ...prev, [group.name]: val })); }}
-                      size="small"
-                      sx={{ '& .MuiToggleButton-root': { fontSize: '0.6rem', px: 1, py: 0.25, borderRadius: '6px !important', textTransform: 'none' } }}
-                    >
-                      <ToggleButton value="all">Wszystkie</ToggleButton>
-                      <ToggleButton value="Do zapłaty">Do zapłaty</ToggleButton>
-                      <ToggleButton value="Opłacone">Opłacone</ToggleButton>
-                      <ToggleButton value="Wykluczone">Wykluczone</ToggleButton>
-                    </ToggleButtonGroup>
-                    <FormControl size="small">
+                  <Box sx={{ display: 'flex', gap: 1.5, px: 2.5, py: 1, alignItems: 'center', borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}`, flexWrap: 'wrap', backgroundColor: alpha(theme.palette.background.default, 0.4) }}>
+                    <Box sx={{ display: 'flex', gap: 0.5 }}>
+                      {(['all', 'Do zapłaty', 'Opłacone', 'Wykluczone'] as const).map((val) => {
+                        const isActive = (statusFilter[group.name] || 'all') === val;
+                        const label = val === 'all' ? 'Wszystkie' : val;
+                        const color = val === 'Opłacone' ? theme.palette.success.main : val === 'Do zapłaty' ? theme.palette.warning.main : val === 'Wykluczone' ? theme.palette.text.secondary : theme.palette.primary.main;
+                        return (
+                          <Chip
+                            key={val}
+                            label={label}
+                            size="small"
+                            onClick={() => setStatusFilter(prev => ({ ...prev, [group.name]: val }))}
+                            sx={{
+                              fontSize: '0.6rem', height: 22, fontWeight: isActive ? 600 : 400,
+                              backgroundColor: isActive ? alpha(color, 0.12) : 'transparent',
+                              color: isActive ? color : theme.palette.text.secondary,
+                              border: `1px solid ${isActive ? alpha(color, 0.3) : alpha(theme.palette.divider, 0.5)}`,
+                              cursor: 'pointer',
+                              '&:hover': { backgroundColor: alpha(color, 0.08) },
+                            }}
+                          />
+                        );
+                      })}
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, ml: 'auto' }}>
+                      <SortIcon sx={{ fontSize: 13, opacity: 0.4 }} />
                       <Select
                         value={sortBy[group.name] || 'default'}
                         onChange={(e) => setSortBy(prev => ({ ...prev, [group.name]: e.target.value as 'default' | 'price-asc' | 'price-desc' | 'name' | 'status' }))}
-                        sx={{ fontSize: '0.65rem', borderRadius: 1.5, height: 24, '& .MuiSelect-select': { py: 0.25, px: 1 }, '& .MuiOutlinedInput-notchedOutline': { borderColor: 'divider' } }}
-                        startAdornment={<SortIcon sx={{ fontSize: 12, opacity: 0.5, mr: 0.5 }} />}
+                        variant="standard"
+                        disableUnderline
+                        sx={{ fontSize: '0.65rem', fontWeight: 500, '& .MuiSelect-select': { py: 0, pr: 2.5 }, '& .MuiSvgIcon-root': { fontSize: 14 } }}
                       >
                         <MenuItem value="default" sx={{ fontSize: '0.75rem' }}>Domyślnie</MenuItem>
                         <MenuItem value="price-asc" sx={{ fontSize: '0.75rem' }}>Cena ↑</MenuItem>
@@ -546,7 +559,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                         <MenuItem value="name" sx={{ fontSize: '0.75rem' }}>Nazwa A-Z</MenuItem>
                         <MenuItem value="status" sx={{ fontSize: '0.75rem' }}>Status</MenuItem>
                       </Select>
-                    </FormControl>
+                    </Box>
                   </Box>
                 )}
                 <TableContainer>
