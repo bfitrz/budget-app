@@ -275,25 +275,6 @@ export function Layout({ children, currentView, onViewChange, themeVariant, them
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      {/* Mobile: swipe area hint */}
-      {isMobile && !mobileOpen && (
-        <Box
-          sx={{
-            position: 'fixed',
-            top: '50%',
-            left: 0,
-            transform: 'translateY(-50%)',
-            width: 6,
-            height: 48,
-            borderRadius: '0 4px 4px 0',
-            backgroundColor: alpha(theme.palette.primary.main, 0.3),
-            zIndex: theme.zIndex.drawer - 1,
-            transition: 'opacity 0.3s',
-            opacity: 0.6,
-          }}
-        />
-      )}
-
       {/* Sidebar */}
       {isMobile ? (
         <SwipeableDrawer
@@ -301,7 +282,9 @@ export function Layout({ children, currentView, onViewChange, themeVariant, them
           open={mobileOpen}
           onOpen={() => setMobileOpen(true)}
           onClose={() => setMobileOpen(false)}
-          swipeAreaWidth={24}
+          swipeAreaWidth={Math.round(window.innerWidth * 0.4)}
+          minFlingVelocity={300}
+          hysteresis={0.35}
           disableBackdropTransition
           ModalProps={{ keepMounted: true }}
           sx={{
