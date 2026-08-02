@@ -30,6 +30,8 @@ export function clearLocalStorage(): void {
   localStorage.removeItem('budget-app-dropbox-token');
   localStorage.removeItem('budget-app-dropbox-refresh');
   localStorage.removeItem('budget-app-dropbox-path');
+  localStorage.removeItem('budget-app-dropbox-appkey');
   localStorage.removeItem('budget-app-gdrive-token');
   localStorage.removeItem('budget-app-gdrive-fileid');
+  localStorage.removeItem('budget-app-gdrive-clientid');
 }

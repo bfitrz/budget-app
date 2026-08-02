@@ -2,7 +2,7 @@ import { useState } from 'react';
 import {
   Box, Typography, Card, CardContent, Button, alpha, useTheme,
   CircularProgress, List, ListItemButton, ListItemText, Dialog, DialogTitle,
-  DialogContent, DialogActions, Alert,
+  DialogContent, DialogActions, Alert, TextField, Link,
 } from '@mui/material';
 import {
   CloudQueue as DropboxIcon,
@@ -43,8 +43,39 @@ export function StorageSetup({
 }: StorageSetupProps) {
   const theme = useTheme();
   const [filePickerOpen, setFilePickerOpen] = useState(false);
+  const [keyDialog, setKeyDialog] = useState<'dropbox' | 'google' | null>(null);
+  const [appKeyInput, setAppKeyInput] = useState('');
   const files = dropboxFiles || googleFiles || [];
   const providerName = isDropboxConnected ? 'Dropbox' : 'Google Drive';
+
+  const handleKeySubmit = () => {
+    if (!appKeyInput.trim()) return;
+    if (keyDialog === 'dropbox') {
+      localStorage.setItem('budget-app-dropbox-appkey', appKeyInput.trim());
+      setKeyDialog(null);
+      setAppKeyInput('');
+      onSelectDropbox();
+    } else if (keyDialog === 'google') {
+      localStorage.setItem('budget-app-gdrive-clientid', appKeyInput.trim());
+      setKeyDialog(null);
+      setAppKeyInput('');
+      onSelectGoogleDrive();
+    }
+  };
+
+  const handleDropboxClick = () => {
+    const existingKey = localStorage.getItem('budget-app-dropbox-appkey') || import.meta.env.VITE_DROPBOX_APP_KEY;
+    if (existingKey) { onSelectDropbox(); return; }
+    setKeyDialog('dropbox');
+    setAppKeyInput('');
+  };
+
+  const handleGoogleClick = () => {
+    const existingKey = localStorage.getItem('budget-app-gdrive-clientid') || import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    if (existingKey) { onSelectGoogleDrive(); return; }
+    setKeyDialog('google');
+    setAppKeyInput('');
+  };
 
   // If connected to a provider, show file picker
   if (isDropboxConnected || isGoogleConnected) {
@@ -127,7 +158,7 @@ export function StorageSetup({
               transition: 'all 0.15s ease',
               '&:hover': { borderColor: theme.palette.primary.main, transform: 'translateY(-2px)', boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.15)}` },
             }}
-            onClick={onSelectDropbox}
+            onClick={handleDropboxClick}
           >
             <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 2.5 }}>
               <Box sx={{ width: 44, height: 44, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: alpha('#0061FF', 0.1) }}>
@@ -153,7 +184,7 @@ export function StorageSetup({
               transition: 'all 0.15s ease',
               '&:hover': { borderColor: theme.palette.primary.main, transform: 'translateY(-2px)', boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.15)}` },
             }}
-            onClick={onSelectGoogleDrive}
+            onClick={handleGoogleClick}
           >
             <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 2.5 }}>
               <Box sx={{ width: 44, height: 44, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: alpha('#4285F4', 0.1) }}>
@@ -195,6 +226,38 @@ export function StorageSetup({
             </CardContent>
           </Card>
         </Box>
+
+        {/* App Key dialog */}
+        <Dialog open={!!keyDialog} onClose={() => setKeyDialog(null)} maxWidth="sm" fullWidth>
+          <DialogTitle sx={{ fontWeight: 600 }}>
+            {keyDialog === 'dropbox' ? 'Podaj Dropbox App Key' : 'Podaj Google Client ID'}
+          </DialogTitle>
+          <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              {keyDialog === 'dropbox' ? (
+                <>Stwórz aplikację na <Link href="https://www.dropbox.com/developers/apps" target="_blank" rel="noopener">dropbox.com/developers</Link> i skopiuj App Key. Wybierz "Scoped access" i dodaj uprawnienia: files.content.read, files.content.write.</>
+              ) : (
+                <>Stwórz OAuth Client ID na <Link href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener">Google Cloud Console</Link>. Typ: Web Application. Dodaj redirect URI: <strong>{window.location.origin}</strong></>
+              )}
+            </Typography>
+            <TextField
+              label={keyDialog === 'dropbox' ? 'App Key' : 'Client ID'}
+              value={appKeyInput}
+              onChange={(e) => setAppKeyInput(e.target.value)}
+              fullWidth
+              autoFocus
+              placeholder={keyDialog === 'dropbox' ? 'np. abc123xyz456' : 'np. 123456-abcdef.apps.googleusercontent.com'}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleKeySubmit(); }}
+            />
+            <Alert severity="info" sx={{ fontSize: '0.75rem' }}>
+              Klucz jest publiczny (nie jest secret) i zapisze się w przeglądarce. Będzie używany wyłącznie do autoryzacji OAuth.
+            </Alert>
+          </DialogContent>
+          <DialogActions sx={{ px: 3, pb: 2.5 }}>
+            <Button onClick={() => setKeyDialog(null)}>Anuluj</Button>
+            <Button variant="contained" onClick={handleKeySubmit} disabled={!appKeyInput.trim()}>Połącz</Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </Box>
   );

@@ -4,7 +4,7 @@
 
 import { StorageProvider, StorageFile } from './types';
 
-const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+const CLIENT_ID = localStorage.getItem('budget-app-gdrive-clientid') || import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 const REDIRECT_URI = `${window.location.origin}${window.location.pathname}`;
 const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 const TOKEN_KEY = 'budget-app-gdrive-token';

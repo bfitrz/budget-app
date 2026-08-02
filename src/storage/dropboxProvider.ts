@@ -3,7 +3,7 @@
 
 import { StorageProvider, StorageFile } from './types';
 
-const APP_KEY = import.meta.env.VITE_DROPBOX_APP_KEY || '';
+const APP_KEY = localStorage.getItem('budget-app-dropbox-appkey') || import.meta.env.VITE_DROPBOX_APP_KEY || '';
 const REDIRECT_URI = `${window.location.origin}${window.location.pathname}`;
 const TOKEN_KEY = 'budget-app-dropbox-token';
 const REFRESH_TOKEN_KEY = 'budget-app-dropbox-refresh';
