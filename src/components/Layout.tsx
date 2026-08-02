@@ -119,13 +119,10 @@ export function Layout({ children, currentView, onViewChange, themeVariant, them
               width: 28,
               height: 28,
               borderRadius: '8px',
-              background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              overflow: 'hidden',
             }}
           >
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#fff' }}>B</Typography>
+            <img src={`${import.meta.env.BASE_URL}pwa-icon.png`} alt="Budget" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </Box>
           <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
             Budget
