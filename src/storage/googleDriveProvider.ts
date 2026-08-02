@@ -12,7 +12,7 @@ let resolveAuth: ((token: string) => void) | null = null;
 let rejectAuth: ((err: Error) => void) | null = null;
 
 function getClientId(): string {
-  return localStorage.getItem('budget-app-gdrive-clientid') || import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+  return localStorage.getItem('budget-app-gdrive-clientid') || import.meta.env.VITE_GOOGLE_CLIENT_ID || '193515898789-crf6i7psgh579jsn9ih3ggsdf7r5seu7.apps.googleusercontent.com';
 }
 
 // Load the GIS script dynamically
