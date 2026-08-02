@@ -55,15 +55,12 @@ export function DashboardView() {
   const totalWithExcluded = summary.lacznyKoszt + excludedTotal;
 
   // Dane do wykresu scenariuszy (min/main/max)
-  const rangeData = [
-    ...categoryBreakdown.map((cat) => ({
-      name: cat.name,
-      min: cat.minKoszt,
-      main: cat.zaplacono + cat.doZaplaty,
-      max: cat.maxKoszt,
-    })),
-    ...(excludedTotal > 0 ? [{ name: 'Pominięte', min: excludedTotal, main: excludedTotal, max: excludedTotal }] : []),
-  ];
+  const rangeData = categoryBreakdown.map((cat) => ({
+    name: cat.name,
+    min: cat.minKoszt,
+    main: cat.zaplacono + cat.doZaplaty,
+    max: cat.maxKoszt,
+  }));
 
   // Scenariusze budżetowe globalne
   const totalMin = categoryBreakdown.reduce((s, c) => s + c.minKoszt, 0);
@@ -324,7 +321,7 @@ export function DashboardView() {
             <CardContent sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ mb: 0.5 }}>Rozpiętość kosztów</Typography>
               <Typography variant="caption" color="text.secondary">
-                Wariant minimalny / obecny / maksymalny{excludedTotal > 0 ? ' (+ pominięte)' : ''}
+                Wariant minimalny / obecny / maksymalny (uwzględniając alternatywy)
               </Typography>
               {rangeData.length > 0 ? (
                 <Box sx={{ mt: 3 }}>
