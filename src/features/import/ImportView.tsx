@@ -46,8 +46,10 @@ export function ImportView() {
 
   const config = getStorageConfig();
 
-  // Auto-open file picker if connected but no file selected
+  // Auto-open file picker if connected but no file selected (skip if OAuth callback in progress)
   useEffect(() => {
+    const hasOAuthCode = window.location.search.includes('code=');
+    if (hasOAuthCode) return; // OAuth callback will handle this
     if (config && (config.provider === 'dropbox' || config.provider === 'google-drive') && !config.filePath) {
       handleBrowseFiles();
     }

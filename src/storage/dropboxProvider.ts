@@ -205,9 +205,11 @@ export class DropboxProvider implements StorageProvider {
 export function checkDropboxCallback(): string | null {
   const params = new URLSearchParams(window.location.search);
   const code = params.get('code');
-  if (code) {
+  // Only match if we have a Dropbox verifier (not Google's code)
+  if (code && localStorage.getItem(CODE_VERIFIER_KEY)) {
     // Clean URL but preserve hash
     window.history.replaceState({}, '', window.location.pathname + (window.location.hash || ''));
+    return code;
   }
-  return code;
+  return null;
 }
