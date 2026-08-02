@@ -402,27 +402,22 @@ export function DashboardView() {
                     cost={totalMin}
                     available={summary.aktualnieSrodki}
                     color={theme.palette.success.main}
+                    subtitle={excludedTotal > 0 ? `z pominięte: ${formatCurrency(totalMin + excludedTotal)} (${summary.aktualnieSrodki >= totalMin + excludedTotal ? '+' : ''}${formatCurrency(summary.aktualnieSrodki - totalMin - excludedTotal)})` : undefined}
                   />
                   <ScenarioRow
                     label="Obecny plan"
                     cost={totalMain}
                     available={summary.aktualnieSrodki}
                     color={theme.palette.primary.main}
+                    subtitle={excludedTotal > 0 ? `z pominięte: ${formatCurrency(totalMain + excludedTotal)} (${summary.aktualnieSrodki >= totalMain + excludedTotal ? '+' : ''}${formatCurrency(summary.aktualnieSrodki - totalMain - excludedTotal)})` : undefined}
                   />
                   <ScenarioRow
                     label="Pesymistyczny"
                     cost={totalMax}
                     available={summary.aktualnieSrodki}
                     color={theme.palette.error.main}
+                    subtitle={excludedTotal > 0 ? `z pominięte: ${formatCurrency(totalMax + excludedTotal)} (${summary.aktualnieSrodki >= totalMax + excludedTotal ? '+' : ''}${formatCurrency(summary.aktualnieSrodki - totalMax - excludedTotal)})` : undefined}
                   />
-                  {excludedTotal > 0 && (
-                    <ScenarioRow
-                      label="Z pominięte"
-                      cost={totalMain + excludedTotal}
-                      available={summary.aktualnieSrodki}
-                      color={theme.palette.text.secondary}
-                    />
-                  )}
                   <Box sx={{ mt: 1, pt: 2, borderTop: `1px solid ${theme.palette.divider}` }}>
                     <Typography variant="caption" color="text.secondary">
                       Rozpiętość: {formatCurrency(totalMax - totalMin)}
@@ -600,9 +595,10 @@ interface ScenarioRowProps {
   cost: number;
   available: number;
   color: string;
+  subtitle?: string;
 }
 
-function ScenarioRow({ label, cost, available, color }: ScenarioRowProps) {
+function ScenarioRow({ label, cost, available, color, subtitle }: ScenarioRowProps) {
   const theme = useTheme();
   const diff = available - cost;
   const isPositive = diff >= 0;
@@ -633,6 +629,11 @@ function ScenarioRow({ label, cost, available, color }: ScenarioRowProps) {
           {isPositive ? '+' : ''}{formatCurrency(diff)}
         </Typography>
       </Box>
+      {subtitle && (
+        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', pl: 3, mt: 0.25, fontSize: '0.55rem' }}>
+          {subtitle}
+        </Typography>
+      )}
     </Box>
   );
 }
