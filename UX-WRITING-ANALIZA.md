@@ -199,3 +199,203 @@
 |---------|-------|
 | Brak danych | `Brak danych — zaimportuj arkusz Excel, aby rozpocząć.` |
 
+
+---
+
+## 5. Środki (SaldoView)
+
+### Nagłówek strony
+
+| Element | Tekst |
+|---------|-------|
+| Tytuł | `Środki` |
+| Podtytuł | `Rejestruj wpływy do budżetu — wypłaty, oszczędności, zwroty. Suma po odjęciu opłaconych pozycji = dostępne środki.` |
+
+### Przycisk dodawania
+
+| Element | Tekst |
+|---------|-------|
+| Button | `Dodaj wpływ` |
+
+### Karty podsumowania
+
+| KPI | Label | Opis pod wartością |
+|-----|-------|--------------------|
+| Aktualne środki | `Dostępne środki` | `wpływy minus opłacone pozycje` |
+| Suma wpływów | `Suma wpływów` | — |
+| Wydane | `Wydane` | — |
+
+### Tabela
+
+| Kolumna | Label |
+|---------|-------|
+| Col 1 | `Data` |
+| Col 2 | `Opis` |
+| Col 3 | `Kwota` |
+
+### Pusty stan
+
+| Element | Tekst |
+|---------|-------|
+| Ikona + tekst | `Brak wpisów. Dodaj wpływ, aby śledzić dostępne środki.` |
+
+### Chip bez daty
+
+| Element | Tekst |
+|---------|-------|
+| Chip | `Start` |
+
+### Dialog dodawania/edycji
+
+| Element | Tekst |
+|---------|-------|
+| Tytuł (add) | `Dodaj wpływ` |
+| Tytuł (edit) | `Edytuj wpływ` |
+| Pole: data | Label: `Data` · Helper: `Puste = saldo początkowe` |
+| Pole: opis | Label: `Opis` |
+| Pole: kwota | Label: `Kwota` · Helper: `Wartość ujemna = korekta w dół` |
+| Btn cancel | `Anuluj` |
+| Btn submit (add) | `Dodaj` |
+| Btn submit (edit) | `Zapisz` |
+
+### Tooltips (tabela)
+
+| Akcja | Tooltip |
+|-------|---------|
+| Edit | `Edytuj` |
+| Delete | `Usuń` |
+
+
+---
+
+## 6. Harmonogram (HarmonogramView)
+
+### Nagłówek strony
+
+| Element | Tekst |
+|---------|-------|
+| Tytuł | `Harmonogram wpływów` |
+| Podtytuł | `Zaplanuj przyszłe wpływy i sprawdź na wykresie, kiedy zgromadzisz wystarczająco środków na pokrycie wydatków.` |
+
+### Przyciski nagłówka
+
+| Element | Tekst |
+|---------|-------|
+| Btn milestone | `Termin kluczowy` |
+| Btn add | `+ Wpływ` |
+
+### Karty podsumowania
+
+| KPI | Label |
+|-----|-------|
+| Card 1 | `Dostępne środki` |
+| Card 2 | `Planowane wpływy` |
+| Card 3 | `Pozostało do opłacenia` |
+| Card 4 | `Bilans po wpływach` |
+
+### Wykres — Symulacja środków w czasie
+
+| Element | Tekst |
+|---------|-------|
+| Tytuł | `Symulacja środków w czasie` |
+| Podtytuł | `Prognoza dostępnych środków. Gdy niebieska linia przekroczy pomarańczową — masz wystarczająco na pokrycie wydatków.` |
+
+### Legenda wykresu
+
+| Element | Tekst |
+|---------|-------|
+| Green dot | `Dostępne środki: {kwota}` |
+| Blue line | `Prognoza środków po wpływach` |
+| Orange dashed | `Cel: {kwota} (tyle musisz zgromadzić)` |
+| Red dashed | `Łącznie z pominiętymi: {kwota}` |
+| Red milestone | `📌 Terminy kluczowe ({n})` |
+
+### Tooltip wykresu
+
+| Element | Tekst |
+|---------|-------|
+| Header | `{data}` |
+| Row 1 | `Aktualnie na stanie: {kwota}` |
+| Row 2 | `Wpływy do tej daty: +{kwota}` |
+| Row 3 | `Prognoza środków: {kwota}` |
+| Divider | — |
+| Row 4 | `Cel (do opłacenia): {kwota}` |
+| Positive | `Nadwyżka: +{kwota}` |
+| Negative | `Brakuje: -{kwota}` |
+| Excluded section | `Łącznie z pominiętymi: {kwota}` |
+
+### Alert po wykresie
+
+| Wariant | Tekst |
+|---------|-------|
+| Negatywny | `Nawet po zaplanowanych wpływach brakuje {kwota} na pokrycie wszystkich wydatków.` |
+| Pozytywny | `Po zaplanowanych wpływach wystarczy na pokrycie wydatków (nadwyżka: {kwota}).` |
+
+### Termin kluczowy — tooltip (chip)
+
+| Element | Tekst |
+|---------|-------|
+| Header | `📌 {opis} — {data}` |
+| Row 1 | `Aktualnie na stanie: {kwota}` |
+| Row 2 | `Przewidywane wpływy do tej daty: +{kwota}` |
+| Row 3 | `Prognoza środków: {kwota}` |
+| Row 4 | `Łączny koszt do pokrycia: {kwota}` |
+| Positive | `Nadwyżka: +{kwota}` |
+| Negative | `Brakuje do celu: -{kwota}` |
+
+### Tabela wpływów
+
+| Kolumna | Label |
+|---------|-------|
+| Col 1 | `Status` |
+| Col 2 | `Data wpływu` |
+| Col 3 | `Opis` |
+| Col 4 | `Kwota` |
+
+### Chip statusu
+
+| Stan | Tekst |
+|------|-------|
+| Zrealizowane | `Zrealizowane` |
+
+### Pusty stan tabeli
+
+| Element | Tekst |
+|---------|-------|
+| Główny | `Brak zaplanowanych wpływów.` |
+| Podpowiedź | `Np. przelew z oszczędności, wypłata, zwrot podatku.` |
+
+### Tooltips tabeli
+
+| Akcja | Tooltip |
+|-------|---------|
+| Oznacz zrealizowane | `Oznacz jako zrealizowane` |
+| Oznacz niezrealizowane | `Cofnij realizację` |
+| Edit | `Edytuj` |
+| Delete | `Usuń` |
+
+### Dialog — Zaplanuj wpływ
+
+| Element | Tekst |
+|---------|-------|
+| Tytuł (add) | `Zaplanuj wpływ` |
+| Tytuł (edit) | `Edytuj planowany wpływ` |
+| Opis | `Dodaj przewidywany wpływ — np. przelew z oszczędności, wypłata, zwrot podatku.` |
+| Pole: data | Label: `Planowana data wpływu` |
+| Pole: opis | Label: `Opis wpływu` · Placeholder: `np. Przelew z konta oszczędnościowego` |
+| Pole: kwota | Label: `Kwota wpływu` |
+| Btn cancel | `Anuluj` |
+| Btn submit (add) | `Zaplanuj` |
+| Btn submit (edit) | `Zapisz` |
+
+### Dialog — Termin kluczowy
+
+| Element | Tekst |
+|---------|-------|
+| Tytuł | `📌 Dodaj termin kluczowy` |
+| Opis | `Ważna data lub deadline — pojawi się jako pionowa linia na wykresie z prognozą środków.` |
+| Pole: data | Label: `Data` |
+| Pole: opis | Label: `Opis` · Placeholder: `np. Termin oddania kluczy` |
+| Btn cancel | `Anuluj` |
+| Btn submit | `Dodaj` |
+
