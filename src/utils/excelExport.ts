@@ -212,3 +212,68 @@ export function exportTemplate(): void {
 
   XLSX.writeFile(workbook, 'Szablon_Budzet_Mieszkania.xlsx');
 }
+
+// Export to ArrayBuffer (for cloud sync — no file download)
+export function exportToExcelBuffer(state: BudgetState, notes?: StickyNote[]): ArrayBuffer {
+  const workbook = XLSX.utils.book_new();
+
+  if (state.meble.length > 0) {
+    const data = state.meble.map((item) => ({
+      Pomieszczenie: item.pomieszczenie, Kategoria: item.kategoria, Nazwa: item.nazwa,
+      Cena: item.cena, Status: item.status, Uwzględnij: item.status !== 'Wykluczone' ? 'TAK' : 'NIE',
+      Uwagi: item.uwagi || '', UwagiMain: item.uwagiMain || '', DataRealizacji: item.dataRealizacji || '',
+      Linki: serializeLinki(item.linki), Alternatywy: serializeAlternatywy(item.alternatywy), WybranaAltId: item.wybranaAltId || '',
+    }));
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(data), 'Meble');
+  }
+  if (state.wykonczenie.length > 0) {
+    const data = state.wykonczenie.map((item) => ({
+      Etap: item.etap, Opis: item.opis, Kwota: item.kwota,
+      Status: item.status, Uwzględnij: item.status !== 'Wykluczone' ? 'TAK' : 'NIE',
+      Uwagi: item.uwagi || '', UwagiMain: item.uwagiMain || '', DataRealizacji: item.dataRealizacji || '',
+      Linki: serializeLinki(item.linki), Alternatywy: serializeAlternatywy(item.alternatywy), WybranaAltId: item.wybranaAltId || '',
+    }));
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(data), 'Wykończenie');
+  }
+  if (state.agd.length > 0) {
+    const data = state.agd.map((item) => ({
+      Nazwa: item.nazwa, Producent: item.producent, Model: item.model, Cena: item.cena,
+      Status: item.status, Uwzględnij: item.status !== 'Wykluczone' ? 'TAK' : 'NIE',
+      Uwagi: item.uwagi || '', UwagiMain: item.uwagiMain || '', DataRealizacji: item.dataRealizacji || '',
+      Linki: serializeLinki(item.linki), Alternatywy: serializeAlternatywy(item.alternatywy), WybranaAltId: item.wybranaAltId || '',
+    }));
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(data), 'AGD');
+  }
+  if (state.pozostale.length > 0) {
+    const data = state.pozostale.map((item) => ({
+      Grupa: item.grupa, Nazwa: item.nazwa, Cena: item.cena,
+      Status: item.status, Uwzględnij: item.status !== 'Wykluczone' ? 'TAK' : 'NIE',
+      Uwagi: item.uwagi || '', UwagiMain: item.uwagiMain || '', DataRealizacji: item.dataRealizacji || '',
+      Linki: serializeLinki(item.linki), Alternatywy: serializeAlternatywy(item.alternatywy), WybranaAltId: item.wybranaAltId || '',
+    }));
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(data), 'Pozostałe');
+  }
+  if (state.wyprowadzka.length > 0) {
+    const data = state.wyprowadzka.map((item) => ({
+      Grupa: item.grupa, Nazwa: item.nazwa, Cena: item.cena,
+      Status: item.status, Uwzględnij: item.status !== 'Wykluczone' ? 'TAK' : 'NIE',
+      Uwagi: item.uwagi || '', UwagiMain: item.uwagiMain || '', DataRealizacji: item.dataRealizacji || '',
+      Linki: serializeLinki(item.linki), Alternatywy: serializeAlternatywy(item.alternatywy), WybranaAltId: item.wybranaAltId || '',
+    }));
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(data), 'Wyprowadzka');
+  }
+  if (state.saldo.length > 0) {
+    const data = state.saldo.map((e) => ({ Data: e.data, Opis: e.opis, Kwota: e.kwota }));
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(data), 'Saldo');
+  }
+  if (state.harmonogram.length > 0) {
+    const data = state.harmonogram.map((e) => ({ Data: e.data, Opis: e.opis, Kwota: e.kwota, Zrealizowane: e.zrealizowane ? 'TAK' : 'NIE' }));
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(data), 'Harmonogram');
+  }
+  if (notes && notes.length > 0) {
+    const data = notes.map((n) => ({ Treść: n.text, Kolor: n.color, Data: n.createdAt }));
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(data), 'Notatki');
+  }
+
+  return XLSX.write(workbook, { type: 'array', bookType: 'xlsx' }) as ArrayBuffer;
+}

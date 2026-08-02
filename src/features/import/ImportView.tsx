@@ -10,6 +10,9 @@ import {
   alpha,
   useTheme,
   Snackbar,
+  Chip,
+  Switch,
+  FormControlLabel,
 } from '@mui/material';
 import {
   FileUpload as UploadIcon,
@@ -17,11 +20,14 @@ import {
   FileDownload as DownloadIcon,
   Description as TemplateIcon,
   DeleteForever as DeleteIcon,
+  CloudDone as SyncIcon,
+  LinkOff as DisconnectIcon,
 } from '@mui/icons-material';
 import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { useBudgetStore } from '@/store';
 import { useNotesStore } from '@/store/notesStore';
 import { importExcelFile, exportToExcel, exportTemplate, clearLocalStorage } from '@/utils';
+import { getStorageConfig, clearStorageConfig, saveStorageConfig } from '@/storage';
 
 export function ImportView() {
   const theme = useTheme();
@@ -169,6 +175,37 @@ export function ImportView() {
           Minęło ponad 7 dni od ostatniego backupu. Zalecamy wyeksportować dane.
         </Alert>
       )}
+
+      {/* Sync section */}
+      {(() => {
+        const config = getStorageConfig();
+        if (!config || config.provider === 'local') return null;
+        const providerLabel = config.provider === 'dropbox' ? 'Dropbox' : 'Google Drive';
+        return (
+          <Card sx={{ maxWidth: 640, mb: 3, border: `1px solid ${alpha(theme.palette.success.main, 0.2)}`, background: `linear-gradient(135deg, ${alpha(theme.palette.success.main, 0.04)}, transparent)` }}>
+            <CardContent sx={{ p: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+                <SyncIcon sx={{ fontSize: 20, color: theme.palette.success.main }} />
+                <Typography variant="h6" sx={{ flex: 1 }}>Synchronizacja</Typography>
+                <Chip label={providerLabel} size="small" sx={{ fontSize: '0.7rem', fontWeight: 600, backgroundColor: alpha(theme.palette.primary.main, 0.1), color: theme.palette.primary.main }} />
+              </Box>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Plik: <strong>{config.filePath || 'nie wybrano'}</strong>
+                {config.lastSync && <> · Ostatnia sync: {new Date(config.lastSync).toLocaleString('pl-PL')}</>}
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+                <FormControlLabel
+                  control={<Switch size="small" checked={config.autoSync} onChange={(e) => saveStorageConfig({ ...config, autoSync: e.target.checked })} />}
+                  label={<Typography variant="body2" sx={{ fontSize: '0.8rem' }}>Auto-sync</Typography>}
+                />
+                <Button size="small" variant="outlined" color="error" startIcon={<DisconnectIcon />} onClick={() => { clearStorageConfig(); window.location.reload(); }}>
+                  Odłącz
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
+        );
+      })()}
 
       <Card sx={{ maxWidth: 640 }}>
         <CardContent sx={{ p: 4 }}>

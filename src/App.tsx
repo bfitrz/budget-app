@@ -15,6 +15,7 @@ import { GuideView } from '@/features/guide';
 import { ChangelogView } from '@/features/changelog';
 import { WykluconeView } from '@/features/wykluczone';
 import { useBudgetStore } from '@/store';
+import { useCloudSync } from '@/hooks/useCloudSync';
 import { getStorageConfig, saveStorageConfig, clearStorageConfig, DropboxProvider, GoogleDriveProvider, checkDropboxCallback, checkGoogleDriveCallback, StorageFile } from '@/storage';
 
 export type ThemeVariant = 'dark' | 'light' | 'dim' | 'unicorn';
@@ -127,6 +128,9 @@ function App() {
     saveStorageConfig({ provider, filePath: path, autoSync: true, syncInterval: 30000, lastSync: null });
     setStorageReady(true);
   };
+
+  // Cloud sync hook (auto-saves after changes)
+  useCloudSync();
 
   const [currentView, setCurrentView] = useState<string>(() => {
     const hashView = getViewFromHash();

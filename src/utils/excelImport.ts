@@ -313,3 +313,10 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
   }
   return result;
 }
+
+// Import from ArrayBuffer (for cloud sync — no File needed)
+export async function importExcelBuffer(buffer: ArrayBuffer): Promise<ImportResult> {
+  // Reuse the same logic as importExcelFile but with buffer directly
+  const fakeFile = new File([buffer], 'cloud.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  return importExcelFile(fakeFile);
+}
