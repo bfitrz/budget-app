@@ -43,8 +43,16 @@ export function ImportView() {
   const [filePickerOpen, setFilePickerOpen] = useState(false);
   const [saveAsDialog, setSaveAsDialog] = useState(false);
   const [saveAsName, setSaveAsName] = useState('Budget.xlsx');
+  const [configVersion, setConfigVersion] = useState(0);
 
   const config = getStorageConfig();
+  
+  const updateConfig = (updates: Partial<typeof config>) => {
+    if (!config) return;
+    const newConfig = { ...config, ...updates };
+    saveStorageConfig(newConfig);
+    setConfigVersion(v => v + 1); // force re-render
+  };
 
   // Auto-open file picker if connected but no file selected (skip if OAuth callback in progress)
   useEffect(() => {
@@ -296,7 +304,7 @@ export function ImportView() {
           {isCloud && config && (
             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', mb: 2.5 }}>
               <FormControlLabel
-                control={<Switch size="small" checked={config.autoSync} onChange={(e) => saveStorageConfig({ ...config, autoSync: e.target.checked })} />}
+                control={<Switch size="small" checked={config.autoSync} onChange={(e) => updateConfig({ autoSync: e.target.checked })} />}
                 label={<Typography variant="body2" sx={{ fontSize: '0.8rem' }}>Auto-zapis</Typography>}
               />
               {config.autoSync && (
@@ -304,7 +312,7 @@ export function ImportView() {
                   <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>Co:</Typography>
                   <Slider
                     value={config.syncInterval / 1000}
-                    onChange={(_, val) => saveStorageConfig({ ...config, syncInterval: (val as number) * 1000 })}
+                    onChange={(_, val) => updateConfig({ syncInterval: (val as number) * 1000 })}
                     min={5} max={120} step={5}
                     valueLabelDisplay="auto"
                     valueLabelFormat={(v) => `${v}s`}
