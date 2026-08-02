@@ -119,9 +119,14 @@ export function Layout({ children, currentView, onViewChange, themeVariant, them
           >
             <img src={`${import.meta.env.BASE_URL}pwa-icon.png`} alt="Budget" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </Box>
-          <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-            Budget
-          </Typography>
+          <Box>
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, lineHeight: 1.2 }}>
+              Budget
+            </Typography>
+            <Typography variant="caption" sx={{ fontSize: '0.55rem', color: 'text.secondary', opacity: 0.6 }}>
+              v2.4.0
+            </Typography>
+          </Box>
         </Box>
         {isMobile && (
           <Box sx={{ display: 'flex', gap: 0.5 }}>

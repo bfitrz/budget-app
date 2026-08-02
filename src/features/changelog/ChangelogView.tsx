@@ -16,27 +16,20 @@ interface ChangeEntry {
 
 const changelog: ChangeEntry[] = [
   {
-    version: '2.3.2',
+    version: '2.4.0',
     date: '2026-08-02',
     changes: [
       { type: 'feat', text: 'Toggle „Sprawdzaj zmiany" — polling włączalny/wyłączalny niezależnie od autozapisu' },
       { type: 'feat', text: 'Notyfikacja „Zapisano do chmury" po każdym udanym autozapisie' },
       { type: 'feat', text: 'Notyfikacja „Wczytano zmiany z chmury" po wczytaniu zmian kolegi' },
-      { type: 'fix', text: 'Własne zapisy nie triggerują bannera „plik zmieniony" (sprawdzanie lastModifyingUser.me)' },
-      { type: 'fix', text: 'Auto-sync faktycznie zapisuje do Google Drive (przepisany hook)' },
-    ],
-  },
-  {
-    version: '2.3.1',
-    date: '2026-08-02',
-    changes: [
-      { type: 'feat', text: 'Suwak „Sprawdzaj zmiany co:" — konfigurowalny interwał pollingu (10–120s)' },
+      { type: 'feat', text: 'Konfigurowalny interwał pollingu (10–120s)' },
       { type: 'feat', text: 'Wyświetlanie kto ostatnio edytował plik (imię z Google)' },
       { type: 'feat', text: 'Banner zmian pokazuje imię osoby: „Plik zmieniony przez Jana"' },
       { type: 'feat', text: 'Przycisk Odśwież (↻) w sidebarze — reload strony bez F5' },
-      { type: 'fix', text: 'Google Drive nie pyta już o Client ID — klik → popup logowania → gotowe' },
-      { type: 'fix', text: 'Udostępnione pliki widoczne na liście (zmiana scope)' },
-      { type: 'fix', text: 'Auto-zapis switch i suwak interwału reagują na zmianę' },
+      { type: 'fix', text: 'Własne zapisy nie triggerują bannera „plik zmieniony" (lastModifyingUser.me)' },
+      { type: 'fix', text: 'Auto-sync faktycznie zapisuje do Google Drive (przepisany hook)' },
+      { type: 'fix', text: 'Udostępnione pliki widoczne na liście (zmiana scope na drive)' },
+      { type: 'fix', text: 'Auto-zapis switch i suwak reagują na zmianę' },
     ],
   },
   {
@@ -50,7 +43,7 @@ const changelog: ChangeEntry[] = [
       { type: 'feat', text: 'Zapisz jako... — tworzenie nowego pliku na Drive z dowolną nazwą' },
       { type: 'feat', text: 'Wczytaj inny plik — przełączanie między plikami na Drive' },
       { type: 'feat', text: 'Ekran startowy — wybór storage (Google Drive / localStorage) przy pierwszym uruchomieniu' },
-      { type: 'feat', text: 'Zero konfiguracji dla użytkowników — klik Google Drive → popup → gotowe' },
+      { type: 'feat', text: 'Zero konfiguracji — klik Google Drive → popup → gotowe (hardcoded Client ID)' },
       { type: 'fix', text: 'Google OAuth przez popup (GIS) zamiast redirect — nie wymaga client_secret' },
       { type: 'style', text: 'Dropbox oznaczony jako „Wkrótce" (jeszcze niedostępny)' },
     ],
