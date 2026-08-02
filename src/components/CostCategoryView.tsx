@@ -4,6 +4,7 @@ import {
   Chip, IconButton, TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions,
   Card, CardContent, alpha, useTheme, Tooltip, Accordion, AccordionSummary, AccordionDetails,
   Autocomplete, Collapse, Menu, MenuItem, ListItemIcon, ListItemText, Select, FormControl,
+  InputAdornment, ToggleButton, ToggleButtonGroup,
 } from '@mui/material';
 import {
   Delete as DeleteIcon, Add as AddIcon, ExpandMore as ExpandMoreIcon,
@@ -14,6 +15,7 @@ import {
   Close as CloseIcon, VisibilityOff as DisableGroupIcon, Visibility as EnableGroupIcon,
   MoreVert as MoreIcon, HelpOutline as HelpIcon, Comment as CommentIcon,
   CheckCircle as PaidIcon, TrendingFlat as RangeIcon, BarChart as StatsIcon,
+  Search as SearchIcon, Sort as SortIcon,
 } from '@mui/icons-material';
 import { AlternativeItem, ItemLink, PaymentStatus } from '@/types';
 import { formatCurrency, formatCurrencyOrDash, generateId } from '@/utils';
@@ -84,6 +86,9 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
   const [deleteConfirmItem, setDeleteConfirmItem] = useState<CostItem | null>(null);
   const [editingGroupName, setEditingGroupName] = useState<{ oldName: string; newName: string } | null>(null);
   const [deleteGroupConfirm, setDeleteGroupConfirm] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'Do zapłaty' | 'Opłacone' | 'Wykluczone'>('all');
+  const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'name' | 'status'>('default');
   const [disabledGroups, setDisabledGroups] = useState<Set<string>>(() => {
     // Initialize from data: group is disabled if ALL its items have status 'Wykluczone'
     const groups = new Map<string, boolean>();
@@ -107,11 +112,37 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
   const [mainMenuAnchor, setMainMenuAnchor] = useState<null | HTMLElement>(null);
   const [mainMenuTarget, setMainMenuTarget] = useState<CostItem | null>(null);
 
-  // Grouping
+  // Filtering
+  const filteredItems = useMemo(() => {
+    let result = items;
+    if (statusFilter !== 'all') {
+      result = result.filter(i => i.status === statusFilter);
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      result = result.filter(i => {
+        // Search across all visible fields
+        for (const col of config.columns) {
+          const val = i[col.field];
+          if (val && String(val).toLowerCase().includes(q)) return true;
+        }
+        // Also search in group field
+        const grpVal = i[config.groupField];
+        if (grpVal && String(grpVal).toLowerCase().includes(q)) return true;
+        return false;
+      });
+    }
+    return result;
+  }, [items, searchQuery, statusFilter, config.columns, config.groupField]);
+
+  const isFiltering = searchQuery.trim() !== '' || statusFilter !== 'all';
+
+  // Grouping (uses filteredItems when filtering, items otherwise for totals)
   const groups = useMemo(() => {
+    const displayItems = isFiltering ? filteredItems : items;
     const groupMap = new Map<string, CostItem[]>();
     for (const g of customGroups) { if (!groupMap.has(g)) groupMap.set(g, []); }
-    for (const item of items) {
+    for (const item of displayItems) {
       const key = (item[config.groupField] as string) || 'Bez grupy';
       const existing = groupMap.get(key) || [];
       existing.push(item);
@@ -119,9 +150,19 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
     }
     return Array.from(groupMap.entries()).map(([name, grpItems]) => {
       const isGroupDisabled = disabledGroups.has(name);
-      const active = grpItems.filter((i) => i.status !== 'Wykluczone' && !isGroupDisabled);
+      // Sort items within group
+      const sortedItems = sortBy === 'default' ? grpItems : [...grpItems].sort((a, b) => {
+        switch (sortBy) {
+          case 'price-asc': return getCost(a) - getCost(b);
+          case 'price-desc': return getCost(b) - getCost(a);
+          case 'name': return ((a[config.nameField] as string) || '').localeCompare((b[config.nameField] as string) || '');
+          case 'status': { const order = { 'Do zapłaty': 0, 'Opłacone': 1, 'Wykluczone': 2 }; return (order[a.status as keyof typeof order] ?? 3) - (order[b.status as keyof typeof order] ?? 3); }
+          default: return 0;
+        }
+      });
+      const active = sortedItems.filter((i) => i.status !== 'Wykluczone' && !isGroupDisabled);
       return {
-        name, items: grpItems,
+        name, items: sortedItems,
         disabled: isGroupDisabled,
         totalCost: active.reduce((s, i) => s + getCost(i), 0),
         paidCost: active.filter((i) => i.status === 'Opłacone').reduce((s, i) => s + getCost(i), 0),
@@ -129,7 +170,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
         totalCount: active.length,
       };
     });
-  }, [items, customGroups, config.groupField, disabledGroups]);
+  }, [items, filteredItems, isFiltering, customGroups, config.groupField, config.nameField, disabledGroups, sortBy]);
 
   const allGroupNames = useMemo(() => {
     const names = new Set<string>();
@@ -304,6 +345,51 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
         </Box>
       </Box>
 
+      {/* Search & filter bar */}
+      {items.length > 0 && (
+        <Box sx={{ display: 'flex', gap: 1.5, mb: 2.5, flexWrap: 'wrap', alignItems: 'center' }}>
+          <TextField
+            size="small"
+            placeholder="Szukaj..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon sx={{ fontSize: 18, opacity: 0.5 }} /></InputAdornment>, endAdornment: searchQuery ? <InputAdornment position="end"><IconButton size="small" onClick={() => setSearchQuery('')} sx={{ p: 0.25 }}><CloseIcon sx={{ fontSize: 14 }} /></IconButton></InputAdornment> : undefined }}
+            sx={{ flex: 1, minWidth: 160, maxWidth: 280, '& .MuiOutlinedInput-root': { borderRadius: 2, fontSize: '0.8rem' } }}
+          />
+          <ToggleButtonGroup
+            value={statusFilter}
+            exclusive
+            onChange={(_, val) => { if (val !== null) setStatusFilter(val); }}
+            size="small"
+            sx={{ '& .MuiToggleButton-root': { fontSize: '0.65rem', px: 1.5, py: 0.5, borderRadius: '8px !important', textTransform: 'none' } }}
+          >
+            <ToggleButton value="all">Wszystkie</ToggleButton>
+            <ToggleButton value="Do zapłaty">Do zapłaty</ToggleButton>
+            <ToggleButton value="Opłacone">Opłacone</ToggleButton>
+            <ToggleButton value="Wykluczone">Wykluczone</ToggleButton>
+          </ToggleButtonGroup>
+          {isFiltering && (
+            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+              {filteredItems.length} z {items.length} pozycji
+            </Typography>
+          )}
+          <FormControl size="small" sx={{ minWidth: 100 }}>
+            <Select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+              sx={{ fontSize: '0.7rem', borderRadius: 2, '& .MuiSelect-select': { py: 0.6, px: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }, '& .MuiOutlinedInput-notchedOutline': { borderColor: 'divider' } }}
+              startAdornment={<SortIcon sx={{ fontSize: 14, opacity: 0.5, mr: 0.5 }} />}
+            >
+              <MenuItem value="default" sx={{ fontSize: '0.8rem' }}>Domyślnie</MenuItem>
+              <MenuItem value="price-asc" sx={{ fontSize: '0.8rem' }}>Cena ↑</MenuItem>
+              <MenuItem value="price-desc" sx={{ fontSize: '0.8rem' }}>Cena ↓</MenuItem>
+              <MenuItem value="name" sx={{ fontSize: '0.8rem' }}>Nazwa A-Z</MenuItem>
+              <MenuItem value="status" sx={{ fontSize: '0.8rem' }}>Status</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+      )}
+
       {/* Summary cards */}
       {(() => {
         const activeItems = items.filter((i) => { const grp = (i[config.groupField] as string) || 'Bez grupy'; return i.status !== 'Wykluczone' && !disabledGroups.has(grp); });
@@ -426,10 +512,12 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
       {/* Groups */}
       {items.length === 0 && groups.length === 0 ? (
         <Card><CardContent sx={{ py: 8, textAlign: 'center' }}><Typography color="text.secondary">Brak pozycji — dodaj nową lub zaimportuj dane z Excela.</Typography></CardContent></Card>
+      ) : isFiltering && filteredItems.length === 0 ? (
+        <Card><CardContent sx={{ py: 6, textAlign: 'center' }}><Typography color="text.secondary">Brak wyników dla „{searchQuery}" {statusFilter !== 'all' ? `(${statusFilter})` : ''}</Typography></CardContent></Card>
       ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-          {groups.map((group) => (
-            <Accordion key={group.name} defaultExpanded={!group.disabled} sx={{ opacity: group.disabled ? 0.5 : 1, transition: 'opacity 0.2s' }}>
+          {groups.filter(g => !isFiltering || g.items.length > 0).map((group) => (
+            <Accordion key={group.name} defaultExpanded={!group.disabled} expanded={isFiltering ? true : undefined} sx={{ opacity: group.disabled ? 0.5 : 1, transition: 'opacity 0.2s' }}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ minHeight: 52, px: 2.5 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', mr: 2 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -440,7 +528,12 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                     {!group.disabled && (
                       <>
-                        <Chip label={`${group.paidCount}/${group.totalCount} opł.`} size="small" sx={{ fontSize: '0.6rem', height: 20, backgroundColor: alpha(theme.palette.success.main, 0.1), color: theme.palette.success.main, fontWeight: 600 }} />
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 80 }}>
+                          <Box sx={{ flex: 1, height: 3, borderRadius: 1.5, backgroundColor: alpha(theme.palette.success.main, 0.12), overflow: 'hidden', minWidth: 40 }}>
+                            <Box sx={{ height: '100%', width: `${group.totalCount > 0 ? (group.paidCount / group.totalCount) * 100 : 0}%`, borderRadius: 1.5, backgroundColor: theme.palette.success.main, transition: 'width 0.3s ease' }} />
+                          </Box>
+                          <Typography variant="caption" sx={{ fontSize: '0.6rem', color: theme.palette.success.main, fontWeight: 600, whiteSpace: 'nowrap' }}>{group.paidCount}/{group.totalCount}</Typography>
+                        </Box>
                         <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'monospace', minWidth: 90, textAlign: 'right' }}>{formatCurrencyOrDash(group.totalCost)}</Typography>
                       </>
                     )}

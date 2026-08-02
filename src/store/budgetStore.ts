@@ -18,6 +18,7 @@ import { saveToLocalStorage, loadFromLocalStorage } from '@/utils/storage';
 import { generateId } from '@/utils/id';
 import { ImportResult } from '@/utils/excelImport';
 import { notify } from './notificationStore';
+import { useUndoStore } from './undoStore';
 
 // Generates a descriptive notification based on what was updated
 function describeUpdate(updates: Record<string, unknown>): string {
@@ -54,6 +55,9 @@ function describeUpdate(updates: Record<string, unknown>): string {
 interface BudgetActions {
   importData: (data: ImportResult) => void;
   resetAndImport: (data: ImportResult) => void;
+
+  undoAction: () => void;
+  redoAction: () => void;
 
   updateMebleItem: (id: string, updates: Partial<MebleItem>) => void;
   addMebleItem: (item: Omit<MebleItem, 'id'>) => void;
@@ -125,6 +129,10 @@ function getStateSnapshot(state: BudgetStore): BudgetState {
     milestones: state.milestones,
     isDataLoaded: state.isDataLoaded,
   };
+}
+
+function captureForUndo(state: BudgetStore): void {
+  useUndoStore.getState().pushSnapshot(getStateSnapshot(state));
 }
 
 export const useBudgetStore = create<BudgetStore>((set, get) => {
@@ -208,8 +216,27 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       });
     },
 
+    undoAction: () => {
+      const currentSnapshot = getStateSnapshot(get() as BudgetStore);
+      const previous = useUndoStore.getState().undo(currentSnapshot);
+      if (previous) {
+        set(previous);
+        persistState(previous);
+      }
+    },
+
+    redoAction: () => {
+      const currentSnapshot = getStateSnapshot(get() as BudgetStore);
+      const next = useUndoStore.getState().redo(currentSnapshot);
+      if (next) {
+        set(next);
+        persistState(next);
+      }
+    },
+
     // Meble
     updateMebleItem: (id, updates) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const meble = state.meble.map((item) => item.id === id ? { ...item, ...updates } : item);
         const newState = { ...state, meble };
@@ -219,6 +246,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       notify.success(describeUpdate(updates as Record<string, unknown>));
     },
     addMebleItem: (item) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const meble = [...state.meble, { ...item, id: generateId() }];
         const newState = { ...state, meble };
@@ -228,6 +256,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       notify.success('Pozycja dodana');
     },
     deleteMebleItem: (id) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const meble = state.meble.filter((item) => item.id !== id);
         const newState = { ...state, meble };
@@ -239,6 +268,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
 
     // Wykończenie
     updateWykonczenieItem: (id, updates) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const wykonczenie = state.wykonczenie.map((item) => item.id === id ? { ...item, ...updates } : item);
         const newState = { ...state, wykonczenie };
@@ -248,6 +278,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       notify.success(describeUpdate(updates as Record<string, unknown>));
     },
     addWykonczenieItem: (item) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const wykonczenie = [...state.wykonczenie, { ...item, id: generateId() }];
         const newState = { ...state, wykonczenie };
@@ -257,6 +288,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       notify.success('Pozycja dodana');
     },
     deleteWykonczenieItem: (id) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const wykonczenie = state.wykonczenie.filter((item) => item.id !== id);
         const newState = { ...state, wykonczenie };
@@ -268,6 +300,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
 
     // AGD
     updateAGDItem: (id, updates) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const agd = state.agd.map((item) => item.id === id ? { ...item, ...updates } : item);
         const newState = { ...state, agd };
@@ -277,6 +310,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       notify.success(describeUpdate(updates as Record<string, unknown>));
     },
     addAGDItem: (item) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const agd = [...state.agd, { ...item, id: generateId() }];
         const newState = { ...state, agd };
@@ -286,6 +320,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       notify.success('Pozycja dodana');
     },
     deleteAGDItem: (id) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const agd = state.agd.filter((item) => item.id !== id);
         const newState = { ...state, agd };
@@ -297,6 +332,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
 
     // Pozostałe
     updatePozostaleItem: (id, updates) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const pozostale = state.pozostale.map((item) => item.id === id ? { ...item, ...updates } : item);
         const newState = { ...state, pozostale };
@@ -306,6 +342,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       notify.success(describeUpdate(updates as Record<string, unknown>));
     },
     addPozostaleItem: (item) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const pozostale = [...state.pozostale, { ...item, id: generateId() }];
         const newState = { ...state, pozostale };
@@ -315,6 +352,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       notify.success('Pozycja dodana');
     },
     deletePozostaleItem: (id) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const pozostale = state.pozostale.filter((item) => item.id !== id);
         const newState = { ...state, pozostale };
@@ -326,6 +364,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
 
     // Wyprowadzka
     updateWyprowadzkaItem: (id, updates) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const wyprowadzka = state.wyprowadzka.map((item) => item.id === id ? { ...item, ...updates } : item);
         const newState = { ...state, wyprowadzka };
@@ -335,6 +374,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       notify.success(describeUpdate(updates as Record<string, unknown>));
     },
     addWyprowadzkaItem: (item) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const wyprowadzka = [...state.wyprowadzka, { ...item, id: generateId() }];
         const newState = { ...state, wyprowadzka };
@@ -344,6 +384,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       notify.success('Pozycja dodana');
     },
     deleteWyprowadzkaItem: (id) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const wyprowadzka = state.wyprowadzka.filter((item) => item.id !== id);
         const newState = { ...state, wyprowadzka };
@@ -355,6 +396,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
 
     // Saldo
     addSaldoEntry: (entry) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const saldo = [...state.saldo, { ...entry, id: generateId() }];
         const newState = { ...state, saldo };
@@ -364,6 +406,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       notify.success('Wpływ dodany');
     },
     deleteSaldoEntry: (id) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const saldo = state.saldo.filter((entry) => entry.id !== id);
         const newState = { ...state, saldo };
@@ -373,6 +416,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       notify.success('Wpływ usunięty');
     },
     updateSaldoEntry: (id, updates) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const saldo = state.saldo.map((entry) => entry.id === id ? { ...entry, ...updates } : entry);
         const newState = { ...state, saldo };
@@ -384,6 +428,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
 
     // Harmonogram
     addScheduleEntry: (entry) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const harmonogram = [...state.harmonogram, { ...entry, id: generateId() }];
         const newState = { ...state, harmonogram };
@@ -393,6 +438,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       notify.success('Wpływ zaplanowany');
     },
     deleteScheduleEntry: (id) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const harmonogram = state.harmonogram.filter((e) => e.id !== id);
         const newState = { ...state, harmonogram };
@@ -402,6 +448,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       notify.success('Wpływ usunięty');
     },
     updateScheduleEntry: (id, updates) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const harmonogram = state.harmonogram.map((e) => e.id === id ? { ...e, ...updates } : e);
         const newState = { ...state, harmonogram };
@@ -411,6 +458,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       notify.success('Wpływ zapisany');
     },
     toggleScheduleRealized: (id) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const harmonogram = state.harmonogram.map((e) =>
           e.id === id ? { ...e, zrealizowane: !e.zrealizowane } : e
@@ -424,6 +472,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
 
     // Milestones
     addMilestone: (entry) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const milestones = [...state.milestones, { ...entry, id: generateId() }];
         const newState = { ...state, milestones };
@@ -433,6 +482,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       notify.success('Ważna data dodana');
     },
     deleteMilestone: (id) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const milestones = state.milestones.filter((e) => e.id !== id);
         const newState = { ...state, milestones };
@@ -442,6 +492,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       notify.success('Ważna data usunięta');
     },
     updateMilestone: (id, updates) => {
+      captureForUndo(get() as BudgetStore);
       set((state) => {
         const milestones = state.milestones.map((e) => e.id === id ? { ...e, ...updates } : e);
         const newState = { ...state, milestones };

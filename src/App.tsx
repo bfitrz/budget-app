@@ -67,6 +67,22 @@ function App() {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, [isDataLoaded]);
 
+  // Undo/Redo keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        useBudgetStore.getState().undoAction();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Z' && e.shiftKey) {
+        e.preventDefault();
+        useBudgetStore.getState().redoAction();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const [themeVariant, setThemeVariant] = useState<ThemeVariant>(getStoredTheme);
 
   const setTheme = (variant: ThemeVariant) => {
