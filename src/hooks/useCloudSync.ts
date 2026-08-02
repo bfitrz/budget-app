@@ -11,7 +11,6 @@ import { importExcelBuffer } from '@/utils/excelImport';
 import { notify } from '@/store/notificationStore';
 
 let isSyncing = false;
-let skipNextPoll = false;
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
 
 function getCloudProvider() {
@@ -43,7 +42,6 @@ async function doSaveToCloud() {
 
     const now = new Date().toISOString();
     saveStorageConfig({ ...config, lastSync: now });
-    skipNextPoll = true;
     console.log('Sync complete:', now);
   } catch (err) {
     console.error('Cloud sync failed:', err);
@@ -112,8 +110,9 @@ export function useCloudSync() {
         }
         const data = await response.json();
         const remoteModified = data.modifiedTime;
+        const isMe = data.lastModifyingUser?.me === true;
 
-        if (data.lastModifyingUser) {
+        if (data.lastModifyingUser && !isMe) {
           setLastEditor(data.lastModifyingUser.displayName || data.lastModifyingUser.emailAddress || null);
         }
 
@@ -125,9 +124,8 @@ export function useCloudSync() {
         if (remoteModified > lastKnownModifiedRef.current) {
           lastKnownModifiedRef.current = remoteModified;
 
-          if (skipNextPoll) {
-            skipNextPoll = false;
-          } else {
+          // Only notify if someone ELSE modified the file
+          if (!isMe) {
             setRemoteChanged(true);
             const editorName = data.lastModifyingUser?.displayName || 'inna osoba';
             notify.info(`Plik zmieniony przez: ${editorName}`);
