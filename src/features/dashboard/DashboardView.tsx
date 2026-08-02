@@ -55,12 +55,15 @@ export function DashboardView() {
   const totalWithExcluded = summary.lacznyKoszt + excludedTotal;
 
   // Dane do wykresu scenariuszy (min/main/max)
-  const rangeData = categoryBreakdown.map((cat) => ({
-    name: cat.name,
-    min: cat.minKoszt,
-    main: cat.zaplacono + cat.doZaplaty,
-    max: cat.maxKoszt,
-  }));
+  const rangeData = [
+    ...categoryBreakdown.map((cat) => ({
+      name: cat.name,
+      min: cat.minKoszt,
+      main: cat.zaplacono + cat.doZaplaty,
+      max: cat.maxKoszt,
+    })),
+    ...(excludedTotal > 0 ? [{ name: 'Pominięte', min: excludedTotal, main: excludedTotal, max: excludedTotal }] : []),
+  ];
 
   // Scenariusze budżetowe globalne
   const totalMin = categoryBreakdown.reduce((s, c) => s + c.minKoszt, 0);
@@ -77,6 +80,15 @@ export function DashboardView() {
       percent: total > 0 ? (cat.zaplacono / total) * 100 : 0,
     };
   });
+
+  // Excluded per category
+  const excludedPerCategory: Record<string, number> = {
+    'Meblowanie': meble.filter(i => !i.included).reduce((s, i) => s + i.cena, 0),
+    'Wykończenie': wykonczenie.filter(i => !i.included).reduce((s, i) => s + i.kwota, 0),
+    'AGD / RTV': agd.filter(i => !i.included).reduce((s, i) => s + i.cena, 0),
+    'Inne': pozostale.filter(i => !i.included).reduce((s, i) => s + i.cena, 0),
+    'Wyprowadzka': wyprowadzka.filter(i => !i.included).reduce((s, i) => s + i.cena, 0),
+  };
 
   return (
     <Box>
@@ -312,7 +324,7 @@ export function DashboardView() {
             <CardContent sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ mb: 0.5 }}>Rozpiętość kosztów</Typography>
               <Typography variant="caption" color="text.secondary">
-                Wariant minimalny / obecny / maksymalny (uwzględniając alternatywy)
+                Wariant minimalny / obecny / maksymalny{excludedTotal > 0 ? ' (+ pominięte)' : ''}
               </Typography>
               {rangeData.length > 0 ? (
                 <Box sx={{ mt: 3 }}>
@@ -466,6 +478,11 @@ export function DashboardView() {
                       },
                     }}
                   />
+                  {(excludedPerCategory[cat.name] || 0) > 0 && (
+                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.55rem', mt: 0.25, display: 'block' }}>
+                      + {formatCurrency(excludedPerCategory[cat.name])} pominięte (łącznie: {formatCurrency(cat.total + excludedPerCategory[cat.name])})
+                    </Typography>
+                  )}
                 </Box>
               ))}
             </Box>
@@ -507,6 +524,17 @@ export function DashboardView() {
               }}
             />
           </Box>
+          {excludedTotal > 0 && (
+            <Box sx={{ mt: 1.5 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Z pominięte</Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.6rem' }}>{totalWithExcluded > 0 ? Math.round((summary.zaplacono / totalWithExcluded) * 100) : 0}%</Typography>
+              </Box>
+              <Box sx={{ height: 4, borderRadius: 2, backgroundColor: alpha(theme.palette.text.secondary, 0.08), overflow: 'hidden' }}>
+                <Box sx={{ height: '100%', width: `${totalWithExcluded > 0 ? Math.min((summary.zaplacono / totalWithExcluded) * 100, 100) : 0}%`, borderRadius: 2, backgroundColor: alpha(theme.palette.text.secondary, 0.3), transition: 'width 0.6s ease' }} />
+              </Box>
+            </Box>
+          )}
         </CardContent>
       </Card>
     </Box>
