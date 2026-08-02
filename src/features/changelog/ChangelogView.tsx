@@ -16,6 +16,22 @@ interface ChangeEntry {
 
 const changelog: ChangeEntry[] = [
   {
+    version: '2.3.0',
+    date: '2026-08-02',
+    changes: [
+      { type: 'feat', text: 'Synchronizacja z Google Drive — plik .xlsx zapisywany automatycznie na Twoim Drive' },
+      { type: 'feat', text: 'Współdzielenie budżetu — udostępnij plik na Drive i pracujcie razem' },
+      { type: 'feat', text: 'Auto-zapis z konfigurowalnym interwałem (5–120s)' },
+      { type: 'feat', text: 'Strona „Dane i sync" — pełne zarządzanie połączeniem z chmurą' },
+      { type: 'feat', text: 'Zapisz jako... — tworzenie nowego pliku na Drive z dowolną nazwą' },
+      { type: 'feat', text: 'Wczytaj inny plik — przełączanie między plikami na Drive' },
+      { type: 'feat', text: 'Ekran startowy — wybór storage (Google Drive / localStorage) przy pierwszym uruchomieniu' },
+      { type: 'feat', text: 'Zero konfiguracji dla użytkowników — klik Google Drive → popup → gotowe' },
+      { type: 'fix', text: 'Google OAuth przez popup (GIS) zamiast redirect — nie wymaga client_secret' },
+      { type: 'style', text: 'Dropbox oznaczony jako „Wkrótce" (jeszcze niedostępny)' },
+    ],
+  },
+  {
     version: '2.2.0',
     date: '2026-08-02',
     changes: [

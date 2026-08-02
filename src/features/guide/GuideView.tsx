@@ -241,7 +241,34 @@ export function GuideView() {
       <Section title="Przeterminowane pozycje i backup" icon={<MoneyIcon sx={{ fontSize: 18 }} />}>
         <Feature label="Czerwona data = przeterminowane" description="Jeśli pozycja ma datę realizacji w przeszłości i status 'Do zapłaty', chip z datą zmienia kolor na czerwony. Łatwo widać co jest po terminie." />
         <Feature label="Najtańsza alternatywa podświetlona" description="W rozwinięciu pozycji najtańsza ALT (tańsza niż MAIN) ma zielone obramowanie — szybko widzisz najlepszą cenę." />
-        <Feature label="Reminder o backupie" description="Jeśli minęło >7 dni od ostatniego eksportu, na stronie Import/Eksport pojawi się alert z przypomnieniem i przyciskiem 'Eksportuj teraz'." />
+        <Feature label="Reminder o backupie" description="Jeśli minęło >7 dni od ostatniego eksportu, na stronie Dane i sync pojawi się alert z przypomnieniem i przyciskiem 'Eksportuj teraz'." />
+      </Section>
+
+      <Section title="Synchronizacja z Google Drive" icon={<DataIcon sx={{ fontSize: 18 }} />}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.8 }}>
+          Aplikacja może zapisywać dane jako plik .xlsx na Twoim Google Drive. Dzięki temu masz backup w chmurze i możesz współdzielić budżet z innymi osobami (partnerem, współlokatorem).
+        </Typography>
+        <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1.5 }}>Jak połączyć:</Typography>
+        <Feature label="1. Kliknij 'Google Drive'" description="Na ekranie startowym (pierwszy raz) lub na stronie 'Dane i sync' w sekcji 'Zmień połączenie'." />
+        <Feature label="2. Zaloguj się" description="Otworzy się popup Google — zaloguj się na swoje konto. Aplikacja prosi tylko o dostęp do plików które sama stworzyła (scope drive.file). Nie widzi Twoich maili, zdjęć ani innych plików." />
+        <Feature label="3. Wybierz lub utwórz plik" description="Po zalogowaniu pojawi się lista Twoich plików .xlsx na Drive. Wybierz istniejący lub kliknij 'Zapisz jako...' żeby stworzyć nowy." />
+        <Feature label="4. Gotowe — auto-sync" description="Od teraz aplikacja zapisuje zmiany do tego pliku automatycznie (co kilka sekund, konfigurowalne)." />
+        <Divider sx={{ my: 2 }} />
+        <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1.5 }}>Współdzielenie z inną osobą:</Typography>
+        <Feature label="1. Udostępnij plik na Drive" description="Wejdź na drive.google.com → znajdź plik budżetu → klik prawym → 'Udostępnij' → wpisz email drugiej osoby → ustaw uprawnienie 'Edytujący'." />
+        <Feature label="2. Druga osoba otwiera apkę" description="Wysyłasz jej link do aplikacji. Klika 'Google Drive', loguje się na SWOJE konto Google." />
+        <Feature label="3. Widzi udostępniony plik" description="Na liście plików pojawi się plik który jej udostępniłeś. Klika go — i pracuje na tych samych danych." />
+        <Feature label="Jak to działa" description="Oboje zapisujecie do tego samego pliku na Drive. Kto ostatni zapisał — jego wersja jest aktualna. Nie jest to edycja w czasie rzeczywistym (jak Google Docs), ale przy budżecie domowym wystarczy." />
+        <Divider sx={{ my: 2 }} />
+        <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1.5 }}>Ustawienia synchronizacji (strona 'Dane i sync'):</Typography>
+        <Feature label="Auto-zapis" description="Switch włącza/wyłącza automatyczne zapisywanie. Suwak ustawia interwał (5–120 sekund). Domyślnie: co 30s po ostatniej zmianie." />
+        <Feature label="Zapisz teraz" description="Ręczny zapis natychmiast — niezależnie od auto-zapisu." />
+        <Feature label="Zapisz jako..." description="Tworzy NOWY plik na Drive z podaną nazwą. Przydatne do tworzenia kopii lub nowego budżetu." />
+        <Feature label="Wczytaj inny plik" description="Otwiera listę plików .xlsx z Drive — możesz przełączyć się na inny plik (np. stary backup)." />
+        <Feature label="Zmień połączenie" description="Przełącz między Google Drive a localStorage. W przyszłości będzie też Dropbox." />
+        <Feature label="Odłącz" description="Rozłącza synchronizację i usuwa token. Dane lokalne pozostają — nic nie jest kasowane." />
+        <Tip>Token Google wygasa po 1 godzinie. Gdy wygaśnie, aplikacja automatycznie pokaże popup logowania ponownie — wystarczy kliknąć swoje konto. Dane nie są tracone.</Tip>
+        <Tip>Twoje hasło do Google NIGDY nie przechodzi przez aplikację. Logowanie odbywa się bezpośrednio na stronie Google. Aplikacja dostaje tylko token z ograniczonym dostępem do plików które sama stworzyła.</Tip>
       </Section>
 
       <Section title="Skróty i wskazówki" icon={<MoneyIcon sx={{ fontSize: 18 }} />}>
