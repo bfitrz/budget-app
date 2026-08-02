@@ -43,6 +43,7 @@ async function doSaveToCloud() {
     const now = new Date().toISOString();
     saveStorageConfig({ ...config, lastSync: now });
     console.log('Sync complete:', now);
+    notify.success('Zapisano do chmury');
   } catch (err) {
     console.error('Cloud sync failed:', err);
     notify.error('Synchronizacja nie powiodła się');
