@@ -90,32 +90,30 @@ export function ImportView() {
   };
 
   const handleConnect = async (provider: 'dropbox' | 'google') => {
-    const key = provider === 'dropbox'
-      ? localStorage.getItem('budget-app-dropbox-appkey') || import.meta.env.VITE_DROPBOX_APP_KEY
-      : localStorage.getItem('budget-app-gdrive-clientid') || import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    if (key) {
-      // Key exists — start OAuth
-      if (provider === 'dropbox') {
-        new DropboxProvider().authenticate();
-      } else {
-        try {
-          setCloudLoading(true);
-          const gProvider = new GoogleDriveProvider();
-          await gProvider.authenticate(); // popup
-          saveStorageConfig({ provider: 'google-drive', filePath: null, autoSync: true, syncInterval: 30000, lastSync: null });
-          const files = await gProvider.listFiles();
-          setCloudFiles(files);
-          setFilePickerOpen(true);
-          setSnackbar({ open: true, type: 'success', text: 'Połączono z Google Drive' });
-        } catch (err) {
-          setSnackbar({ open: true, type: 'error', text: err instanceof Error ? err.message : 'Błąd połączenia' });
-        } finally {
-          setCloudLoading(false);
-        }
+    if (provider === 'google') {
+      // Client ID is hardcoded — always ready
+      try {
+        setCloudLoading(true);
+        const gProvider = new GoogleDriveProvider();
+        await gProvider.authenticate();
+        saveStorageConfig({ provider: 'google-drive', filePath: null, autoSync: true, syncInterval: 30000, lastSync: null });
+        const files = await gProvider.listFiles();
+        setCloudFiles(files);
+        setFilePickerOpen(true);
+        setSnackbar({ open: true, type: 'success', text: 'Połączono z Google Drive' });
+      } catch (err) {
+        setSnackbar({ open: true, type: 'error', text: err instanceof Error ? err.message : 'Błąd połączenia' });
+      } finally {
+        setCloudLoading(false);
       }
+      return;
+    }
+    // Dropbox — needs key from user
+    const key = localStorage.getItem('budget-app-dropbox-appkey') || import.meta.env.VITE_DROPBOX_APP_KEY;
+    if (key) {
+      new DropboxProvider().authenticate();
     } else {
-      // Need key from user
-      setConnectDialog(provider);
+      setConnectDialog('dropbox');
       setAppKeyInput('');
     }
   };

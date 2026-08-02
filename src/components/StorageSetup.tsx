@@ -71,10 +71,8 @@ export function StorageSetup({
   };
 
   const handleGoogleClick = () => {
-    const existingKey = localStorage.getItem('budget-app-gdrive-clientid') || import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    if (existingKey) { onSelectGoogleDrive(); return; }
-    setKeyDialog('google');
-    setAppKeyInput('');
+    // Client ID is hardcoded — always available, no need to ask
+    onSelectGoogleDrive();
   };
 
   // If connected to a provider, show file picker
