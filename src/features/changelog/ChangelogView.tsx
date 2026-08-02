@@ -21,6 +21,8 @@ const changelog: ChangeEntry[] = [
     changes: [
       { type: 'fix', text: 'Google Drive nie pyta już o Client ID — klik → popup logowania → gotowe' },
       { type: 'fix', text: 'Kolega/siostra nie musi nic konfigurować — wystarczy link do apki' },
+      { type: 'feat', text: 'Przycisk Odśwież (↻) w sidebarze — reload strony bez F5' },
+      { type: 'fix', text: 'Auto-zapis switch i suwak interwału reagują na zmianę' },
     ],
   },
   {

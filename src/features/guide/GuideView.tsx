@@ -274,6 +274,7 @@ export function GuideView() {
       <Section title="Skróty i wskazówki" icon={<MoneyIcon sx={{ fontSize: 18 }} />}>
         <Feature label="Nawigacja mobilna (swipe)" description="Na telefonie przesuń palcem z lewej do prawej aby otworzyć menu nawigacji. Przesuń z powrotem lub kliknij poza menu aby zamknąć." />
         <Feature label="Logo → Podsumowanie" description="Kliknij logo 'Budget' w pasku bocznym aby wrócić na stronę główną (dashboard)." />
+        <Feature label="Przycisk Odśwież (↻)" description="Ikona obok logo (desktop) lub obok X (mobile). Przeładowuje aplikację — przydatne po aktualizacji lub gdy coś się zawiesi." />
         <Feature label="Motywy kolorystyczne" description="Paleta kolorów na dole paska bocznego. 4 motywy: Ciemny, Stonowany, Jasny, Unicorn 🦄. Wybór jest zapisywany między sesjami." />
         <Feature label="Status z dropdown" description="Zmiana statusu bezpośrednio w tabeli — dropdown 'Do zapłaty' / 'Opłacone' / 'Wykluczone'. Nie musisz otwierać modala edycji." />
         <Feature label="Ikona ? przy tytule" description="Na stronach wydatków przy podtytule jest ikona znaku zapytania. Najedź aby zobaczyć krótki opis do czego służy dana zakładka." />
