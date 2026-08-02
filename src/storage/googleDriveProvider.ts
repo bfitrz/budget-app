@@ -32,7 +32,7 @@ function loadGisScript(): Promise<void> {
 function initTokenClient(clientId: string): google.accounts.oauth2.TokenClient {
   return google.accounts.oauth2.initTokenClient({
     client_id: clientId,
-    scope: 'https://www.googleapis.com/auth/drive.file',
+    scope: 'https://www.googleapis.com/auth/drive',
     callback: (response) => {
       if (response.error) {
         if (rejectAuth) rejectAuth(new Error(response.error_description || response.error));
@@ -113,8 +113,10 @@ export class GoogleDriveProvider implements StorageProvider {
   }
 
   async listFiles(): Promise<StorageFile[]> {
+    // List own xlsx files + shared with me
+    const query = "mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' and trashed=false";
     const response = await this.apiCall(
-      `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent("mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'")}&fields=files(id,name,modifiedTime,size)&orderBy=modifiedTime desc`
+      `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name,modifiedTime,size,shared,owners)&orderBy=modifiedTime desc&includeItemsFromAllDrives=false&supportsAllDrives=false`
     );
 
     if (!response.ok) throw new Error('Nie udało się pobrać listy plików');
