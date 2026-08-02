@@ -16,7 +16,7 @@ import { ChangelogView } from '@/features/changelog';
 import { WykluconeView } from '@/features/wykluczone';
 import { useBudgetStore } from '@/store';
 import { useCloudSync } from '@/hooks/useCloudSync';
-import { getStorageConfig, saveStorageConfig, clearStorageConfig, DropboxProvider, GoogleDriveProvider, checkDropboxCallback, checkGoogleDriveCallback, StorageFile } from '@/storage';
+import { getStorageConfig, saveStorageConfig, clearStorageConfig, DropboxProvider, GoogleDriveProvider, checkDropboxCallback, StorageFile } from '@/storage';
 
 export type ThemeVariant = 'dark' | 'light' | 'dim' | 'unicorn';
 
@@ -52,7 +52,7 @@ function App() {
   const [cloudFiles, setCloudFiles] = useState<StorageFile[]>([]);
   const [connectedProvider, setConnectedProvider] = useState<'dropbox' | 'google-drive' | null>(null);
 
-  // Handle OAuth callbacks on mount — always, regardless of storageReady
+  // Handle OAuth callbacks on mount (Dropbox only — Google uses popup via GIS)
   useEffect(() => {
     const handleOAuthCallback = async () => {
       const dropboxCode = checkDropboxCallback();
@@ -60,7 +60,6 @@ function App() {
         try {
           const provider = new DropboxProvider();
           await provider.handleCallback(dropboxCode);
-          // Save config and reload
           saveStorageConfig({ provider: 'dropbox', filePath: null, autoSync: true, syncInterval: 30000, lastSync: null });
           setStorageReady(true);
           setConnectedProvider('dropbox');
@@ -69,26 +68,6 @@ function App() {
         } catch (err) {
           setStorageError(err instanceof Error ? err.message : 'Błąd autoryzacji Dropbox');
         }
-        return;
-      }
-
-      const googleCode = checkGoogleDriveCallback();
-      if (googleCode) {
-        try {
-          const provider = new GoogleDriveProvider();
-          await provider.handleCallback(googleCode);
-          // Save config — user needs to pick/create file next
-          saveStorageConfig({ provider: 'google-drive', filePath: null, autoSync: true, syncInterval: 30000, lastSync: null });
-          setStorageReady(true);
-          setConnectedProvider('google-drive');
-          // Navigate to import page for file picker
-          window.location.hash = '#/import';
-          const files = await provider.listFiles();
-          setCloudFiles(files);
-        } catch (err) {
-          setStorageError(err instanceof Error ? err.message : 'Błąd autoryzacji Google');
-        }
-        return;
       }
     };
     handleOAuthCallback();
@@ -110,10 +89,19 @@ function App() {
 
   const handleSelectGoogleDrive = async () => {
     try {
+      setStorageLoading(true);
       const provider = new GoogleDriveProvider();
-      await provider.authenticate(); // Redirects to Google
+      await provider.authenticate(); // Opens popup (GIS)
+      // After popup closes, we have token
+      saveStorageConfig({ provider: 'google-drive', filePath: null, autoSync: true, syncInterval: 30000, lastSync: null });
+      setStorageReady(true);
+      setConnectedProvider('google-drive');
+      const files = await provider.listFiles();
+      setCloudFiles(files);
     } catch (err) {
       setStorageError(err instanceof Error ? err.message : 'Błąd połączenia z Google Drive');
+    } finally {
+      setStorageLoading(false);
     }
   };
 

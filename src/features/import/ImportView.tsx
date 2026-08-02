@@ -81,14 +81,30 @@ export function ImportView() {
     return null;
   };
 
-  const handleConnect = (provider: 'dropbox' | 'google') => {
+  const handleConnect = async (provider: 'dropbox' | 'google') => {
     const key = provider === 'dropbox'
       ? localStorage.getItem('budget-app-dropbox-appkey') || import.meta.env.VITE_DROPBOX_APP_KEY
       : localStorage.getItem('budget-app-gdrive-clientid') || import.meta.env.VITE_GOOGLE_CLIENT_ID;
     if (key) {
       // Key exists — start OAuth
-      if (provider === 'dropbox') new DropboxProvider().authenticate();
-      else new GoogleDriveProvider().authenticate();
+      if (provider === 'dropbox') {
+        new DropboxProvider().authenticate();
+      } else {
+        try {
+          setCloudLoading(true);
+          const gProvider = new GoogleDriveProvider();
+          await gProvider.authenticate(); // popup
+          saveStorageConfig({ provider: 'google-drive', filePath: null, autoSync: true, syncInterval: 30000, lastSync: null });
+          const files = await gProvider.listFiles();
+          setCloudFiles(files);
+          setFilePickerOpen(true);
+          setSnackbar({ open: true, type: 'success', text: 'Połączono z Google Drive' });
+        } catch (err) {
+          setSnackbar({ open: true, type: 'error', text: err instanceof Error ? err.message : 'Błąd połączenia' });
+        } finally {
+          setCloudLoading(false);
+        }
+      }
     } else {
       // Need key from user
       setConnectDialog(provider);
@@ -96,16 +112,18 @@ export function ImportView() {
     }
   };
 
-  const handleKeySubmit = () => {
+  const handleKeySubmit = async () => {
     if (!appKeyInput.trim() || !connectDialog) return;
     if (connectDialog === 'dropbox') {
       localStorage.setItem('budget-app-dropbox-appkey', appKeyInput.trim());
+      setConnectDialog(null);
       new DropboxProvider().authenticate();
     } else {
       localStorage.setItem('budget-app-gdrive-clientid', appKeyInput.trim());
-      new GoogleDriveProvider().authenticate();
+      setConnectDialog(null);
+      // Use popup flow
+      handleConnect('google');
     }
-    setConnectDialog(null);
   };
 
   const handleBrowseFiles = async () => {
