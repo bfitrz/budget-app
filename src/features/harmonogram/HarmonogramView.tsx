@@ -133,6 +133,24 @@ export function HarmonogramView() {
     return saldo;
   };
 
+  // Calculate cel (costs to cover) at a given date - respects dataRealizacji
+  const getCelAtDate = (date: string): number => {
+    const allItems = [
+      ...meble.filter(i => i.included && i.status !== 'Opłacone').map(i => ({ kwota: i.cena, dataRealizacji: i.dataRealizacji || '' })),
+      ...wykonczenie.filter(i => i.included && i.status !== 'Opłacone').map(i => ({ kwota: i.kwota, dataRealizacji: i.dataRealizacji || '' })),
+      ...agd.filter(i => i.included && i.status !== 'Opłacone').map(i => ({ kwota: i.cena, dataRealizacji: i.dataRealizacji || '' })),
+      ...pozostale.filter(i => i.included && i.status !== 'Opłacone').map(i => ({ kwota: i.cena, dataRealizacji: i.dataRealizacji || '' })),
+      ...wyprowadzka.filter(i => i.included && i.status !== 'Opłacone').map(i => ({ kwota: i.cena, dataRealizacji: i.dataRealizacji || '' })),
+    ];
+    let cel = 0;
+    for (const item of allItems) {
+      if (!item.dataRealizacji || item.dataRealizacji <= date) {
+        cel += item.kwota;
+      }
+    }
+    return cel;
+  };
+
   const onSubmit = (data: ScheduleFormData) => {
     if (editingEntry) {
       updateScheduleEntry(editingEntry.id, {
@@ -421,7 +439,8 @@ export function HarmonogramView() {
                 {/* Milestones */}
                 {milestones.map((ms) => {
                   const saldoAtMs = getSaldoAtDate(ms.data);
-                  const bilansAtMs = saldoAtMs - summary.pozostaloDoZaplaty;
+                  const celAtMs = getCelAtDate(ms.data);
+                  const bilansAtMs = saldoAtMs - celAtMs;
                   return (
                     <ReferenceLine
                       key={ms.id}
@@ -476,7 +495,8 @@ export function HarmonogramView() {
                 {milestones.map((ms) => {
                   const prognozowaneSrodkiNaDate = getSaldoAtDate(ms.data);
                   const wplywDoMomentu = prognozowaneSrodkiNaDate - summary.aktualnieSrodki;
-                  const brakuje = summary.pozostaloDoZaplaty - prognozowaneSrodkiNaDate;
+                  const celNaDate = getCelAtDate(ms.data);
+                  const brakuje = celNaDate - prognozowaneSrodkiNaDate;
                   return (
                     <Tooltip key={ms.id} title={
                       <Box sx={{ p: 0.5, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
@@ -485,7 +505,7 @@ export function HarmonogramView() {
                         <Typography variant="caption" sx={{ display: 'block' }}>Przewidywane wpływy do tej daty: +{formatCurrency(wplywDoMomentu)}</Typography>
                         <Typography variant="caption" sx={{ display: 'block', fontWeight: 600 }}>Prognoza środków: {formatCurrency(prognozowaneSrodkiNaDate)}</Typography>
                         <Box sx={{ borderTop: `1px solid ${alpha(theme.palette.divider, 0.3)}`, mt: 0.5, pt: 0.5 }}>
-                          <Typography variant="caption" sx={{ display: 'block' }}>Łączny koszt do pokrycia: {formatCurrency(summary.pozostaloDoZaplaty)}</Typography>
+                          <Typography variant="caption" sx={{ display: 'block' }}>Koszty do pokrycia na tę datę: {formatCurrency(celNaDate)}</Typography>
                           <Typography variant="caption" sx={{ display: 'block', fontWeight: 700, color: brakuje <= 0 ? theme.palette.success.main : theme.palette.error.main }}>
                             {brakuje <= 0 ? `Nadwyżka: +${formatCurrency(Math.abs(brakuje))}` : `Brakuje do celu: -${formatCurrency(brakuje)}`}
                           </Typography>
