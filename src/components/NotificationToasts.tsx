@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react';
-import { Box, Typography, alpha, useTheme, IconButton } from '@mui/material';
+import { Box, Typography, alpha, useTheme, IconButton, Button } from '@mui/material';
 import {
   CheckCircle as SuccessIcon,
   Info as InfoIcon,
   Warning as WarningIcon,
   Error as ErrorIcon,
   Close as CloseIcon,
+  CloudOff as DisconnectedIcon,
+  Sync as SyncIcon,
 } from '@mui/icons-material';
 import { useNotificationStore, Notification, NotificationType } from '@/store/notificationStore';
+import { getStorageConfig } from '@/storage/types';
+import { GoogleDriveProvider } from '@/storage/googleDriveProvider';
 
 function getIcon(type: NotificationType) {
   switch (type) {
@@ -24,7 +28,6 @@ function ToastItem({ notification }: { notification: Notification }) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    // Trigger enter animation
     requestAnimationFrame(() => setVisible(true));
   }, []);
 
@@ -60,39 +63,105 @@ function ToastItem({ notification }: { notification: Notification }) {
       <Box sx={{ color, display: 'flex', flexShrink: 0 }}>
         {getIcon(notification.type)}
       </Box>
-      <Typography
-        variant="body2"
-        sx={{
-          flex: 1,
-          fontSize: '0.8rem',
-          fontWeight: 500,
-          lineHeight: 1.4,
-          color: theme.palette.text.primary,
-        }}
-      >
+      <Typography variant="body2" sx={{ flex: 1, fontSize: '0.8rem', fontWeight: 500, lineHeight: 1.4 }}>
         {notification.message}
       </Typography>
-      <IconButton
-        size="small"
-        onClick={() => dismiss(notification.id)}
-        sx={{
-          opacity: 0.4,
-          flexShrink: 0,
-          width: 22,
-          height: 22,
-          '&:hover': { opacity: 1 },
-        }}
-      >
+      <IconButton size="small" onClick={() => dismiss(notification.id)} sx={{ opacity: 0.4, flexShrink: 0, width: 22, height: 22, '&:hover': { opacity: 1 } }}>
         <CloseIcon sx={{ fontSize: 14 }} />
       </IconButton>
     </Box>
   );
 }
 
+function ConnectionStatus() {
+  const theme = useTheme();
+  const config = getStorageConfig();
+  const [disconnected, setDisconnected] = useState(false);
+  const [reconnecting, setReconnecting] = useState(false);
+
+  useEffect(() => {
+    if (!config || config.provider === 'local') return;
+    const token = localStorage.getItem('budget-app-gdrive-token');
+    if (!token && config.filePath) {
+      setDisconnected(true);
+    }
+  }, []);
+
+  // Listen for sync failures
+  useEffect(() => {
+    const check = () => {
+      if (!config || config.provider === 'local') return;
+      const token = localStorage.getItem('budget-app-gdrive-token');
+      if (!token && config?.filePath) setDisconnected(true);
+      else setDisconnected(false);
+    };
+    const interval = setInterval(check, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleReconnect = async () => {
+    setReconnecting(true);
+    try {
+      const provider = new GoogleDriveProvider();
+      await provider.authenticate();
+      setDisconnected(false);
+    } catch {
+      // Still disconnected
+    } finally {
+      setReconnecting(false);
+    }
+  };
+
+  if (!disconnected) return null;
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1.5,
+        px: 2,
+        py: 1.5,
+        borderRadius: '12px',
+        backgroundColor: alpha(theme.palette.warning.main, 0.08),
+        border: `1px solid ${alpha(theme.palette.warning.main, 0.3)}`,
+        boxShadow: `0 4px 16px ${alpha(theme.palette.warning.main, 0.1)}`,
+        minWidth: 240,
+        maxWidth: 320,
+        pointerEvents: 'auto',
+        animation: 'pulse 2s infinite',
+        '@keyframes pulse': {
+          '0%, 100%': { boxShadow: `0 4px 16px ${alpha(theme.palette.warning.main, 0.1)}` },
+          '50%': { boxShadow: `0 4px 24px ${alpha(theme.palette.warning.main, 0.25)}` },
+        },
+      }}
+    >
+      <DisconnectedIcon sx={{ fontSize: 18, color: theme.palette.warning.main, flexShrink: 0 }} />
+      <Box sx={{ flex: 1 }}>
+        <Typography variant="body2" sx={{ fontSize: '0.75rem', fontWeight: 600, color: theme.palette.warning.main }}>
+          Brak połączenia
+        </Typography>
+        <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.secondary' }}>
+          Sesja Google wygasła
+        </Typography>
+      </Box>
+      <Button
+        size="small"
+        variant="outlined"
+        color="warning"
+        startIcon={<SyncIcon sx={{ fontSize: 14 }} />}
+        onClick={handleReconnect}
+        disabled={reconnecting}
+        sx={{ fontSize: '0.65rem', textTransform: 'none', borderRadius: 2, px: 1.5, minWidth: 'auto' }}
+      >
+        {reconnecting ? '...' : 'Połącz'}
+      </Button>
+    </Box>
+  );
+}
+
 export function NotificationToasts() {
   const notifications = useNotificationStore((s) => s.notifications);
-
-  if (notifications.length === 0) return null;
 
   return (
     <Box
@@ -107,6 +176,9 @@ export function NotificationToasts() {
         pointerEvents: 'none',
       }}
     >
+      {/* Persistent connection status */}
+      <ConnectionStatus />
+      {/* Transient notifications */}
       {notifications.slice(0, 5).map((notification) => (
         <ToastItem key={notification.id} notification={notification} />
       ))}

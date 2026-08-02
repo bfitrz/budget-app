@@ -100,6 +100,22 @@ interface RawNotatkaRow {
   Data?: string;
 }
 // --- Parsers ---
+
+function parseDate(value: string | number | undefined): string {
+  if (!value) return '';
+  // If number — Excel serial date
+  if (typeof value === 'number') {
+    const date = new Date((value - 25569) * 86400 * 1000);
+    return date.toISOString().split('T')[0];
+  }
+  // If already YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(String(value))) return String(value);
+  // Try parsing
+  const d = new Date(String(value));
+  if (!isNaN(d.getTime())) return d.toISOString().split('T')[0];
+  return String(value);
+}
+
 function parseStatus(status: string | undefined): PaymentStatus {
   if (status === 'Opłacone') return 'Opłacone';
   if (status === 'Wykluczone' || status === 'Pominięte') return 'Wykluczone';
@@ -184,7 +200,7 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       cena: Number(row.Cena) || 0,
       uwagi: row.Uwagi || '',
       uwagiMain: row.UwagiMain || '',
-      dataRealizacji: row.DataRealizacji || '',
+      dataRealizacji: parseDate(row.DataRealizacji as unknown as string | number | undefined),
       linki: parseLinki(row.Linki),
       alternatywy: parseAlternatywy(row.Alternatywy),
       wybranaAltId: row.WybranaAltId || null,
@@ -203,7 +219,7 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       kwota: Number(row.Kwota) || 0,
       uwagi: row.Uwagi || '',
       uwagiMain: row.UwagiMain || '',
-      dataRealizacji: row.DataRealizacji || '',
+      dataRealizacji: parseDate(row.DataRealizacji as unknown as string | number | undefined),
       linki: parseLinki(row.Linki),
       alternatywy: parseAlternatywy(row.Alternatywy),
       wybranaAltId: row.WybranaAltId || null,
@@ -223,7 +239,7 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       cena: Number(row.Cena) || 0,
       uwagi: row.Uwagi || '',
       uwagiMain: row.UwagiMain || '',
-      dataRealizacji: row.DataRealizacji || '',
+      dataRealizacji: parseDate(row.DataRealizacji as unknown as string | number | undefined),
       linki: parseLinki(row.Linki),
       alternatywy: parseAlternatywy(row.Alternatywy),
       wybranaAltId: row.WybranaAltId || null,
@@ -242,7 +258,7 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       cena: Number(row.Cena) || 0,
       uwagi: row.Uwagi || '',
       uwagiMain: row.UwagiMain || '',
-      dataRealizacji: row.DataRealizacji || '',
+      dataRealizacji: parseDate(row.DataRealizacji as unknown as string | number | undefined),
       linki: parseLinki(row.Linki),
       alternatywy: parseAlternatywy(row.Alternatywy),
       wybranaAltId: row.WybranaAltId || null,
@@ -260,7 +276,7 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       cena: Number(row.Cena) || 0,
       uwagi: row.Uwagi || '',
       uwagiMain: row.UwagiMain || '',
-      dataRealizacji: row.DataRealizacji || '',
+      dataRealizacji: parseDate(row.DataRealizacji as unknown as string | number | undefined),
       linki: parseLinki(row.Linki),
       alternatywy: parseAlternatywy(row.Alternatywy),
       wybranaAltId: row.WybranaAltId || null,

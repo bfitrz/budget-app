@@ -16,6 +16,17 @@ interface ChangeEntry {
 
 const changelog: ChangeEntry[] = [
   {
+    version: '2.6.0',
+    date: '2026-08-02',
+    changes: [
+      { type: 'feat', text: 'Stały blok „Brak połączenia" w prawym górnym rogu gdy sesja Google wygasła + przycisk Połącz' },
+      { type: 'feat', text: 'Toasty notyfikacji wyświetlają się pod blokiem statusu połączenia' },
+      { type: 'feat', text: 'Animacja pulse na bloku rozłączenia — przyciąga uwagę' },
+      { type: 'fix', text: 'Import daty z Excela — obsługa serial number (Excel konwertuje daty na liczby)' },
+      { type: 'fix', text: 'Auto-refresh tokena Google w tle (silent re-auth przy wygaśnięciu)' },
+    ],
+  },
+  {
     version: '2.5.0',
     date: '2026-08-02',
     changes: [

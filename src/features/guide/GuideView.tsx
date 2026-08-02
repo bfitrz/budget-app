@@ -264,6 +264,7 @@ export function GuideView() {
         <Feature label="Auto-zapis" description="Switch włącza/wyłącza automatyczne zapisywanie. Suwak ustawia interwał (5–120 sekund). Domyślnie: co 30s po ostatniej zmianie." />
         <Feature label="Sprawdzaj zmiany" description="Switch włącza/wyłącza automatyczne sprawdzanie czy ktoś inny zmienił plik. Suwak (10–120s) ustawia jak często. Jeśli wykryje zmianę innej osoby, pokaże animowany banner na górze ekranu z imieniem osoby i przyciskiem 'Wczytaj'. Banner jest widoczny na każdej stronie i nie znika przy scrollowaniu. Własne zapisy są ignorowane." />
         <Feature label="Powiadomienia sync" description="Po każdym udanym autozapisie pojawia się toast 'Zapisano do chmury'. Po wczytaniu zmian: 'Wczytano zmiany z chmury'. Przy błędzie: 'Synchronizacja nie powiodła się'." />
+        <Feature label="Status połączenia" description="Gdy sesja Google wygaśnie, w prawym górnym rogu pojawi się stały blok 'Brak połączenia' z przyciskiem 'Połącz'. Toasty pojawiają się pod nim. Blok znika po ponownym połączeniu." />
         <Feature label="Kto ostatnio edytował" description="Na stronie 'Dane i sync' widać imię osoby która ostatnio zapisała plik. W bannerze zmian też wyświetla się imię — wiesz kto co zmienił." />
         <Feature label="Zapisz teraz" description="Ręczny zapis natychmiast — niezależnie od auto-zapisu." />
         <Feature label="Zapisz jako..." description="Tworzy NOWY plik na Drive z podaną nazwą. Przydatne do tworzenia kopii lub nowego budżetu." />
