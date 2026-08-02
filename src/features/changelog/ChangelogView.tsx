@@ -16,6 +16,16 @@ interface ChangeEntry {
 
 const changelog: ChangeEntry[] = [
   {
+    version: '2.8.0',
+    date: '2026-08-02',
+    changes: [
+      { type: 'feat', text: 'Banner „🔄 Nowa wersja od X" przeniesiony do prawego górnego rogu (obok innych statusów)' },
+      { type: 'feat', text: 'Po reload/otwarciu apki — natychmiastowe sprawdzenie czy plik ma nowszą wersję' },
+      { type: 'feat', text: 'Trzy stałe bloki statusu w prawym górnym rogu: aktualizacja apki / zmiana pliku / brak połączenia' },
+      { type: 'fix', text: 'Banner zmian nie znikał po F5 — teraz porównuje modifiedTime z lastSync przy starcie' },
+    ],
+  },
+  {
     version: '2.7.0',
     date: '2026-08-02',
     changes: [

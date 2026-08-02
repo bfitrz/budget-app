@@ -15,7 +15,7 @@ import { getStorageConfig } from '@/storage/types';
 import { GoogleDriveProvider } from '@/storage/googleDriveProvider';
 import { useCloudSync } from '@/hooks/useCloudSync';
 
-const CURRENT_VERSION = '2.7.0';
+const CURRENT_VERSION = '2.8.0';
 
 function getIcon(type: NotificationType) {
   switch (type) {
