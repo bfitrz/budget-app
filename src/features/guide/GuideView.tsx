@@ -262,6 +262,8 @@ export function GuideView() {
         <Divider sx={{ my: 2 }} />
         <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1.5 }}>Ustawienia synchronizacji (strona 'Dane i sync'):</Typography>
         <Feature label="Auto-zapis" description="Switch włącza/wyłącza automatyczne zapisywanie. Suwak ustawia interwał (5–120 sekund). Domyślnie: co 30s po ostatniej zmianie." />
+        <Feature label="Sprawdzaj zmiany co..." description="Suwak 10–120s — jak często aplikacja sprawdza czy ktoś inny zmienił plik. Jeśli wykryje zmianę, pokaże banner z imieniem osoby która edytowała i przyciskiem 'Wczytaj zmiany'." />
+        <Feature label="Kto ostatnio edytował" description="Na stronie 'Dane i sync' widać imię osoby która ostatnio zapisała plik. W bannerze zmian też wyświetla się imię — wiesz kto co zmienił." />
         <Feature label="Zapisz teraz" description="Ręczny zapis natychmiast — niezależnie od auto-zapisu." />
         <Feature label="Zapisz jako..." description="Tworzy NOWY plik na Drive z podaną nazwą. Przydatne do tworzenia kopii lub nowego budżetu." />
         <Feature label="Wczytaj inny plik" description="Otwiera listę plików .xlsx z Drive — możesz przełączyć się na inny plik (np. stary backup)." />
