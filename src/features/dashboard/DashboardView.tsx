@@ -34,11 +34,25 @@ export function DashboardView() {
   const getCategoryCosts = useBudgetStore((s) => s.getCategoryCosts);
   const getCategoryBreakdown = useBudgetStore((s) => s.getCategoryBreakdown);
   const getPaymentProgress = useBudgetStore((s) => s.getPaymentProgress);
+  const meble = useBudgetStore((s) => s.meble);
+  const wykonczenie = useBudgetStore((s) => s.wykonczenie);
+  const agd = useBudgetStore((s) => s.agd);
+  const pozostale = useBudgetStore((s) => s.pozostale);
+  const wyprowadzka = useBudgetStore((s) => s.wyprowadzka);
 
   const summary = getDashboardSummary();
   const categoryCosts = getCategoryCosts();
   const categoryBreakdown = getCategoryBreakdown();
   const progress = getPaymentProgress();
+
+  // Wygaszone (excluded) totals
+  const excludedTotal = 
+    meble.filter(i => !i.included).reduce((s, i) => s + i.cena, 0) +
+    wykonczenie.filter(i => !i.included).reduce((s, i) => s + i.kwota, 0) +
+    agd.filter(i => !i.included).reduce((s, i) => s + i.cena, 0) +
+    pozostale.filter(i => !i.included).reduce((s, i) => s + i.cena, 0) +
+    wyprowadzka.filter(i => !i.included).reduce((s, i) => s + i.cena, 0);
+  const totalWithExcluded = summary.lacznyKoszt + excludedTotal;
 
   // Dane do wykresu scenariuszy (min/main/max)
   const rangeData = categoryBreakdown.map((cat) => ({
@@ -138,6 +152,16 @@ export function DashboardView() {
                 <Typography variant="caption" color="text.secondary">Łączny koszt</Typography>
               </Box>
               <Typography variant="h5">{formatCurrency(summary.lacznyKoszt)}</Typography>
+              {excludedTotal > 0 && (
+                <Box sx={{ mt: 1 }}>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.6rem' }}>
+                    z pominięte: {formatCurrency(totalWithExcluded)}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: theme.palette.success.main, fontSize: '0.6rem' }}>
+                    oszczędzasz: {formatCurrency(excludedTotal)}
+                  </Typography>
+                </Box>
+              )}
             </Box>
           </Box>
         </CardContent>
