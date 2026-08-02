@@ -16,6 +16,23 @@ interface ChangeEntry {
 
 const changelog: ChangeEntry[] = [
   {
+    version: '1.7.0',
+    date: '2026-08-02',
+    changes: [
+      { type: 'feat', text: 'Pominięte kwoty widoczne we WSZYSTKICH widgetach i diagramach na dashboardzie' },
+      { type: 'feat', text: 'Donut (Struktura kosztów) — dodatkowy segment "Pominięte"' },
+      { type: 'feat', text: 'Scenariusze budżetowe — kwota i diff "z pominięte" pod każdym scenariuszem' },
+      { type: 'feat', text: 'Postęp płatności wg kategorii — "z pominięte: opłacone/total (%)" pod każdą kategorią' },
+      { type: 'feat', text: 'Postęp globalny — dodatkowy progress bar "z pominięte"' },
+      { type: 'feat', text: 'Wykres harmonogramu — czerwona linia "cel z pominięte"' },
+      { type: 'feat', text: 'Tooltip wykresu harmonogramu — ujednolicony styl z chipami milestone (pełny breakdown)' },
+      { type: 'feat', text: 'Dashboard bilans — "bilans z pominięte" + "oszczędzasz"' },
+      { type: 'feat', text: 'Ikony przy labelkach WSZYSTKICH widgetów (dashboard, saldo, harmonogram, koszty, pominięte)' },
+      { type: 'feat', text: 'Nowa ikona PWA (dom + wykres + monety)' },
+      { type: 'style', text: 'Favicon i logo w sidebarze z nowej ikony' },
+    ],
+  },
+  {
     version: '1.6.0',
     date: '2026-08-02',
     changes: [

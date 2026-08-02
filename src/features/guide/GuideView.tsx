@@ -118,6 +118,7 @@ export function GuideView() {
         <Feature label="Bilans" description="Zielony = nadwyżka (masz więcej niż potrzebujesz), czerwony = niedobór." />
         <Feature label="Wykresy" description="Podział kosztów (donut), breakdown wg kategorii, scenariusze min/max, postęp płatności." />
         <Feature label="Scenariusze" description="Optymistyczny (min) / obecny / pesymistyczny (max) — na podstawie dodanych alternatyw." />
+        <Feature label="Pominięte w diagramach" description="Każdy widget i diagram pokazuje wersję 'z pominięte' mniejszym fontem — ile by kosztowało gdybyś nic nie wygasił." />
       </Section>
 
       {/* Środki */}
