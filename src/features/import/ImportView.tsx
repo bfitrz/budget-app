@@ -16,10 +16,12 @@ import {
   CloudUpload as CloudIcon,
   FileDownload as DownloadIcon,
   Description as TemplateIcon,
+  DeleteForever as DeleteIcon,
 } from '@mui/icons-material';
+import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { useBudgetStore } from '@/store';
 import { useNotesStore } from '@/store/notesStore';
-import { importExcelFile, exportToExcel, exportTemplate } from '@/utils';
+import { importExcelFile, exportToExcel, exportTemplate, clearLocalStorage } from '@/utils';
 
 export function ImportView() {
   const theme = useTheme();
@@ -31,6 +33,7 @@ export function ImportView() {
   const [isDragOver, setIsDragOver] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [snackbar, setSnackbar] = useState<{ open: boolean; type: 'success' | 'error'; text: string }>({ open: false, type: 'success', text: '' });
+  const [clearDialogOpen, setClearDialogOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = async (file: File) => {
@@ -291,6 +294,100 @@ export function ImportView() {
           </CardContent>
         </Card>
       )}
+
+      {/* Clear data section */}
+      <Card
+        sx={{
+          maxWidth: 640,
+          mt: 4,
+          border: `1px solid ${alpha(theme.palette.error.main, 0.3)}`,
+          background: `linear-gradient(135deg, ${alpha(theme.palette.error.main, 0.04)}, ${alpha(theme.palette.error.main, 0.01)})`,
+        }}
+      >
+        <CardContent sx={{ p: 4 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+            <DeleteIcon sx={{ fontSize: 20, color: theme.palette.error.main }} />
+            <Typography variant="h6" sx={{ color: theme.palette.error.main }}>
+              Wyczyść dane
+            </Typography>
+          </Box>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            Usuwa wszystkie dane aplikacji z przeglądarki — wydatki, środki, harmonogram, notatki. Ta operacja jest nieodwracalna. Przed wyczyszczeniem zalecamy wyeksportować dane jako backup.
+          </Typography>
+          <Button
+            variant="outlined"
+            color="error"
+            startIcon={<DeleteIcon />}
+            onClick={() => setClearDialogOpen(true)}
+          >
+            Wyczyść wszystkie dane
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Clear data confirmation dialog */}
+      <Dialog
+        open={clearDialogOpen}
+        onClose={() => setClearDialogOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle
+          sx={{
+            fontWeight: 600,
+            color: theme.palette.error.main,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+          }}
+        >
+          <DeleteIcon sx={{ fontSize: 22 }} />
+          Wyczyścić wszystkie dane?
+        </DialogTitle>
+        <DialogContent dividers>
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            Wszystkie dane zostaną trwale usunięte z tej przeglądarki:
+          </Typography>
+          <Box
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              backgroundColor: alpha(theme.palette.error.main, 0.06),
+              border: `1px solid ${alpha(theme.palette.error.main, 0.15)}`,
+              mb: 2,
+            }}
+          >
+            <Typography variant="body2" sx={{ lineHeight: 1.8 }}>
+              • Wszystkie wydatki i kategorie<br />
+              • Środki i wpływy<br />
+              • Harmonogram i ważne daty<br />
+              • Notatki<br />
+              • Alternatywy i linki
+            </Typography>
+          </Box>
+          <Typography variant="body2" sx={{ color: theme.palette.error.main, fontWeight: 600 }}>
+            Tej operacji nie można cofnąć.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5, justifyContent: 'space-between' }}>
+          <Button onClick={() => setClearDialogOpen(false)}>Anuluj</Button>
+          <Button
+            variant="contained"
+            color="error"
+            startIcon={<DeleteIcon />}
+            onClick={() => {
+              clearLocalStorage();
+              localStorage.removeItem('budget-app-notes');
+              localStorage.removeItem('budget-app-theme');
+              setClearDialogOpen(false);
+              setSnackbar({ open: true, type: 'success', text: 'Dane zostały usunięte' });
+              setTimeout(() => window.location.reload(), 1000);
+            }}
+          >
+            Wyczyść dane
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Snackbar
         open={snackbar.open}
