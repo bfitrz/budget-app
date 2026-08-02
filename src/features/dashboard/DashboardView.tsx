@@ -1,5 +1,13 @@
 import { Box, Card, CardContent, Grid, Typography, useTheme, alpha, LinearProgress } from '@mui/material';
 import {
+  AccountBalanceWallet as WalletIcon,
+  TrendingUp as TrendingUpIcon,
+  CheckCircle as PaidIcon,
+  Warning as WarningIcon,
+  Balance as BalanceIcon,
+  Receipt as CostIcon,
+} from '@mui/icons-material';
+import {
   PieChart,
   Pie,
   Cell,
@@ -71,13 +79,14 @@ export function DashboardView() {
       {/* Hero KPI row */}
       <Grid container spacing={2} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} lg={3}>
-          <KPICard label="Wpływy łącznie" value={summary.wplywy} variant="neutral" />
+          <KPICard label="Wpływy łącznie" value={summary.wplywy} variant="neutral" icon={<WalletIcon sx={{ fontSize: 16 }} />} />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
           <KPICard
             label="Dostępne środki"
             value={summary.aktualnieSrodki}
             variant={summary.aktualnieSrodki >= 0 ? 'positive' : 'negative'}
+            icon={<TrendingUpIcon sx={{ fontSize: 16 }} />}
           />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
@@ -86,10 +95,11 @@ export function DashboardView() {
             value={summary.zaplacono}
             variant="positive"
             subtitle={`${progress.toFixed(0)}% całości`}
+            icon={<PaidIcon sx={{ fontSize: 16 }} />}
           />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
-          <KPICard label="Do opłacenia" value={summary.pozostaloDoZaplaty} variant="warning" />
+          <KPICard label="Do opłacenia" value={summary.pozostaloDoZaplaty} variant="warning" icon={<WarningIcon sx={{ fontSize: 16 }} />} />
         </Grid>
       </Grid>
 
@@ -106,7 +116,10 @@ export function DashboardView() {
         <CardContent sx={{ p: 3 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Box>
-              <Typography variant="overline" color="text.secondary">Bilans</Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                <BalanceIcon sx={{ fontSize: 16, color: 'text.secondary', opacity: 0.6 }} />
+                <Typography variant="overline" color="text.secondary">Bilans</Typography>
+              </Box>
               <Typography
                 variant="h2"
                 sx={{ color: summary.bilans >= 0 ? theme.palette.success.main : theme.palette.error.main, fontWeight: 700 }}
@@ -120,7 +133,10 @@ export function DashboardView() {
               </Typography>
             </Box>
             <Box sx={{ textAlign: 'right' }}>
-              <Typography variant="caption" color="text.secondary">Łączny koszt</Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, justifyContent: 'flex-end' }}>
+                <CostIcon sx={{ fontSize: 14, color: 'text.secondary', opacity: 0.6 }} />
+                <Typography variant="caption" color="text.secondary">Łączny koszt</Typography>
+              </Box>
               <Typography variant="h5">{formatCurrency(summary.lacznyKoszt)}</Typography>
             </Box>
           </Box>
@@ -461,9 +477,10 @@ interface KPICardProps {
   value: number;
   variant: 'positive' | 'negative' | 'warning' | 'neutral';
   subtitle?: string;
+  icon?: React.ReactNode;
 }
 
-function KPICard({ label, value, variant, subtitle }: KPICardProps) {
+function KPICard({ label, value, variant, subtitle, icon }: KPICardProps) {
   const theme = useTheme();
   const accentColor = {
     positive: theme.palette.success.main,
@@ -475,9 +492,12 @@ function KPICard({ label, value, variant, subtitle }: KPICardProps) {
   return (
     <Card sx={{ height: '100%' }}>
       <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
-        <Typography variant="overline" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
-          {label}
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1 }}>
+          {icon && <Box sx={{ color: 'text.secondary', display: 'flex', opacity: 0.6 }}>{icon}</Box>}
+          <Typography variant="overline" color="text.secondary">
+            {label}
+          </Typography>
+        </Box>
         <Typography
           variant="h4"
           sx={{

@@ -15,7 +15,7 @@ import {
   alpha,
   useTheme,
 } from '@mui/material';
-import { AddCircle as RestoreIcon } from '@mui/icons-material';
+import { AddCircle as RestoreIcon, Savings as SavingsIcon } from '@mui/icons-material';
 import { useBudgetStore } from '@/store';
 import { formatCurrency } from '@/utils';
 
@@ -82,7 +82,7 @@ export function WykluconeView() {
       <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
         <Card sx={{ flex: 1, minWidth: 200, background: `linear-gradient(135deg, ${alpha(theme.palette.warning.main, 0.08)}, ${alpha(theme.palette.error.main, 0.05)})`, border: `1px solid ${alpha(theme.palette.warning.main, 0.15)}` }}>
           <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
-            <Typography variant="overline" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Zaoszczędzone</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}><SavingsIcon sx={{ fontSize: 14, color: 'text.secondary', opacity: 0.6 }} /><Typography variant="overline" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Zaoszczędzone</Typography></Box>
             <Typography variant="h5" sx={{ fontWeight: 700, color: theme.palette.success.main }}>{formatCurrency(totalSaved)}</Typography>
             <Typography variant="caption" color="text.secondary">
               {excluded.length} pozycji pominiętych w budżecie

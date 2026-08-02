@@ -13,6 +13,7 @@ import {
   TrendingDown as ArrowDownPriceIcon, TrendingUp as ArrowUpIcon, DragHandle as DragHandleIcon,
   Close as CloseIcon, VisibilityOff as DisableGroupIcon, Visibility as EnableGroupIcon,
   MoreVert as MoreIcon, HelpOutline as HelpIcon, Comment as CommentIcon,
+  CheckCircle as PaidIcon, TrendingFlat as RangeIcon, BarChart as StatsIcon,
 } from '@mui/icons-material';
 import { AlternativeItem, ItemLink, PaymentStatus } from '@/types';
 import { formatCurrency, formatCurrencyOrDash, generateId } from '@/utils';
@@ -293,7 +294,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
             {/* Main card: paid / total */}
             <Card sx={{ flex: 1.5, minWidth: 260, background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)}, ${alpha(theme.palette.success.main, 0.05)})`, border: `1px solid ${alpha(theme.palette.primary.main, 0.15)}` }}>
               <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
-                <Typography variant="overline" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Opłacone / Suma</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}><PaidIcon sx={{ fontSize: 13, color: 'text.secondary', opacity: 0.6 }} /><Typography variant="overline" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Opłacone / Suma</Typography></Box>
                 <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.75, mt: 0.5 }}>
                   <Typography variant="h5" sx={{ fontWeight: 700, color: theme.palette.success.main }}>{formatCurrency(paidTotal)}</Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>/</Typography>
@@ -316,7 +317,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
             {/* Range card: min/max */}
             <Card sx={{ flex: 1, minWidth: 180, background: `linear-gradient(135deg, ${alpha(theme.palette.info.main, 0.08)}, ${alpha(theme.palette.warning.main, 0.05)})`, border: `1px solid ${alpha(theme.palette.info.main, 0.15)}` }}>
               <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
-                <Typography variant="overline" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Rozpiętość kosztów</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}><RangeIcon sx={{ fontSize: 13, color: 'text.secondary', opacity: 0.6 }} /><Typography variant="overline" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Rozpiętość kosztów</Typography></Box>
                 {hasRange ? (
                   <>
                     <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.5, mt: 0.5 }}>
@@ -351,7 +352,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
             {/* Stats card */}
             <Card sx={{ flex: 1, minWidth: 160, background: `linear-gradient(135deg, ${alpha(theme.palette.secondary.main, 0.07)}, ${alpha(theme.palette.primary.main, 0.05)})`, border: `1px solid ${alpha(theme.palette.secondary.main, 0.12)}` }}>
               <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
-                <Typography variant="overline" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Statystyki</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}><StatsIcon sx={{ fontSize: 13, color: 'text.secondary', opacity: 0.6 }} /><Typography variant="overline" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Statystyki</Typography></Box>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75, mt: 1 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Typography variant="caption" color="text.secondary">Pozycje</Typography>
