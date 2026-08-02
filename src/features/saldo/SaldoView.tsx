@@ -28,6 +28,7 @@ import {
   Edit as EditIcon,
   TrendingUp as TrendingUpIcon,
   AccountBalanceWallet as WalletIcon,
+  Payment as PaymentIcon,
 } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { useBudgetStore } from '@/store';
@@ -154,9 +155,12 @@ export function SaldoView() {
         </Card>
         <Card sx={{ flex: 1, minWidth: 160 }}>
           <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
-            <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.65rem' }}>
-              Suma wpływów
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <TrendingUpIcon sx={{ fontSize: 14, color: 'text.secondary', opacity: 0.6 }} />
+              <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.65rem' }}>
+                Suma wpływów
+              </Typography>
+            </Box>
             <Typography variant="h6" sx={{ fontWeight: 700, color: theme.palette.success.main }}>
               {formatCurrency(sumaWplywow)}
             </Typography>
@@ -164,9 +168,12 @@ export function SaldoView() {
         </Card>
         <Card sx={{ flex: 1, minWidth: 160 }}>
           <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
-            <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.65rem' }}>
-              Wydane (opłacone pozycje)
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <PaymentIcon sx={{ fontSize: 14, color: "text.secondary", opacity: 0.6 }} />
+              <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.65rem' }}>
+                Wydane (opłacone pozycje)
+              </Typography>
+            </Box>
             <Typography variant="h6" sx={{ fontWeight: 700, color: theme.palette.warning.main }}>
               {formatCurrency(summary.zaplacono)}
             </Typography>

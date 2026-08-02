@@ -31,6 +31,7 @@ import {
   CheckCircle as CheckIcon,
   Warning as WarningIcon,
   Edit as EditIcon,
+  AccountBalanceWallet as WalletIcon,
 } from '@mui/icons-material';
 import {
   AreaChart,
@@ -195,9 +196,12 @@ export function HarmonogramView() {
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-              <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.65rem' }}>
-                Aktualne środki
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <WalletIcon sx={{ fontSize: 14, color: 'text.secondary', opacity: 0.6 }} />
+                <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.65rem' }}>
+                  Aktualne środki
+                </Typography>
+              </Box>
               <Typography variant="h6" sx={{ fontWeight: 700 }}>
                 {formatCurrency(summary.aktualnieSrodki)}
               </Typography>
@@ -222,9 +226,12 @@ export function HarmonogramView() {
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-              <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.65rem' }}>
-                Pozostało do zapłaty
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <WarningIcon sx={{ fontSize: 14, color: 'text.secondary', opacity: 0.6 }} />
+                <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.65rem' }}>
+                  Pozostało do zapłaty
+                </Typography>
+              </Box>
               <Typography variant="h6" sx={{ fontWeight: 700, color: theme.palette.warning.main }}>
                 {formatCurrency(summary.pozostaloDoZaplaty)}
               </Typography>
@@ -234,9 +241,12 @@ export function HarmonogramView() {
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-              <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.65rem' }}>
-                Bilans po wpływach
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <CheckIcon sx={{ fontSize: 14, color: 'text.secondary', opacity: 0.6 }} />
+                <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.65rem' }}>
+                  Bilans po wpływach
+                </Typography>
+              </Box>
               <Typography
                 variant="h6"
                 sx={{
