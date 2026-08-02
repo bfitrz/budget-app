@@ -4,14 +4,19 @@
   "description": "Aplikacja do planowania budżetu na wykończenie i wyposażenie mieszkania",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#09090b",
-  "theme_color": "#09090b",
+  "background_color": "#0f0f23",
+  "theme_color": "#1e1b4b",
   "icons": [
+    {
+      "src": "pwa-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
     {
       "src": "pwa-icon.svg",
       "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "type": "image/svg+xml"
     }
   ]
 }
