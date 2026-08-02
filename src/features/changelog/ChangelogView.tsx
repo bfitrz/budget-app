@@ -16,6 +16,19 @@ interface ChangeEntry {
 
 const changelog: ChangeEntry[] = [
   {
+    version: '2.1.0',
+    date: '2026-08-02',
+    changes: [
+      { type: 'feat', text: 'Dropdown statusu zamiast oddzielnej ikony $ i chipu — jeden kontroler: Do zapłaty / Opłacone / Wykluczone' },
+      { type: 'feat', text: 'Nawigacja mobilna przez swipe (przesunięcie palcem z lewej do prawej otwiera menu)' },
+      { type: 'feat', text: 'Dialogi fullscreen na mobile — przyciski zawsze widoczne nawet z klawiaturą' },
+      { type: 'fix', text: 'Naprawiono race condition w menu kontekstowym grup (rename/delete nie działało)' },
+      { type: 'fix', text: 'Naprawiono operacje na grupie „Bez grupy" (rename/delete/wyklucz)' },
+      { type: 'refactor', text: 'Ujednolicona terminologia → „Wykluczone" wszędzie (zamiast mieszanki wygaszone/pominięte/wyłączone)' },
+      { type: 'style', text: 'Usunięty hamburger button na mobile (zakrywał tytuł) — zastąpiony gestem swipe' },
+    ],
+  },
+  {
     version: '2.0.0',
     date: '2026-08-02',
     changes: [

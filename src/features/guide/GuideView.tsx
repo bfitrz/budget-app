@@ -148,8 +148,7 @@ export function GuideView() {
         <Divider sx={{ my: 2 }} />
         <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1.5 }}>Anatomia jednej pozycji:</Typography>
         <Feature label="Strzałka ▶ (rozwiń)" description="Kliknij strzałkę po lewej aby zobaczyć szczegóły: cenę główną (GŁÓWNA), alternatywy (ALT), linki do sklepów i uwagi." />
-        <Feature label="Status pozycji (dropdown)" description="Każda pozycja ma dropdown statusu: 'Do zapłaty', 'Opłacone' lub 'Wykluczone'. Ustaw 'Wykluczone' aby tymczasowo usunąć pozycję z budżetu bez jej kasowania." />
-        <Feature label="Chip statusu (Do zapłaty / Opłacone)" description="Kliknij chip aby zmienić status. Gdy oznaczysz jako 'Opłacone', kwota zostanie odjęta od dostępnych środków. Jeśli pozycja ma alternatywy, pojawi się pytanie 'którą opcję opłaciłeś?'." />
+        <Feature label="Status pozycji (dropdown)" description="Każda pozycja ma dropdown z trzema statusami: 'Do zapłaty' (w budżecie, czeka), 'Opłacone' (zapłacone — kwota odjęta od środków), 'Wykluczone' (tymczasowo poza budżetem). Zmiana statusu na 'Opłacone' przy pozycji z alternatywami pyta 'którą opcję opłaciłeś?'." />
         <Feature label="Cena i zakres" description="Jeśli masz alternatywy, pod ceną główną zobaczysz zakres min—max. Zakres wpływa na scenariusze na dashboardzie." />
         <Feature label="Menu ⋮ (trzy kropki)" description="Otwiera menu kontekstowe: Edytuj (zmień nazwę, cenę, grupę), Linki (dodaj URL do sklepu), Alternatywy (dodaj inną opcję cenową), Usuń." />
         <Feature label="Ikona 💬 (uwagi)" description="Jeśli pozycja ma uwagi, pojawia się ikona bąbelka. Najedź aby zobaczyć treść. Uwagi dodajesz przez menu Edytuj." />
@@ -161,7 +160,7 @@ export function GuideView() {
           W każdej zakładce wydatków pozycje są zorganizowane w rozwijane grupy (accordiony). Grupy to np. pomieszczenia (dla mebli), etapy prac (dla wykończenia) lub producenci (dla AGD). Każda grupa ma swoje podsumowanie kosztów i menu ⋮ z akcjami.
         </Typography>
         <Feature label="Wyklucz grupę" description="Menu ⋮ → 'Wyklucz grupę'. Wyklucza WSZYSTKIE pozycje w grupie z budżetu naraz. Grupa się przyciemnia i dostaje badge 'wykluczona'. Przydatne gdy chcesz tymczasowo wykluczyć cały pokój (np. 'zobaczymy czy starczy na gabinet')." />
-        <Feature label="Włącz grupę" description="Menu ⋮ → 'Włącz grupę'. Przywraca wszystkie pozycje z powrotem do budżetu." />
+        <Feature label="Przywróć grupę" description="Menu ⋮ → 'Przywróć grupę'. Przywraca wszystkie pozycje z powrotem do budżetu (status 'Do zapłaty')." />
         <Feature label="Zmień nazwę" description="Menu ⋮ → 'Zmień nazwę'. Zmienia nazwę grupy na wszystkich pozycjach w niej. Np. 'Pokój 1' → 'Sypialnia'." />
         <Feature label="Usuń grupę" description="Menu ⋮ → 'Usuń grupę'. UWAGA: usuwa grupę wraz ze WSZYSTKIMI pozycjami w środku. Nieodwracalne! Pojawi się dialog z potwierdzeniem i łączną wartością." />
         <Feature label="Nowa grupa" description="Przycisk 'Nowa grupa' w nagłówku strony. Tworzy pustą grupę, do której możesz dodawać pozycje." />
@@ -220,9 +219,10 @@ export function GuideView() {
       </Section>
 
       <Section title="Skróty i wskazówki" icon={<MoneyIcon sx={{ fontSize: 18 }} />}>
+        <Feature label="Nawigacja mobilna (swipe)" description="Na telefonie przesuń palcem z lewej do prawej aby otworzyć menu nawigacji. Przesuń z powrotem lub kliknij poza menu aby zamknąć." />
         <Feature label="Logo → Podsumowanie" description="Kliknij logo 'Budget' w pasku bocznym aby wrócić na stronę główną (dashboard)." />
         <Feature label="Motywy kolorystyczne" description="Paleta kolorów na dole paska bocznego. 4 motywy: Ciemny, Stonowany, Jasny, Unicorn 🦄. Wybór jest zapisywany między sesjami." />
-        <Feature label="Status jednym kliknięciem" description="Kliknij chip 'Do zapłaty' / 'Opłacone' bezpośrednio w tabeli aby przełączyć. Nie musisz otwierać modala edycji." />
+        <Feature label="Status z dropdown" description="Zmiana statusu bezpośrednio w tabeli — dropdown 'Do zapłaty' / 'Opłacone' / 'Wykluczone'. Nie musisz otwierać modala edycji." />
         <Feature label="Ikona ? przy tytule" description="Na stronach wydatków przy podtytule jest ikona znaku zapytania. Najedź aby zobaczyć krótki opis do czego służy dana zakładka." />
         <Feature label="Notyfikacje" description="Po każdej akcji (dodanie, edycja, usunięcie) w prawym górnym rogu pojawia się krótki toast z potwierdzeniem. Znika po 5 sekundach." />
         <Feature label="Linki do sklepów" description="Każda pozycja i alternatywa może mieć linki URL (np. do produktu w sklepie). Dodaj przez menu ⋮ → Linki lub rozwiń pozycję i kliknij ikonę linku." />
