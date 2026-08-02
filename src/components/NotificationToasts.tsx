@@ -8,10 +8,13 @@ import {
   Close as CloseIcon,
   CloudOff as DisconnectedIcon,
   Sync as SyncIcon,
+  SystemUpdateAlt as UpdateIcon,
 } from '@mui/icons-material';
 import { useNotificationStore, Notification, NotificationType } from '@/store/notificationStore';
 import { getStorageConfig } from '@/storage/types';
 import { GoogleDriveProvider } from '@/storage/googleDriveProvider';
+
+const CURRENT_VERSION = '2.6.0';
 
 function getIcon(type: NotificationType) {
   switch (type) {
@@ -69,6 +72,72 @@ function ToastItem({ notification }: { notification: Notification }) {
       <IconButton size="small" onClick={() => dismiss(notification.id)} sx={{ opacity: 0.4, flexShrink: 0, width: 22, height: 22, '&:hover': { opacity: 1 } }}>
         <CloseIcon sx={{ fontSize: 14 }} />
       </IconButton>
+    </Box>
+  );
+}
+
+function UpdateAvailable() {
+  const theme = useTheme();
+  const [newVersion, setNewVersion] = useState<string | null>(null);
+
+  useEffect(() => {
+    const checkVersion = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.BASE_URL}version.json?t=${Date.now()}`);
+        if (!response.ok) return;
+        const data = await response.json();
+        if (data.version && data.version !== CURRENT_VERSION) {
+          setNewVersion(data.version);
+        }
+      } catch { /* ignore */ }
+    };
+
+    checkVersion();
+    const interval = setInterval(checkVersion, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  if (!newVersion) return null;
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1.5,
+        px: 2,
+        py: 1.5,
+        borderRadius: '12px',
+        background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.1)}, ${alpha(theme.palette.info.main, 0.08)})`,
+        border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
+        boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.15)}`,
+        minWidth: 240,
+        maxWidth: 320,
+        pointerEvents: 'auto',
+        animation: 'slideIn 0.3s ease-out',
+        '@keyframes slideIn': {
+          from: { opacity: 0, transform: 'translateX(20px)' },
+          to: { opacity: 1, transform: 'translateX(0)' },
+        },
+      }}
+    >
+      <UpdateIcon sx={{ fontSize: 18, color: theme.palette.primary.main, flexShrink: 0 }} />
+      <Box sx={{ flex: 1 }}>
+        <Typography variant="body2" sx={{ fontSize: '0.75rem', fontWeight: 600, color: theme.palette.primary.main }}>
+          Nowa wersja {newVersion}
+        </Typography>
+        <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.secondary' }}>
+          Kliknij Odśwież aby zaktualizować
+        </Typography>
+      </Box>
+      <Button
+        size="small"
+        variant="contained"
+        onClick={() => window.location.reload()}
+        sx={{ fontSize: '0.65rem', textTransform: 'none', borderRadius: 2, px: 1.5, minWidth: 'auto', boxShadow: 'none' }}
+      >
+        Odśwież
+      </Button>
     </Box>
   );
 }
@@ -176,7 +245,8 @@ export function NotificationToasts() {
         pointerEvents: 'none',
       }}
     >
-      {/* Persistent connection status */}
+      {/* Persistent status blocks */}
+      <UpdateAvailable />
       <ConnectionStatus />
       {/* Transient notifications */}
       {notifications.slice(0, 5).map((notification) => (
