@@ -674,12 +674,13 @@ export function HarmonogramView() {
       </Card>
 
       {/* Add dialog */}
-      <Dialog open={dialogOpen} onClose={() => { setDialogOpen(false); setEditingEntry(null); }} maxWidth="sm" fullWidth>
+      <Dialog open={dialogOpen} onClose={() => { setDialogOpen(false); setEditingEntry(null); }} maxWidth="sm" fullWidth
+        sx={{ '& .MuiDialog-paper': { maxHeight: { xs: '100dvh', sm: '85vh' }, height: { xs: '100dvh', sm: 'auto' }, m: { xs: 0, sm: 2 }, borderRadius: { xs: 0, sm: 2 } } }}>
         <DialogTitle sx={{ fontWeight: 600 }}>
           {editingEntry ? 'Edytuj planowany wpływ' : 'Zaplanuj wpływ'}
         </DialogTitle>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1, maxHeight: '70vh' }}>
+        <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
+          <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1, overflowY: 'auto', flex: 1 }}>
             <Typography variant="body2" color="text.secondary">
               Dodaj przewidywany wpływ — np. przelew z oszczędności, wypłata, zwrot podatku.
             </Typography>

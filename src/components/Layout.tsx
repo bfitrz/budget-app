@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   Typography,
-  Drawer,
+  SwipeableDrawer,
   List,
   ListItemButton,
   ListItemIcon,
@@ -10,7 +10,6 @@ import {
   IconButton,
   useMediaQuery,
   useTheme,
-  Tooltip,
   alpha,
   Divider,
   Popover,
@@ -23,7 +22,6 @@ import {
   MoreHoriz as MoreIcon,
   AccountBalance as SaldoIcon,
   SyncAlt as DataIcon,
-  Menu as MenuIcon,
   Schedule as ScheduleIcon,
   Close as CloseIcon,
   Palette as PaletteIcon,
@@ -277,45 +275,41 @@ export function Layout({ children, currentView, onViewChange, themeVariant, them
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      {/* Mobile menu trigger */}
-      {isMobile && (
+      {/* Mobile: swipe area hint */}
+      {isMobile && !mobileOpen && (
         <Box
           sx={{
             position: 'fixed',
-            top: 16,
-            left: 16,
-            zIndex: theme.zIndex.drawer + 1,
+            top: '50%',
+            left: 0,
+            transform: 'translateY(-50%)',
+            width: 6,
+            height: 48,
+            borderRadius: '0 4px 4px 0',
+            backgroundColor: alpha(theme.palette.primary.main, 0.3),
+            zIndex: theme.zIndex.drawer - 1,
+            transition: 'opacity 0.3s',
+            opacity: 0.6,
           }}
-        >
-          <IconButton
-            onClick={() => setMobileOpen(true)}
-            sx={{
-              width: 36,
-              height: 36,
-              backgroundColor: theme.palette.background.paper,
-              border: `1px solid ${theme.palette.divider}`,
-              borderRadius: '10px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            }}
-          >
-            <MenuIcon sx={{ fontSize: 18 }} />
-          </IconButton>
-        </Box>
+        />
       )}
 
       {/* Sidebar */}
       {isMobile ? (
-        <Drawer
+        <SwipeableDrawer
           variant="temporary"
           open={mobileOpen}
+          onOpen={() => setMobileOpen(true)}
           onClose={() => setMobileOpen(false)}
+          swipeAreaWidth={24}
+          disableBackdropTransition
           ModalProps={{ keepMounted: true }}
           sx={{
             '& .MuiDrawer-paper': { width: DRAWER_WIDTH, boxSizing: 'border-box' },
           }}
         >
           {drawerContent}
-        </Drawer>
+        </SwipeableDrawer>
       ) : (
         <Box
           sx={{

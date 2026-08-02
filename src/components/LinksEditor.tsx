@@ -111,6 +111,7 @@ export function LinksModal({ open, onClose, links, onSave, itemName }: LinksModa
       maxWidth="sm"
       fullWidth
       TransitionProps={{ onEnter: handleOpen }}
+      sx={{ '& .MuiDialog-paper': { maxHeight: { xs: '100dvh', sm: '85vh' }, height: { xs: '100dvh', sm: 'auto' }, m: { xs: 0, sm: 2 }, borderRadius: { xs: 0, sm: 2 } } }}
     >
       <DialogTitle sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -121,7 +122,7 @@ export function LinksModal({ open, onClose, links, onSave, itemName }: LinksModa
           <CloseIcon sx={{ fontSize: 16 }} />
         </IconButton>
       </DialogTitle>
-      <DialogContent dividers sx={{ pt: 1, maxHeight: '70vh' }}>
+      <DialogContent dividers sx={{ pt: 1, overflowY: 'auto', flex: 1 }}>
         {/* Existing links */}
         {localLinks.length > 0 ? (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 3 }}>
@@ -289,7 +290,7 @@ export function LinksModal({ open, onClose, links, onSave, itemName }: LinksModa
           </Box>
         </Box>
       </DialogContent>
-      <DialogActions sx={{ px: 3, pb: 2.5, justifyContent: 'space-between' }}>
+      <DialogActions sx={{ px: 3, pb: 2.5, justifyContent: 'space-between', flexShrink: 0 }}>
         <Button onClick={onClose}>Zamknij</Button>
         <Button variant="contained" onClick={handleSave}>
           Zapisz ({localLinks.length})

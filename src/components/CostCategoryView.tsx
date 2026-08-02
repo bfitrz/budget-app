@@ -631,12 +631,13 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
       )}
 
       {/* Add/Edit dialog */}
-      <Dialog open={dialogOpen} onClose={() => { setDialogOpen(false); setEditingItem(null); }} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Dialog open={dialogOpen} onClose={() => { setDialogOpen(false); setEditingItem(null); }} maxWidth="sm" fullWidth
+        sx={{ '& .MuiDialog-paper': { maxHeight: { xs: '100dvh', sm: '85vh' }, height: { xs: '100dvh', sm: 'auto' }, m: { xs: 0, sm: 2 }, borderRadius: { xs: 0, sm: 2 } } }}>
+        <DialogTitle sx={{ fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
           {editingItem ? `Edytuj — ${config.title}` : `Dodaj — ${config.title}`}
           <IconButton size="small" onClick={() => { setDialogOpen(false); setEditingItem(null); }}><CloseIcon sx={{ fontSize: 16 }} /></IconButton>
         </DialogTitle>
-        <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1, maxHeight: '70vh' }}>
+        <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1, overflowY: 'auto', flex: 1 }}>
           {!presetGroupName && (
             <Autocomplete freeSolo options={allGroupNames} value={formData[config.groupField] as string || ''} onInputChange={(_, v) => setFormData(p => ({ ...p, [config.groupField]: v }))}
               renderInput={(params) => <TextField {...params} label="Grupa" helperText="Wybierz lub wpisz nową" />} />
@@ -663,16 +664,17 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
             />
           </Box>
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2.5, justifyContent: 'space-between' }}>
+        <DialogActions sx={{ px: 3, pb: 2.5, justifyContent: 'space-between', flexShrink: 0, borderTop: t => `1px solid ${t.palette.divider}` }}>
           <Button onClick={() => { setDialogOpen(false); setEditingItem(null); }}>Zamknij</Button>
           <Button variant="contained" onClick={handleSubmit}>{editingItem ? 'Zapisz' : 'Dodaj'}</Button>
         </DialogActions>
       </Dialog>
 
       {/* New group dialog */}
-      <Dialog open={groupDialogOpen} onClose={() => setGroupDialogOpen(false)} maxWidth="xs" fullWidth>
+      <Dialog open={groupDialogOpen} onClose={() => setGroupDialogOpen(false)} maxWidth="xs" fullWidth
+        sx={{ '& .MuiDialog-paper': { m: { xs: 2 }, maxHeight: { xs: 'calc(100dvh - 32px)' } } }}>
         <DialogTitle sx={{ fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>Nowa grupa<IconButton size="small" onClick={() => setGroupDialogOpen(false)}><CloseIcon sx={{ fontSize: 16 }} /></IconButton></DialogTitle>
-        <DialogContent dividers sx={{ pt: 1, maxHeight: '70vh' }}>
+        <DialogContent dividers sx={{ pt: 1 }}>
           <TextField label="Nazwa grupy" value={newGroupName} onChange={(e) => setNewGroupName(e.target.value)} fullWidth autoFocus onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddGroup(); } }} />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2.5, justifyContent: 'space-between' }}>
@@ -689,9 +691,10 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
       <AlternativesModal open={!!altItem} onClose={() => setAltItem(null)} alternatives={altItem?.alternatywy || []} onSave={(alternatywy) => { if (altItem) updateItem(altItem.id, { alternatywy }); setAltItem(null); }} itemName={altItem?.[config.nameField] as string} baseCena={altItem ? getCost(altItem) : undefined} />
 
       {/* Edit MAIN price */}
-      <Dialog open={!!editingMainPrice} onClose={() => setEditingMainPrice(null)} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontWeight: 600 }}>Edytuj MAIN — {editingMainPrice ? (editingMainPrice[swapField] as string) : ''}</DialogTitle>
-        <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2, maxHeight: '70vh' }}>
+      <Dialog open={!!editingMainPrice} onClose={() => setEditingMainPrice(null)} maxWidth="sm" fullWidth
+        sx={{ '& .MuiDialog-paper': { maxHeight: { xs: '100dvh', sm: '85vh' }, height: { xs: '100dvh', sm: 'auto' }, m: { xs: 0, sm: 2 }, borderRadius: { xs: 0, sm: 2 } } }}>
+        <DialogTitle sx={{ fontWeight: 600, flexShrink: 0 }}>Edytuj MAIN — {editingMainPrice ? (editingMainPrice[swapField] as string) : ''}</DialogTitle>
+        <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2, overflowY: 'auto', flex: 1 }}>
           <TextField label={swapField === config.nameField ? (config.addFields[0]?.label || 'Nazwa') : swapField.charAt(0).toUpperCase() + swapField.slice(1)} defaultValue={editingMainPrice ? (editingMainPrice[swapField] as string) : ''} onChange={(e) => { if (editingMainPrice) setEditingMainPrice({ ...editingMainPrice, [swapField]: e.target.value } as CostItem); }} fullWidth size="small" />
           <TextField label={costField === 'kwota' ? 'Kwota (PLN)' : 'Cena (PLN)'} type="number" defaultValue={editingMainPrice ? getCost(editingMainPrice) : 0} onChange={(e) => { if (editingMainPrice) setEditingMainPrice({ ...editingMainPrice, [costField]: Number(e.target.value) } as CostItem); }} fullWidth size="small" />
           <TextField label="Uwagi (MAIN)" defaultValue={editingMainPrice?.uwagiMain || ''} onChange={(e) => { if (editingMainPrice) setEditingMainPrice({ ...editingMainPrice, uwagiMain: e.target.value } as CostItem); }} fullWidth size="small" multiline rows={2} />
@@ -700,9 +703,10 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
       </Dialog>
 
       {/* Edit ALT */}
-      <Dialog open={!!editingAlt} onClose={() => setEditingAlt(null)} maxWidth="xs" fullWidth>
+      <Dialog open={!!editingAlt} onClose={() => setEditingAlt(null)} maxWidth="xs" fullWidth
+        sx={{ '& .MuiDialog-paper': { m: { xs: 2 }, maxHeight: { xs: 'calc(100dvh - 32px)' } } }}>
         <DialogTitle sx={{ fontWeight: 600 }}>Edytuj alternatywę</DialogTitle>
-        <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1, maxHeight: '70vh' }}>
+        <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1, overflowY: 'auto' }}>
           <TextField label="Nazwa" defaultValue={editingAlt?.alt.nazwa || ''} onChange={(e) => { if (editingAlt) setEditingAlt({ ...editingAlt, alt: { ...editingAlt.alt, nazwa: e.target.value } }); }} fullWidth size="small" />
           <TextField label="Cena (PLN)" type="number" defaultValue={editingAlt?.alt.cena || 0} onChange={(e) => { if (editingAlt) setEditingAlt({ ...editingAlt, alt: { ...editingAlt.alt, cena: Number(e.target.value) } }); }} fullWidth size="small" />
           <TextField label="Uwagi" defaultValue={editingAlt?.alt.uwagi || ''} onChange={(e) => { if (editingAlt) setEditingAlt({ ...editingAlt, alt: { ...editingAlt.alt, uwagi: e.target.value } }); }} fullWidth size="small" multiline rows={2} />
@@ -880,9 +884,10 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
       </Dialog>
 
       {/* Rename group */}
-      <Dialog open={!!editingGroupName} onClose={() => setEditingGroupName(null)} maxWidth="xs" fullWidth>
+      <Dialog open={!!editingGroupName} onClose={() => setEditingGroupName(null)} maxWidth="xs" fullWidth
+        sx={{ '& .MuiDialog-paper': { m: { xs: 2 }, maxHeight: { xs: 'calc(100dvh - 32px)' } } }}>
         <DialogTitle sx={{ fontWeight: 600 }}>Zmień nazwę grupy</DialogTitle>
-        <DialogContent dividers sx={{ pt: 2, maxHeight: '70vh' }}>
+        <DialogContent dividers sx={{ pt: 2 }}>
           <TextField
             label="Nowa nazwa"
             value={editingGroupName?.newName || ''}

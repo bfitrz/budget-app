@@ -82,7 +82,8 @@ export function AlternativesModal({ open, onClose, alternatives, onSave, itemNam
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth TransitionProps={{ onEnter: handleOpen }}>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth TransitionProps={{ onEnter: handleOpen }}
+      sx={{ '& .MuiDialog-paper': { maxHeight: { xs: '100dvh', sm: '85vh' }, height: { xs: '100dvh', sm: 'auto' }, m: { xs: 0, sm: 2 }, borderRadius: { xs: 0, sm: 2 } } }}>
       <DialogTitle sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <AltIcon sx={{ fontSize: 20 }} />
@@ -92,7 +93,7 @@ export function AlternativesModal({ open, onClose, alternatives, onSave, itemNam
           <CloseIcon sx={{ fontSize: 16 }} />
         </IconButton>
       </DialogTitle>
-      <DialogContent dividers sx={{ maxHeight: '70vh' }}>
+      <DialogContent dividers sx={{ overflowY: 'auto', flex: 1 }}>
         {baseCena !== undefined && (
           <Box sx={{ mb: 2.5, p: 1.5, borderRadius: 2, backgroundColor: alpha(theme.palette.success.main, 0.06), border: `1px solid ${alpha(theme.palette.success.main, 0.15)}` }}>
             <Typography variant="caption" color="text.secondary">Aktualna cena MAIN</Typography>
@@ -128,7 +129,7 @@ export function AlternativesModal({ open, onClose, alternatives, onSave, itemNam
           </Box>
         </Box>
       </DialogContent>
-      <DialogActions sx={{ px: 3, pb: 2.5, justifyContent: 'space-between' }}>
+      <DialogActions sx={{ px: 3, pb: 2.5, justifyContent: 'space-between', flexShrink: 0 }}>
         <Button onClick={onClose}>Anuluj</Button>
         <Button variant="contained" onClick={handleAddAlt} disabled={!formNazwa.trim()}>Dodaj alternatywę</Button>
       </DialogActions>
