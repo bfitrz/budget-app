@@ -143,6 +143,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
           wyprowadzka: data.wyprowadzka.length > 0 ? data.wyprowadzka : state.wyprowadzka,
           saldo: data.saldo.length > 0 ? data.saldo : state.saldo,
           harmonogram: data.harmonogram.length > 0 ? data.harmonogram : state.harmonogram,
+          milestones: data.milestones.length > 0 ? data.milestones : state.milestones,
           isDataLoaded: true,
         };
         persistState(getStateSnapshot(newState as BudgetStore));
@@ -161,6 +162,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
           wyprowadzka: data.wyprowadzka,
           saldo: data.saldo,
           harmonogram: data.harmonogram,
+          milestones: data.milestones,
           isDataLoaded: true,
         };
         persistState(getStateSnapshot(newState as BudgetStore));

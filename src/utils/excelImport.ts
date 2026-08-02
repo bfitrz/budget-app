@@ -7,6 +7,7 @@ import {
   WyprowadzkaItem,
   SaldoEntry,
   ScheduleEntry,
+  MilestoneEntry,
   PaymentStatus,
   ItemLink,
   AlternativeItem,
@@ -156,6 +157,7 @@ export interface ImportResult {
   wyprowadzka: WyprowadzkaItem[];
   saldo: SaldoEntry[];
   harmonogram: ScheduleEntry[];
+  milestones: MilestoneEntry[];
   notes: StickyNote[];
 }
 
@@ -173,6 +175,7 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
     wyprowadzka: [],
     saldo: [],
     harmonogram: [],
+    milestones: [],
     notes: [],
   };
 
@@ -299,6 +302,17 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       opis: row.Opis || '',
       kwota: Number(row.Kwota) || 0,
       zrealizowane: row.Zrealizowane?.toUpperCase() === 'TAK',
+    }));
+  }
+
+  // Milestones
+  if (workbook.SheetNames.includes('Milestones')) {
+    const sheet = workbook.Sheets['Milestones'];
+    const rows = XLSX.utils.sheet_to_json<{ Data?: string; Opis?: string }>(sheet);
+    result.milestones = rows.map((row) => ({
+      id: generateId(),
+      data: row.Data || '',
+      opis: row.Opis || '',
     }));
   }
 

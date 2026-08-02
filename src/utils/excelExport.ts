@@ -130,6 +130,16 @@ export function exportToExcel(state: BudgetState, notes?: StickyNote[]): void {
     XLSX.utils.book_append_sheet(workbook, ws, 'Harmonogram');
   }
 
+  // Milestones
+  if (state.milestones && state.milestones.length > 0) {
+    const msData = state.milestones.map((ms) => ({
+      Data: ms.data,
+      Opis: ms.opis,
+    }));
+    const ws = XLSX.utils.json_to_sheet(msData);
+    XLSX.utils.book_append_sheet(workbook, ws, 'Milestones');
+  }
+
   // Notatki
   if (notes && notes.length > 0) {
     const notesData = notes.map((note) => ({
@@ -184,6 +194,11 @@ export function exportTemplate(): void {
   const harmHeaders = [['Data', 'Opis', 'Kwota', 'Zrealizowane']];
   const wsHarm = XLSX.utils.aoa_to_sheet(harmHeaders);
   XLSX.utils.book_append_sheet(workbook, wsHarm, 'Harmonogram');
+
+  // Milestones
+  const msHeaders = [['Data', 'Opis']];
+  const wsMs = XLSX.utils.aoa_to_sheet(msHeaders);
+  XLSX.utils.book_append_sheet(workbook, wsMs, 'Milestones');
 
   // Notatki
   const notatkiHeaders = [['Tekst', 'Kolor', 'Zrobione', 'Data']];

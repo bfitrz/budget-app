@@ -52,12 +52,13 @@ export function ImportView() {
         result.pozostale.length +
         result.wyprowadzka.length +
         result.saldo.length +
-        result.harmonogram.length;
+        result.harmonogram.length +
+        result.milestones.length;
 
       if (totalItems === 0) {
         setMessage({
           type: 'error',
-          text: 'Nie znaleziono danych w pliku. Upewnij się, że arkusze mają nazwy: Meble, Wykończenie, AGD, Pozostałe, Wyprowadzka, Saldo, Harmonogram, Notatki.',
+          text: 'Nie znaleziono danych w pliku. Upewnij się, że arkusze mają nazwy: Meble, Wykończenie, AGD, Pozostałe, Wyprowadzka, Saldo, Harmonogram, Milestones, Notatki.',
         });
       } else {
         if (isDataLoaded) {
@@ -85,6 +86,7 @@ export function ImportView() {
         if (result.wyprowadzka.length > 0) parts.push(`Wyprowadzka (${result.wyprowadzka.length})`);
         if (result.saldo.length > 0) parts.push(`Saldo (${result.saldo.length})`);
         if (result.harmonogram.length > 0) parts.push(`Harmonogram (${result.harmonogram.length})`);
+        if (result.milestones.length > 0) parts.push(`Milestones (${result.milestones.length})`);
         if (result.notes.length > 0) parts.push(`Notatki (${result.notes.length})`);
 
         setMessage({
@@ -225,7 +227,7 @@ export function ImportView() {
               Obsługiwane arkusze
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
-              {['Meble', 'Wykończenie', 'AGD', 'Pozostałe', 'Wyprowadzka', 'Saldo', 'Harmonogram', 'Notatki'].map((name) => (
+              {['Meble', 'Wykończenie', 'AGD', 'Pozostałe', 'Wyprowadzka', 'Saldo', 'Harmonogram', 'Milestones', 'Notatki'].map((name) => (
                 <Typography
                   key={name}
                   variant="body2"
