@@ -29,15 +29,13 @@ import {
   Palette as PaletteIcon,
   Check as CheckIcon,
   LocalShipping as ShippingIcon,
-  StickyNote2 as NotesIcon,
   HelpOutline as HelpIcon,
 } from '@mui/icons-material';
 import { ThemeVariant } from '@/App';
-import { StickyNotesPanel } from './StickyNotesPanel';
+import { NotificationToasts } from './NotificationToasts';
 import { BudgetTopBar } from './BudgetTopBar';
 
 const DRAWER_WIDTH = 240;
-const NOTES_PANEL_WIDTH = 300;
 
 interface NavigationItem {
   id: string;
@@ -88,9 +86,7 @@ interface LayoutProps {
 export function Layout({ children, currentView, onViewChange, themeVariant, themeLabel, onCycleTheme, onSetTheme }: LayoutProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const isTablet = useMediaQuery(theme.breakpoints.down('lg'));
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [notesOpen, setNotesOpen] = useState(!isMobile);
   const [themeAnchor, setThemeAnchor] = useState<HTMLElement | null>(null);
 
   const handleNavClick = (viewId: string) => {
@@ -177,39 +173,8 @@ export function Layout({ children, currentView, onViewChange, themeVariant, them
         </List>
       </Box>
 
-      {/* Footer: theme selector + notes toggle */}
+      {/* Footer: theme selector */}
       <Box sx={{ pt: 2, borderTop: `1px solid ${theme.palette.divider}`, display: 'flex', flexDirection: 'column', gap: 1 }}>
-        {/* Notes toggle */}
-        <Box
-          onClick={() => setNotesOpen(!notesOpen)}
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1.5,
-            px: 1.5,
-            py: 0.75,
-            borderRadius: '10px',
-            cursor: 'pointer',
-            transition: 'background-color 0.1s ease',
-            backgroundColor: notesOpen ? alpha(theme.palette.primary.main, 0.08) : 'transparent',
-            '&:hover': { backgroundColor: alpha(theme.palette.primary.main, 0.06) },
-          }}
-        >
-          <NotesIcon sx={{ fontSize: 16, color: notesOpen ? theme.palette.primary.main : 'text.secondary' }} />
-          <Typography variant="caption" sx={{ fontWeight: 500, flex: 1 }}>
-            Notatki
-          </Typography>
-          <Box
-            sx={{
-              width: 8,
-              height: 8,
-              borderRadius: '50%',
-              backgroundColor: notesOpen ? theme.palette.success.main : theme.palette.text.secondary,
-              opacity: 0.6,
-            }}
-          />
-        </Box>
-
         {/* Theme selector */}
         <Box
           onClick={(e) => setThemeAnchor(e.currentTarget)}
@@ -338,32 +303,6 @@ export function Layout({ children, currentView, onViewChange, themeVariant, them
         </Box>
       )}
 
-      {/* Mobile notes trigger */}
-      {isMobile && (
-        <Box
-          sx={{
-            position: 'fixed',
-            top: 16,
-            right: 16,
-            zIndex: theme.zIndex.drawer + 1,
-          }}
-        >
-          <IconButton
-            onClick={() => setNotesOpen(!notesOpen)}
-            sx={{
-              width: 36,
-              height: 36,
-              backgroundColor: theme.palette.background.paper,
-              border: `1px solid ${theme.palette.divider}`,
-              borderRadius: '10px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            }}
-          >
-            <NotesIcon sx={{ fontSize: 18 }} />
-          </IconButton>
-        </Box>
-      )}
-
       {/* Sidebar */}
       {isMobile ? (
         <Drawer
@@ -410,38 +349,8 @@ export function Layout({ children, currentView, onViewChange, themeVariant, them
         </Box>
       </Box>
 
-      {/* Right panel - Sticky Notes */}
-      {isMobile ? (
-        <Drawer
-          variant="temporary"
-          anchor="right"
-          open={notesOpen}
-          onClose={() => setNotesOpen(false)}
-          ModalProps={{ keepMounted: true }}
-          sx={{
-            '& .MuiDrawer-paper': { width: NOTES_PANEL_WIDTH, boxSizing: 'border-box' },
-          }}
-        >
-          <StickyNotesPanel />
-        </Drawer>
-      ) : (
-        notesOpen && (
-          <Box
-            sx={{
-              width: NOTES_PANEL_WIDTH,
-              flexShrink: 0,
-              borderLeft: `1px solid ${theme.palette.divider}`,
-              height: '100vh',
-              position: 'sticky',
-              top: 0,
-              overflowY: 'auto',
-              backgroundColor: theme.palette.background.default,
-            }}
-          >
-            <StickyNotesPanel />
-          </Box>
-        )
-      )}
+      {/* Notifications */}
+      <NotificationToasts />
     </Box>
   );
 }

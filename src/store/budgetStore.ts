@@ -17,6 +17,7 @@ import {
 import { saveToLocalStorage, loadFromLocalStorage } from '@/utils/storage';
 import { generateId } from '@/utils/id';
 import { ImportResult } from '@/utils/excelImport';
+import { notify } from './notificationStore';
 
 interface BudgetActions {
   importData: (data: ImportResult) => void;
@@ -187,6 +188,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { meble };
       });
+      notify.success('Pozycja dodana');
     },
     deleteMebleItem: (id) => {
       set((state) => {
@@ -195,6 +197,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { meble };
       });
+      notify.success('Pozycja usunięta');
     },
 
     // Wykończenie
@@ -213,6 +216,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { wykonczenie };
       });
+      notify.success('Pozycja dodana');
     },
     deleteWykonczenieItem: (id) => {
       set((state) => {
@@ -221,6 +225,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { wykonczenie };
       });
+      notify.success('Pozycja usunięta');
     },
 
     // AGD
@@ -239,6 +244,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { agd };
       });
+      notify.success('Pozycja dodana');
     },
     deleteAGDItem: (id) => {
       set((state) => {
@@ -247,6 +253,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { agd };
       });
+      notify.success('Pozycja usunięta');
     },
 
     // Pozostałe
@@ -265,6 +272,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { pozostale };
       });
+      notify.success('Pozycja dodana');
     },
     deletePozostaleItem: (id) => {
       set((state) => {
@@ -273,6 +281,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { pozostale };
       });
+      notify.success('Pozycja usunięta');
     },
 
     // Wyprowadzka
@@ -291,6 +300,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { wyprowadzka };
       });
+      notify.success('Pozycja dodana');
     },
     deleteWyprowadzkaItem: (id) => {
       set((state) => {
@@ -299,6 +309,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { wyprowadzka };
       });
+      notify.success('Pozycja usunięta');
     },
 
     // Saldo
@@ -309,6 +320,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { saldo };
       });
+      notify.success('Wpływ dodany');
     },
     deleteSaldoEntry: (id) => {
       set((state) => {
@@ -317,6 +329,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { saldo };
       });
+      notify.success('Wpływ usunięty');
     },
     updateSaldoEntry: (id, updates) => {
       set((state) => {
@@ -335,6 +348,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { harmonogram };
       });
+      notify.success('Wpływ zaplanowany');
     },
     deleteScheduleEntry: (id) => {
       set((state) => {
@@ -343,6 +357,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { harmonogram };
       });
+      notify.success('Wpływ usunięty');
     },
     updateScheduleEntry: (id, updates) => {
       set((state) => {
@@ -361,6 +376,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { harmonogram };
       });
+      notify.info('Status wpływu zmieniony');
     },
 
     // Milestones
@@ -371,6 +387,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { milestones };
       });
+      notify.success('Ważna data dodana');
     },
     deleteMilestone: (id) => {
       set((state) => {
@@ -379,6 +396,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { milestones };
       });
+      notify.success('Ważna data usunięta');
     },
     updateMilestone: (id, updates) => {
       set((state) => {
@@ -387,6 +405,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { milestones };
       });
+      notify.success('Ważna data zaktualizowana');
     },
 
     // Computed
