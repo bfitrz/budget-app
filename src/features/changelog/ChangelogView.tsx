@@ -16,6 +16,20 @@ interface ChangeEntry {
 
 const changelog: ChangeEntry[] = [
   {
+    version: '2.2.0',
+    date: '2026-08-02',
+    changes: [
+      { type: 'feat', text: 'Wyszukiwanie pozycji — pole szukania filtruje po nazwie, grupie i kolumnach' },
+      { type: 'feat', text: 'Szybkie filtry statusu — toggle buttons: Wszystkie / Do zapłaty / Opłacone / Wykluczone' },
+      { type: 'feat', text: 'Sortowanie pozycji w grupach — cena ↑↓, nazwa A-Z, status' },
+      { type: 'feat', text: 'Mini progress bar na nagłówku grupy — wizualny postęp opłaconych' },
+      { type: 'feat', text: 'Reminder o backupie — alert jeśli >7 dni bez eksportu' },
+      { type: 'feat', text: 'Najtańsza alternatywa podświetlona zielonym obramowaniem' },
+      { type: 'feat', text: 'Przeterminowane pozycje — chip daty zmienia kolor na czerwony' },
+      { type: 'feat', text: 'Undo/Redo — Ctrl+Z cofa ostatnią akcję, Ctrl+Shift+Z przywraca' },
+    ],
+  },
+  {
     version: '2.1.0',
     date: '2026-08-02',
     changes: [

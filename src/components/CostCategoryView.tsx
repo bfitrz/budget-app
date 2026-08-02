@@ -672,8 +672,15 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                                       </Box>
                                     </Box>
                                     {/* ALTs */}
-                                    {(item.alternatywy || []).map((alt) => (
-                                      <Box key={alt.id} sx={{ display: 'grid', gridTemplateColumns: '24px 50px 1fr 120px 80px auto', alignItems: 'center', gap: 2, px: 1.5, py: 0.75, borderRadius: 1.5, backgroundColor: alpha(theme.palette.info.main, 0.02), border: `1px solid ${alpha(theme.palette.info.main, 0.08)}`, opacity: alt.included ? 1 : 0.4 }}>
+                                    {(() => {
+                                      const alts = item.alternatywy || [];
+                                      const includedAlts = alts.filter(a => a.included);
+                                      const allPricesForCompare = [getCost(item), ...includedAlts.map(a => a.cena)];
+                                      const cheapestPrice = Math.min(...allPricesForCompare);
+                                      return alts.map((alt) => {
+                                        const isCheapest = alt.included && alt.cena === cheapestPrice && alt.cena < getCost(item);
+                                        return (
+                                      <Box key={alt.id} sx={{ display: 'grid', gridTemplateColumns: '24px 50px 1fr 120px 80px auto', alignItems: 'center', gap: 2, px: 1.5, py: 0.75, borderRadius: 1.5, backgroundColor: isCheapest ? alpha(theme.palette.success.main, 0.05) : alpha(theme.palette.info.main, 0.02), border: `1px solid ${isCheapest ? alpha(theme.palette.success.main, 0.25) : alpha(theme.palette.info.main, 0.08)}`, opacity: alt.included ? 1 : 0.4 }}>
                                         <Tooltip title={alt.included ? 'Wyklucz z zakresu cenowego' : 'Włącz do zakresu cenowego'}>
                                           <IconButton size="small" onClick={() => { const newAlts = (item.alternatywy || []).map((a) => a.id === alt.id ? { ...a, included: !a.included } : a); updateItem(item.id, { alternatywy: newAlts }); }} sx={{ p: 0, width: 20, height: 20, color: alt.included ? theme.palette.success.main : theme.palette.text.secondary, opacity: alt.included ? 0.7 : 0.3, '&:hover': { opacity: 1 } }}>
                                             {alt.included ? <IncludedIcon sx={{ fontSize: 13 }} /> : <ExcludedIcon sx={{ fontSize: 13 }} />}
@@ -706,7 +713,9 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                                           <Tooltip title="Usuń"><IconButton size="small" onClick={() => { const newAlts = (item.alternatywy || []).filter((a) => a.id !== alt.id); updateItem(item.id, { alternatywy: newAlts }); }} sx={{ opacity: 0.4, '&:hover': { opacity: 1, color: theme.palette.error.main }, width: 20, height: 20 }}><DeleteIcon sx={{ fontSize: 12 }} /></IconButton></Tooltip>
                                         </Box>
                                       </Box>
-                                    ))}
+                                        );
+                                      });
+                                    })()}
                                   </Box>
                                 </Collapse>
                               </TableCell>

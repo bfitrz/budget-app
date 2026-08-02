@@ -1,48 +1,42 @@
 # TODO — Budget App
 
-## Kolejność realizacji
+## Zrealizowane ✅
 
-### 1. Undo/Redo
-- [ ] Stos historii zmian (max 20-30 kroków)
-- [ ] Ctrl+Z / Cmd+Z → cofnij ostatnią akcję
-- [ ] Ctrl+Shift+Z → przywróć cofniętą akcję
-- [ ] Toast "Cofnięto" z opcją "Przywróć" (jak Gmail)
-- [ ] Obsługuje: dodawanie, usuwanie, edycję pozycji/grup, zmianę statusu
+### 1. Undo/Redo ✅
+- [x] Stos historii zmian (max 30 kroków)
+- [x] Ctrl+Z / Cmd+Z → cofnij ostatnią akcję
+- [x] Ctrl+Shift+Z → przywróć cofniętą akcję
+- [x] Toast "Cofnięto" po undo
 
-### 2. Wyszukiwanie / filtrowanie
-- [ ] Pole wyszukiwania w nagłówku stron wydatków
-- [ ] Filtrowanie po nazwie, grupie, statusie
-- [ ] Szybkie filtry: "Do zapłaty", "Opłacone", "Wykluczone"
-- [ ] Podświetlanie wyników w tabeli
-- [ ] Działa across all groups (rozwijanie accordionów z wynikami)
+### 2. Wyszukiwanie / filtrowanie ✅
+- [x] Pole wyszukiwania w nagłówku stron wydatków
+- [x] Filtrowanie po nazwie, grupie, polach kolumn
+- [x] Szybkie filtry: Wszystkie / Do zapłaty / Opłacone / Wykluczone
+- [x] Licznik wyników
+- [x] Grupy bez wyników ukryte, wszystkie rozwinięte przy filtrowaniu
 
-### 3. Sortowanie pozycji w grupie
-- [ ] Dropdown/ikona sortowania przy nagłówku grupy
-- [ ] Sortowanie po: cenie (rosnąco/malejąco), nazwie (A-Z), statusie
-- [ ] Zapamiętywanie preferencji sortowania per kategoria
+### 3. Sortowanie pozycji w grupie ✅
+- [x] Dropdown sortowania: Domyślnie / Cena ↑ / Cena ↓ / Nazwa A-Z / Status
+- [x] Sortowanie wewnątrz każdej grupy
 
-### 4. Mini progress bar na grupie
-- [ ] Pasek postępu opłacone/total w AccordionSummary
-- [ ] Liczba: "3/7 opłacone" (już jest częściowo — rozbudować wizualnie)
-- [ ] Kwota zostało do zapłaty w grupie
+### 4. Mini progress bar na grupie ✅
+- [x] Pasek postępu opłacone/total w AccordionSummary
+- [x] Liczba X/Y obok kwoty
 
-### 5. Automatyczny backup
-- [ ] Auto-eksport do pliku co X dni (localStorage reminder)
-- [ ] Opcja "Wyślij backup na email" (mailto: link z załącznikiem?)
-- [ ] Alternatywa: integracja z Google Drive API (OAuth)
-- [ ] Wersjonowanie backupów (data w nazwie pliku)
+### 5. Reminder o backupie ✅
+- [x] Auto-reminder na stronie Import jeśli >7 dni bez eksportu
+- [x] Alert z przyciskiem 'Eksportuj teraz'
+- [x] Data ostatniego eksportu w localStorage
 
-### 6. Tryb porównawczy alternatyw
-- [ ] Widok side-by-side dla 2-3 alternatyw
-- [ ] Porównanie cen, linków, uwag obok siebie
-- [ ] Podświetlenie najtańszej/najdroższej opcji
-- [ ] Przycisk "Wybierz tę" → ustawia jako MAIN
+### 6. Podświetlenie najtańszej alternatywy ✅
+- [x] Najtańsza ALT (tańsza niż MAIN) podświetlona zielonym obramowaniem
+- [x] Ułatwia wizualne porównanie opcji
 
-### 7. Powiadomienia o terminach
-- [ ] Push notifications (PWA Notification API)
-- [ ] Przypomnienie X dni przed `dataRealizacji`
-- [ ] Oznaczanie przeterminowanych pozycji (czerwony badge)
-- [ ] Ustawienia: włącz/wyłącz, ile dni przed terminem
+### 7. Przeterminowane pozycje ✅
+- [x] Chip z datą zmienia kolor na czerwony gdy pozycja jest po terminie
+- [x] Dotyczy pozycji ze statusem 'Do zapłaty' i datą w przeszłości
+
+## Do realizacji
 
 ### 8. Współdzielenie (sync)
 - [ ] Backend: Firebase/Supabase realtime DB
