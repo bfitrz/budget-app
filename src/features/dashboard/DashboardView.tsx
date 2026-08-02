@@ -249,13 +249,13 @@ export function DashboardView() {
           <Card sx={{ height: '100%' }}>
             <CardContent sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ mb: 0.5 }}>Struktura kosztów</Typography>
-              <Typography variant="caption" color="text.secondary">Procentowy podział wg kategorii</Typography>
+              <Typography variant="caption" color="text.secondary">Procentowy podział wg kategorii{excludedTotal > 0 ? ' (+ pominięte)' : ''}</Typography>
               {categoryCosts.length > 0 ? (
                 <Box sx={{ mt: 2 }}>
                   <ResponsiveContainer width="100%" height={200}>
                     <PieChart>
                       <Pie
-                        data={categoryCosts}
+                        data={excludedTotal > 0 ? [...categoryCosts, { name: 'Pominięte', value: excludedTotal }] : categoryCosts}
                         cx="50%"
                         cy="50%"
                         innerRadius={55}
@@ -403,6 +403,14 @@ export function DashboardView() {
                     available={summary.aktualnieSrodki}
                     color={theme.palette.error.main}
                   />
+                  {excludedTotal > 0 && (
+                    <ScenarioRow
+                      label="Z pominięte"
+                      cost={totalMain + excludedTotal}
+                      available={summary.aktualnieSrodki}
+                      color={theme.palette.text.secondary}
+                    />
+                  )}
                   <Box sx={{ mt: 1, pt: 2, borderTop: `1px solid ${theme.palette.divider}` }}>
                     <Typography variant="caption" color="text.secondary">
                       Rozpiętość: {formatCurrency(totalMax - totalMin)}
@@ -474,7 +482,7 @@ export function DashboardView() {
             <Box>
               <Typography variant="h6">Postęp płatności</Typography>
               <Typography variant="caption" color="text.secondary">
-                {formatCurrency(summary.zaplacono)} z {formatCurrency(summary.lacznyKoszt)} opłacone
+                {formatCurrency(summary.zaplacono)} z {formatCurrency(summary.lacznyKoszt)} opłacone{excludedTotal > 0 ? ` (z pominięte: ${formatCurrency(totalWithExcluded)})` : ''}
               </Typography>
             </Box>
             <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.primary.main }}>
