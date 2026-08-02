@@ -52,7 +52,7 @@ const navigationItems: NavigationItem[] = [
   { id: 'pozostale', label: 'Inne', icon: <MoreIcon /> },
   { id: 'wyprowadzka', label: 'Wyprowadzka', icon: <ShippingIcon /> },
   { id: 'wykluczone', label: 'Wykluczone', icon: <MoreIcon /> },
-  { id: 'import', label: 'Import / Eksport', icon: <DataIcon />, section: 'Ustawienia' },
+  { id: 'import', label: 'Dane i sync', icon: <DataIcon />, section: 'Ustawienia' },
   { id: 'guide', label: 'Przewodnik', icon: <HelpIcon /> },
   { id: 'changelog', label: 'Changelog', icon: <HelpIcon /> },
 ];
