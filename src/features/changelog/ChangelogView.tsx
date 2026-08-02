@@ -16,6 +16,14 @@ interface ChangeEntry {
 
 const changelog: ChangeEntry[] = [
   {
+    version: '2.3.1',
+    date: '2026-08-02',
+    changes: [
+      { type: 'fix', text: 'Google Drive nie pyta już o Client ID — klik → popup logowania → gotowe' },
+      { type: 'fix', text: 'Kolega/siostra nie musi nic konfigurować — wystarczy link do apki' },
+    ],
+  },
+  {
     version: '2.3.0',
     date: '2026-08-02',
     changes: [
