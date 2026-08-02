@@ -180,6 +180,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { meble };
       });
+      notify.success('Zapisano');
     },
     addMebleItem: (item) => {
       set((state) => {
@@ -208,6 +209,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { wykonczenie };
       });
+      notify.success('Zapisano');
     },
     addWykonczenieItem: (item) => {
       set((state) => {
@@ -236,6 +238,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { agd };
       });
+      notify.success('Zapisano');
     },
     addAGDItem: (item) => {
       set((state) => {
@@ -264,6 +267,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { pozostale };
       });
+      notify.success('Zapisano');
     },
     addPozostaleItem: (item) => {
       set((state) => {
@@ -292,6 +296,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { wyprowadzka };
       });
+      notify.success('Zapisano');
     },
     addWyprowadzkaItem: (item) => {
       set((state) => {
@@ -338,6 +343,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { saldo };
       });
+      notify.success('Wpływ zapisany');
     },
 
     // Harmonogram
@@ -366,6 +372,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { harmonogram };
       });
+      notify.success('Wpływ zapisany');
     },
     toggleScheduleRealized: (id) => {
       set((state) => {
