@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { ThemeProvider, createTheme, CssBaseline, Button, Box, Typography, alpha } from '@mui/material';
+import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { Layout } from '@/components';
 import { StorageSetup } from '@/components/StorageSetup';
 import { DashboardView } from '@/features/dashboard';
@@ -120,7 +120,7 @@ function App() {
   };
 
   // Cloud sync hook (auto-saves after changes + polls for remote changes)
-  const { remoteChanged, loadFromCloud, dismissRemoteChanged, lastEditor } = useCloudSync();
+  useCloudSync();
 
   const [currentView, setCurrentView] = useState<string>(() => {
     const hashView = getViewFromHash();
@@ -437,58 +437,6 @@ function App() {
         onCycleTheme={cycleTheme}
         onSetTheme={setTheme}
       >
-        {remoteChanged && (
-          <Box
-            sx={{
-              mx: { xs: 2, sm: 3, md: 4 }, mt: 1, mb: 1,
-              position: 'sticky', top: 8, zIndex: 10,
-              borderRadius: 3,
-              overflow: 'hidden',
-              background: `linear-gradient(135deg, ${alpha(theme.palette.info.main, 0.12)}, ${alpha(theme.palette.primary.main, 0.08)})`,
-              border: `1px solid ${alpha(theme.palette.info.main, 0.25)}`,
-              backdropFilter: 'blur(12px)',
-              boxShadow: `0 4px 24px ${alpha(theme.palette.info.main, 0.15)}, 0 1px 4px ${alpha(theme.palette.common.black, 0.1)}`,
-              p: 2,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
-              animation: 'slideDown 0.3s ease-out',
-              '@keyframes slideDown': {
-                from: { opacity: 0, transform: 'translateY(-12px)' },
-                to: { opacity: 1, transform: 'translateY(0)' },
-              },
-            }}
-          >
-            <Box sx={{ width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: alpha(theme.palette.info.main, 0.15), flexShrink: 0 }}>
-              <Typography sx={{ fontSize: 18 }}>🔄</Typography>
-            </Box>
-            <Box sx={{ flex: 1, minWidth: 0 }}>
-              <Typography variant="body2" sx={{ fontWeight: 600, lineHeight: 1.3 }}>
-                Nowa wersja{lastEditor ? ` od ${lastEditor}` : ''}
-              </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
-                Plik został zaktualizowany. Wczytaj aby zobaczyć zmiany.
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', gap: 1, flexShrink: 0 }}>
-              <Button
-                size="small"
-                variant="contained"
-                onClick={loadFromCloud}
-                sx={{ borderRadius: 2, textTransform: 'none', fontSize: '0.75rem', px: 2, boxShadow: 'none' }}
-              >
-                Wczytaj
-              </Button>
-              <Button
-                size="small"
-                onClick={dismissRemoteChanged}
-                sx={{ borderRadius: 2, textTransform: 'none', fontSize: '0.75rem', color: 'text.secondary', minWidth: 'auto' }}
-              >
-                ✕
-              </Button>
-            </Box>
-          </Box>
-        )}
         {renderView()}
       </Layout>
     </ThemeProvider>

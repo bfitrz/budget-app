@@ -13,6 +13,7 @@ import {
 import { useNotificationStore, Notification, NotificationType } from '@/store/notificationStore';
 import { getStorageConfig } from '@/storage/types';
 import { GoogleDriveProvider } from '@/storage/googleDriveProvider';
+import { useCloudSync } from '@/hooks/useCloudSync';
 
 const CURRENT_VERSION = '2.7.0';
 
@@ -229,6 +230,53 @@ function ConnectionStatus() {
   );
 }
 
+function RemoteChangedBanner() {
+  const theme = useTheme();
+  const { remoteChanged, loadFromCloud, dismissRemoteChanged, lastEditor } = useCloudSync();
+
+  if (!remoteChanged) return null;
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1.5,
+        px: 2,
+        py: 1.5,
+        borderRadius: '12px',
+        background: `linear-gradient(135deg, ${alpha(theme.palette.info.main, 0.12)}, ${alpha(theme.palette.primary.main, 0.08)})`,
+        border: `1px solid ${alpha(theme.palette.info.main, 0.25)}`,
+        boxShadow: `0 4px 24px ${alpha(theme.palette.info.main, 0.15)}`,
+        minWidth: 240,
+        maxWidth: 340,
+        pointerEvents: 'auto',
+        animation: 'slideIn 0.3s ease-out',
+        '@keyframes slideIn': {
+          from: { opacity: 0, transform: 'translateX(20px)' },
+          to: { opacity: 1, transform: 'translateX(0)' },
+        },
+      }}
+    >
+      <Typography sx={{ fontSize: 18, flexShrink: 0 }}>🔄</Typography>
+      <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Typography variant="body2" sx={{ fontSize: '0.75rem', fontWeight: 600 }}>
+          Nowa wersja{lastEditor ? ` od ${lastEditor}` : ''}
+        </Typography>
+        <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'text.secondary' }}>
+          Plik zaktualizowany. Wczytaj zmiany.
+        </Typography>
+      </Box>
+      <Button size="small" variant="contained" onClick={loadFromCloud} sx={{ fontSize: '0.65rem', textTransform: 'none', borderRadius: 2, px: 1.5, minWidth: 'auto', boxShadow: 'none' }}>
+        Wczytaj
+      </Button>
+      <IconButton size="small" onClick={dismissRemoteChanged} sx={{ opacity: 0.5, width: 20, height: 20, '&:hover': { opacity: 1 } }}>
+        <CloseIcon sx={{ fontSize: 12 }} />
+      </IconButton>
+    </Box>
+  );
+}
+
 export function NotificationToasts() {
   const notifications = useNotificationStore((s) => s.notifications);
 
@@ -247,6 +295,7 @@ export function NotificationToasts() {
     >
       {/* Persistent status blocks */}
       <UpdateAvailable />
+      <RemoteChangedBanner />
       <ConnectionStatus />
       {/* Transient notifications */}
       {notifications.slice(0, 5).map((notification) => (
