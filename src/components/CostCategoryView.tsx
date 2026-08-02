@@ -501,6 +501,9 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                               </TableCell>
                               <TableCell>
                                 <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center', justifyContent: 'flex-end' }}>
+                                  {item.dataRealizacji && (
+                                    <Chip label={item.dataRealizacji.split('-').reverse().join('.')} size="small" sx={{ fontSize: '0.55rem', height: 20, backgroundColor: alpha(theme.palette.secondary.main, 0.1), color: theme.palette.secondary.main, fontWeight: 500 }} />
+                                  )}
                                   {item.uwagi && (
                                     <Tooltip title={item.uwagi} arrow slotProps={{ tooltip: { sx: { maxWidth: 280, fontSize: '0.75rem', lineHeight: 1.5, p: 1.5 } } }}>
                                       <CommentIcon sx={{ fontSize: 14, color: theme.palette.warning.main, opacity: 0.7 }} />
