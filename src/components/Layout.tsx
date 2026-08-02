@@ -119,14 +119,9 @@ export function Layout({ children, currentView, onViewChange, themeVariant, them
           >
             <img src={`${import.meta.env.BASE_URL}pwa-icon.png`} alt="Budget" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </Box>
-          <Box>
-            <Typography variant="subtitle1" sx={{ fontWeight: 600, lineHeight: 1.2 }}>
-              Budget
-            </Typography>
-            <Typography variant="caption" sx={{ fontSize: '0.55rem', color: 'text.secondary', opacity: 0.6 }}>
-              v2.4.0
-            </Typography>
-          </Box>
+          <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+            Budget
+          </Typography>
         </Box>
         {isMobile && (
           <Box sx={{ display: 'flex', gap: 0.5 }}>
@@ -334,8 +329,14 @@ export function Layout({ children, currentView, onViewChange, themeVariant, them
           maxWidth: '1200px',
         }}
       >
+        {/* Version bar */}
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', px: { xs: 2, sm: 3, md: 4 }, pt: 1.5 }}>
+          <Typography variant="caption" sx={{ fontSize: '0.6rem', color: 'text.secondary', opacity: 0.5 }}>
+            v2.4.0
+          </Typography>
+        </Box>
         {showTopBar && <BudgetTopBar />}
-        <Box sx={{ px: { xs: 2, sm: 3, md: 4, lg: 5 }, py: { xs: 3, sm: 4, md: 4 }, flex: 1 }}>
+        <Box sx={{ px: { xs: 2, sm: 3, md: 4, lg: 5 }, py: { xs: 2, sm: 3, md: 4 }, flex: 1 }}>
           {children}
         </Box>
       </Box>
