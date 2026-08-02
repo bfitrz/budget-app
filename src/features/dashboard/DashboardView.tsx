@@ -402,21 +402,21 @@ export function DashboardView() {
                     cost={totalMin}
                     available={summary.aktualnieSrodki}
                     color={theme.palette.success.main}
-                    subtitle={excludedTotal > 0 ? `z pominięte: ${formatCurrency(totalMin + excludedTotal)} (${summary.aktualnieSrodki >= totalMin + excludedTotal ? '+' : ''}${formatCurrency(summary.aktualnieSrodki - totalMin - excludedTotal)})` : undefined}
+                    costWithExcluded={excludedTotal > 0 ? totalMin + excludedTotal : undefined}
                   />
                   <ScenarioRow
                     label="Obecny plan"
                     cost={totalMain}
                     available={summary.aktualnieSrodki}
                     color={theme.palette.primary.main}
-                    subtitle={excludedTotal > 0 ? `z pominięte: ${formatCurrency(totalMain + excludedTotal)} (${summary.aktualnieSrodki >= totalMain + excludedTotal ? '+' : ''}${formatCurrency(summary.aktualnieSrodki - totalMain - excludedTotal)})` : undefined}
+                    costWithExcluded={excludedTotal > 0 ? totalMain + excludedTotal : undefined}
                   />
                   <ScenarioRow
                     label="Pesymistyczny"
                     cost={totalMax}
                     available={summary.aktualnieSrodki}
                     color={theme.palette.error.main}
-                    subtitle={excludedTotal > 0 ? `z pominięte: ${formatCurrency(totalMax + excludedTotal)} (${summary.aktualnieSrodki >= totalMax + excludedTotal ? '+' : ''}${formatCurrency(summary.aktualnieSrodki - totalMax - excludedTotal)})` : undefined}
+                    costWithExcluded={excludedTotal > 0 ? totalMax + excludedTotal : undefined}
                   />
                   <Box sx={{ mt: 1, pt: 2, borderTop: `1px solid ${theme.palette.divider}` }}>
                     <Typography variant="caption" color="text.secondary">
@@ -595,17 +595,18 @@ interface ScenarioRowProps {
   cost: number;
   available: number;
   color: string;
-  subtitle?: string;
+  costWithExcluded?: number;
 }
 
-function ScenarioRow({ label, cost, available, color, subtitle }: ScenarioRowProps) {
+function ScenarioRow({ label, cost, available, color, costWithExcluded }: ScenarioRowProps) {
   const theme = useTheme();
   const diff = available - cost;
   const isPositive = diff >= 0;
+  const diffWithExcl = costWithExcluded ? available - costWithExcluded : null;
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Box sx={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: color }} />
           <Typography variant="body2" sx={{ fontWeight: 500 }}>{label}</Typography>
@@ -614,27 +615,34 @@ function ScenarioRow({ label, cost, available, color, subtitle }: ScenarioRowPro
           <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
             {formatCurrency(cost)}
           </Typography>
-          {subtitle && (
+          {costWithExcluded && (
             <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.55rem', display: 'block' }}>
-              {subtitle}
+              z pominięte: {formatCurrency(costWithExcluded)}
             </Typography>
           )}
         </Box>
       </Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pl: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', pl: 3 }}>
         <Typography variant="caption" color="text.secondary">
           {isPositive ? 'Nadwyżka' : 'Brakuje'}
         </Typography>
-        <Typography
-          variant="caption"
-          sx={{
-            fontWeight: 700,
-            fontFamily: 'monospace',
-            color: isPositive ? theme.palette.success.main : theme.palette.error.main,
-          }}
-        >
-          {isPositive ? '+' : ''}{formatCurrency(diff)}
-        </Typography>
+        <Box sx={{ textAlign: 'right' }}>
+          <Typography
+            variant="caption"
+            sx={{
+              fontWeight: 700,
+              fontFamily: 'monospace',
+              color: isPositive ? theme.palette.success.main : theme.palette.error.main,
+            }}
+          >
+            {isPositive ? '+' : ''}{formatCurrency(diff)}
+          </Typography>
+          {diffWithExcl !== null && (
+            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.55rem', display: 'block' }}>
+              {diffWithExcl >= 0 ? '+' : ''}{formatCurrency(diffWithExcl)}
+            </Typography>
+          )}
+        </Box>
       </Box>
     </Box>
   );
