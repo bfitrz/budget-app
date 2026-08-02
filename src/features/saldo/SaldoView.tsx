@@ -121,36 +121,24 @@ export function SaldoView() {
       <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
         <Card sx={{ flex: 1, minWidth: 200 }}>
           <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              <Box
-                sx={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: '10px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: 'linear-gradient(135deg, #589df6, #3574c4)',
-                  color: '#fff',
-                }}
-              >
-                <WalletIcon sx={{ fontSize: 20 }} />
-              </Box>
-              <Box>
-                <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.65rem' }}>
-                  Aktualne środki (wpływy minus wydatki)
-                </Typography>
-                <Typography
-                  variant="h5"
-                  sx={{
-                    fontWeight: 700,
-                    color: summary.aktualnieSrodki >= 0 ? theme.palette.success.main : theme.palette.error.main,
-                  }}
-                >
-                  {formatCurrency(summary.aktualnieSrodki)}
-                </Typography>
-              </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <WalletIcon sx={{ fontSize: 14, color: 'text.secondary', opacity: 0.6 }} />
+              <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.65rem' }}>
+                Aktualne środki
+              </Typography>
             </Box>
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 700,
+                color: summary.aktualnieSrodki >= 0 ? theme.palette.success.main : theme.palette.error.main,
+              }}
+            >
+              {formatCurrency(summary.aktualnieSrodki)}
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.6rem' }}>
+              wpływy minus opłacone pozycje
+            </Typography>
           </CardContent>
         </Card>
         <Card sx={{ flex: 1, minWidth: 160 }}>
