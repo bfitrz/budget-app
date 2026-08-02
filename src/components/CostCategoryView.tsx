@@ -210,8 +210,10 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
 
   const handleToggleGroup = (groupName: string) => {
     const isCurrentlyDisabled = disabledGroups.has(groupName);
+    // 'Bez grupy' is a display-only fallback for empty groupField
+    const matchValue = groupName === 'Bez grupy' ? '' : groupName;
     // Toggle status on all items in the group
-    const groupItems = items.filter(i => (i[config.groupField] as string) === groupName);
+    const groupItems = items.filter(i => (i[config.groupField] as string || '') === matchValue);
     groupItems.forEach(item => {
       if (isCurrentlyDisabled) {
         // Restore: set to 'Do zapłaty' only if currently 'Pominięte'
@@ -237,7 +239,9 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
     const { oldName, newName } = editingGroupName;
     if (newName.trim() && newName.trim() !== oldName) {
       // Rename group on all items - collect IDs first then update
-      const itemsToUpdate = items.filter(item => (item[config.groupField] as string) === oldName);
+      // 'Bez grupy' is a display-only fallback for empty groupField
+      const matchValue = oldName === 'Bez grupy' ? '' : oldName;
+      const itemsToUpdate = items.filter(item => (item[config.groupField] as string || '') === matchValue);
       itemsToUpdate.forEach(item => {
         updateItem(item.id, { [config.groupField]: newName.trim() } as Partial<CostItem>);
       });
@@ -255,9 +259,11 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
 
   const handleDeleteGroup = () => {
     if (!deleteGroupConfirm) return;
+    // 'Bez grupy' is a display-only fallback for empty groupField
+    const matchValue = deleteGroupConfirm === 'Bez grupy' ? '' : deleteGroupConfirm;
     // Delete all items in this group
     for (const item of items) {
-      if ((item[config.groupField] as string) === deleteGroupConfirm) {
+      if ((item[config.groupField] as string || '') === matchValue) {
         deleteItem(item.id);
       }
     }
