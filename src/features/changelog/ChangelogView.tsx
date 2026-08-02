@@ -16,6 +16,17 @@ interface ChangeEntry {
 
 const changelog: ChangeEntry[] = [
   {
+    version: '2.3.2',
+    date: '2026-08-02',
+    changes: [
+      { type: 'feat', text: 'Toggle „Sprawdzaj zmiany" — polling włączalny/wyłączalny niezależnie od autozapisu' },
+      { type: 'feat', text: 'Notyfikacja „Zapisano do chmury" po każdym udanym autozapisie' },
+      { type: 'feat', text: 'Notyfikacja „Wczytano zmiany z chmury" po wczytaniu zmian kolegi' },
+      { type: 'fix', text: 'Własne zapisy nie triggerują bannera „plik zmieniony" (sprawdzanie lastModifyingUser.me)' },
+      { type: 'fix', text: 'Auto-sync faktycznie zapisuje do Google Drive (przepisany hook)' },
+    ],
+  },
+  {
     version: '2.3.1',
     date: '2026-08-02',
     changes: [
