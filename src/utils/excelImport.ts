@@ -288,7 +288,7 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
     const rows = XLSX.utils.sheet_to_json<RawSaldoRow>(sheet);
     result.saldo = rows.map((row) => ({
       id: generateId(),
-      data: row.Data || '',
+      data: parseDate(row.Data as unknown as string | number | undefined),
       opis: row.Opis || '',
       kwota: Number(row.Kwota) || 0,
     }));
@@ -299,7 +299,7 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
     const rows = XLSX.utils.sheet_to_json<RawHarmonogramRow>(sheet);
     result.harmonogram = rows.map((row) => ({
       id: generateId(),
-      data: row.Data || '',
+      data: parseDate(row.Data as unknown as string | number | undefined),
       opis: row.Opis || '',
       kwota: Number(row.Kwota) || 0,
       zrealizowane: row.Zrealizowane?.toUpperCase() === 'TAK',
@@ -311,7 +311,7 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
     const rows = XLSX.utils.sheet_to_json<{ Data?: string; Opis?: string }>(sheet);
     result.milestones = rows.map((row) => ({
       id: generateId(),
-      data: row.Data || '',
+      data: parseDate(row.Data as unknown as string | number | undefined),
       opis: row.Opis || '',
     }));
   }
