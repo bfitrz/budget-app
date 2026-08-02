@@ -79,7 +79,8 @@ export class GoogleDriveProvider implements StorageProvider {
         resolve();
       };
       rejectAuth = reject;
-      tokenClient!.requestAccessToken({ prompt: 'consent' });
+      // Use prompt:'' for silent refresh, falls back to consent if needed
+      tokenClient!.requestAccessToken({ prompt: '' });
     });
   }
 

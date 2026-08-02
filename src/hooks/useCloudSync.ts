@@ -25,9 +25,19 @@ async function doSaveToCloud() {
   if (!config || config.provider === 'local' || !config.filePath) return;
 
   const provider = getCloudProvider();
-  if (!provider || !provider.isAuthenticated()) {
-    console.log('Sync skipped: not authenticated');
+  if (!provider) {
+    console.log('Sync skipped: no provider');
     return;
+  }
+
+  if (!provider.isAuthenticated()) {
+    // Try silent re-auth
+    try {
+      await provider.authenticate();
+    } catch {
+      console.log('Sync skipped: re-auth failed');
+      return;
+    }
   }
 
   if (isSyncing) return;
@@ -97,14 +107,32 @@ export function useCloudSync() {
 
     const checkRemote = async () => {
       if (isSyncing) return;
-      const currentToken = localStorage.getItem('budget-app-gdrive-token');
+      let currentToken = localStorage.getItem('budget-app-gdrive-token');
       if (!currentToken || !config?.filePath) return;
 
       try {
-        const response = await fetch(
+        let response = await fetch(
           `https://www.googleapis.com/drive/v3/files/${config.filePath}?fields=modifiedTime,lastModifyingUser`,
           { headers: { Authorization: `Bearer ${currentToken}` } }
         );
+
+        // Token expired — try silent refresh
+        if (response.status === 401) {
+          try {
+            const provider = new GoogleDriveProvider();
+            await provider.authenticate();
+            currentToken = localStorage.getItem('budget-app-gdrive-token');
+            if (!currentToken) return;
+            response = await fetch(
+              `https://www.googleapis.com/drive/v3/files/${config.filePath}?fields=modifiedTime,lastModifyingUser`,
+              { headers: { Authorization: `Bearer ${currentToken}` } }
+            );
+          } catch {
+            console.log('Poll: token refresh failed');
+            return;
+          }
+        }
+
         if (!response.ok) {
           console.log('Poll failed:', response.status);
           return;
