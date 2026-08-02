@@ -610,9 +610,16 @@ function ScenarioRow({ label, cost, available, color, subtitle }: ScenarioRowPro
           <Box sx={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: color }} />
           <Typography variant="body2" sx={{ fontWeight: 500 }}>{label}</Typography>
         </Box>
-        <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
-          {formatCurrency(cost)}
-        </Typography>
+        <Box sx={{ textAlign: 'right' }}>
+          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+            {formatCurrency(cost)}
+          </Typography>
+          {subtitle && (
+            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.55rem', display: 'block' }}>
+              {subtitle}
+            </Typography>
+          )}
+        </Box>
       </Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pl: 3 }}>
         <Typography variant="caption" color="text.secondary">
@@ -629,11 +636,6 @@ function ScenarioRow({ label, cost, available, color, subtitle }: ScenarioRowPro
           {isPositive ? '+' : ''}{formatCurrency(diff)}
         </Typography>
       </Box>
-      {subtitle && (
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', pl: 3, mt: 0.25, fontSize: '0.55rem' }}>
-          {subtitle}
-        </Typography>
-      )}
     </Box>
   );
 }
