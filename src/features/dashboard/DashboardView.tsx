@@ -108,7 +108,7 @@ export function DashboardView() {
             label="Opłacono"
             value={summary.zaplacono}
             variant="positive"
-            subtitle={`${progress.toFixed(0)}% całości`}
+            subtitle={excludedTotal > 0 ? `${progress.toFixed(0)}% aktywnych · ${totalWithExcluded > 0 ? Math.round((summary.zaplacono / totalWithExcluded) * 100) : 0}% z pominięte` : `${progress.toFixed(0)}% całości`}
             icon={<PaidIcon sx={{ fontSize: 16 }} />}
           />
         </Grid>
@@ -117,7 +117,7 @@ export function DashboardView() {
             label="Do opłacenia"
             value={summary.pozostaloDoZaplaty}
             variant="warning"
-            subtitle={excludedTotal > 0 ? `+ ${formatCurrency(excludedTotal)} pominięte` : undefined}
+            subtitle={excludedTotal > 0 ? `z pominięte: ${formatCurrency(summary.pozostaloDoZaplaty + excludedTotal)}` : undefined}
             icon={<WarningIcon sx={{ fontSize: 16 }} />}
           />
         </Grid>
@@ -151,6 +151,11 @@ export function DashboardView() {
                   ? 'Środki pokrywają zaplanowane wydatki'
                   : 'Brakuje środków na pokrycie zaplanowanych kosztów'}
               </Typography>
+              {excludedTotal > 0 && (
+                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block', fontSize: '0.65rem' }}>
+                  Bilans z pominięte: <strong style={{ color: (summary.bilans - excludedTotal) >= 0 ? theme.palette.success.main : theme.palette.error.main }}>{formatCurrency(summary.bilans - excludedTotal)}</strong>
+                </Typography>
+              )}
             </Box>
             <Box sx={{ textAlign: 'right' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, justifyContent: 'flex-end' }}>
