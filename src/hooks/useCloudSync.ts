@@ -92,18 +92,23 @@ export function useCloudSync() {
 
   // Check if file was modified remotely
   const checkForRemoteChanges = useCallback(async () => {
-    if (!config || !isCloud || !config.filePath || isSyncing) return;
-    const provider = getProvider();
-    if (!provider || !provider.isAuthenticated()) return;
+    if (!config || !isCloud || !config.filePath) return;
+    // Don't check while we're saving
+    if (isSyncing) return;
+
+    const token = localStorage.getItem('budget-app-gdrive-token');
+    if (!token) return;
 
     try {
-      // Only Google Drive for now — check modifiedTime
       if (config.provider === 'google-drive') {
         const response = await fetch(
           `https://www.googleapis.com/drive/v3/files/${config.filePath}?fields=modifiedTime,lastModifyingUser`,
-          { headers: { Authorization: `Bearer ${localStorage.getItem('budget-app-gdrive-token')}` } }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
-        if (!response.ok) return;
+        if (!response.ok) {
+          console.log('Poll failed:', response.status);
+          return;
+        }
         const data = await response.json();
         const remoteModified = data.modifiedTime;
 
@@ -112,19 +117,25 @@ export function useCloudSync() {
           setLastEditor(data.lastModifyingUser.displayName || data.lastModifyingUser.emailAddress || null);
         }
 
-        if (lastKnownModifiedRef.current && remoteModified > lastKnownModifiedRef.current) {
+        // First poll — just store the timestamp
+        if (!lastKnownModifiedRef.current) {
+          lastKnownModifiedRef.current = remoteModified;
+          return;
+        }
+
+        // Compare — if remote is newer than what we know
+        if (remoteModified > lastKnownModifiedRef.current) {
+          // Update ref so we don't spam notifications
+          lastKnownModifiedRef.current = remoteModified;
           setRemoteChanged(true);
           const editorName = data.lastModifyingUser?.displayName || 'inna osoba';
           notify.info(`Plik zmieniony przez: ${editorName}`);
         }
-        if (!lastKnownModifiedRef.current) {
-          lastKnownModifiedRef.current = remoteModified;
-        }
       }
-    } catch {
-      // Silently ignore polling errors
+    } catch (err) {
+      console.log('Poll error:', err);
     }
-  }, [config, isCloud, getProvider]);
+  }, [config, isCloud]);
 
   // Subscribe to store changes and trigger sync
   useEffect(() => {
@@ -144,13 +155,22 @@ export function useCloudSync() {
   useEffect(() => {
     if (!isCloud || !config?.filePath) return;
 
-    // Initial check
-    checkForRemoteChanges();
-
     const interval = config.pollInterval || 30000;
-    const pollInterval = setInterval(checkForRemoteChanges, interval);
-    return () => clearInterval(pollInterval);
-  }, [isCloud, config?.filePath, config?.pollInterval, checkForRemoteChanges]);
+    
+    // Initial delay then periodic check
+    const initialTimeout = setTimeout(() => {
+      checkForRemoteChanges();
+    }, 5000); // 5s after mount
+
+    const pollId = setInterval(() => {
+      checkForRemoteChanges();
+    }, interval);
+
+    return () => {
+      clearTimeout(initialTimeout);
+      clearInterval(pollId);
+    };
+  }, [isCloud, config?.filePath, config?.pollInterval]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return {
     isCloud,
