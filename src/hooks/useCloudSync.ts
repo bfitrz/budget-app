@@ -150,6 +150,13 @@ export function useCloudSync() {
 
         if (!lastKnownModifiedRef.current) {
           lastKnownModifiedRef.current = remoteModified;
+          // First poll after page load — check if file is newer than our last sync
+          const cfg = getStorageConfig();
+          if (cfg?.lastSync && remoteModified > cfg.lastSync && !isMe) {
+            setRemoteChanged(true);
+            const editorName = data.lastModifyingUser?.displayName || 'inna osoba';
+            notify.info(`Plik zmieniony przez: ${editorName}`);
+          }
           return;
         }
 
