@@ -16,6 +16,17 @@ interface ChangeEntry {
 
 const changelog: ChangeEntry[] = [
   {
+    version: '2.0.0',
+    date: '2026-08-02',
+    changes: [
+      { type: 'feat', text: 'System notyfikacji — każda akcja potwierdzona komunikatem w prawym górnym rogu' },
+      { type: 'feat', text: 'Notyfikacje opisują co się zmieniło: „Wyłączono z budżetu", „Oznaczono jako opłacone", „Cena zaktualizowana" itp.' },
+      { type: 'feat', text: 'Przycisk „Wyczyść dane" na stronie Import/Eksport z potwierdzeniem' },
+      { type: 'feat', text: 'Rozbudowany przewodnik — dokładne wyjaśnienia każdej funkcji dla nowych użytkowników' },
+      { type: 'refactor', text: 'Usunięto panel notatek (Sticky Notes) — zastąpiony systemem notyfikacji' },
+    ],
+  },
+  {
     version: '1.9.0',
     date: '2026-08-02',
     changes: [
