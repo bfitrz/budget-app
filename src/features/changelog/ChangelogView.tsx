@@ -16,6 +16,17 @@ interface ChangeEntry {
 
 const changelog: ChangeEntry[] = [
   {
+    version: '2.7.0',
+    date: '2026-08-02',
+    changes: [
+      { type: 'feat', text: 'Powiadomienie o nowej wersji aplikacji — blok „Nowa wersja" z przyciskiem Odśwież' },
+      { type: 'feat', text: 'Data ostatniej edycji pliku (z Google Drive) widoczna na stronie Dane i sync' },
+      { type: 'feat', text: 'Stały blok „Brak połączenia" z przyciskiem Połącz gdy sesja wygaśnie' },
+      { type: 'feat', text: 'Auto-refresh tokena Google — silent re-auth bez popupu' },
+      { type: 'fix', text: 'Import dat z Excela — obsługa serial numbers (kolumna DataRealizacji, Saldo, Harmonogram, Milestones)' },
+    ],
+  },
+  {
     version: '2.6.0',
     date: '2026-08-02',
     changes: [

@@ -14,7 +14,7 @@ import { useNotificationStore, Notification, NotificationType } from '@/store/no
 import { getStorageConfig } from '@/storage/types';
 import { GoogleDriveProvider } from '@/storage/googleDriveProvider';
 
-const CURRENT_VERSION = '2.6.0';
+const CURRENT_VERSION = '2.7.0';
 
 function getIcon(type: NotificationType) {
   switch (type) {
