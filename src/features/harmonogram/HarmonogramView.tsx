@@ -70,6 +70,18 @@ export function HarmonogramView() {
   const getCashFlowProjection = useBudgetStore((s) => s.getCashFlowProjection);
   const getDashboardSummary = useBudgetStore((s) => s.getDashboardSummary);
   const milestones = useBudgetStore((s) => s.milestones);
+  const meble = useBudgetStore((s) => s.meble);
+  const wykonczenie = useBudgetStore((s) => s.wykonczenie);
+  const agd = useBudgetStore((s) => s.agd);
+  const pozostale = useBudgetStore((s) => s.pozostale);
+  const wyprowadzka = useBudgetStore((s) => s.wyprowadzka);
+
+  const excludedTotal =
+    meble.filter(i => !i.included).reduce((s, i) => s + i.cena, 0) +
+    wykonczenie.filter(i => !i.included).reduce((s, i) => s + i.kwota, 0) +
+    agd.filter(i => !i.included).reduce((s, i) => s + i.cena, 0) +
+    pozostale.filter(i => !i.included).reduce((s, i) => s + i.cena, 0) +
+    wyprowadzka.filter(i => !i.included).reduce((s, i) => s + i.cena, 0);
   const addMilestone = useBudgetStore((s) => s.addMilestone);
   const deleteMilestone = useBudgetStore((s) => s.deleteMilestone);
 
@@ -274,13 +286,14 @@ export function HarmonogramView() {
             <ResponsiveContainer width="100%" height={320}>
               <AreaChart data={(() => {
                 // Merge cashFlow with milestone dates for ReferenceLine to work
-                const baseData = cashFlow.map(p => ({ ...p, cel: summary.pozostaloDoZaplaty }));
+                const celZPominietymi = summary.pozostaloDoZaplaty + excludedTotal;
+                const baseData = cashFlow.map(p => ({ ...p, cel: summary.pozostaloDoZaplaty, celFull: celZPominietymi }));
                 const existingDates = new Set(baseData.map(p => p.data));
                 // Add milestone dates that don't exist in cashFlow
                 for (const ms of milestones) {
                   if (!existingDates.has(ms.data)) {
                     const saldo = getSaldoAtDate(ms.data);
-                    baseData.push({ data: ms.data, label: ms.opis, saldo, cel: summary.pozostaloDoZaplaty });
+                    baseData.push({ data: ms.data, label: ms.opis, saldo, cel: summary.pozostaloDoZaplaty, celFull: celZPominietymi });
                   }
                 }
                 // Sort by date
@@ -312,7 +325,7 @@ export function HarmonogramView() {
                 <RechartsTooltip
                   formatter={(value: number, name: string) => [
                     formatCurrency(value),
-                    name === 'saldo' ? 'Dostępne środki' : 'Cel (pozostało do zapłaty)',
+                    name === 'saldo' ? 'Prognozowane środki' : name === 'cel' ? 'Cel (pozostało do zapłaty)' : 'Cel z pominięte',
                   ]}
                   labelFormatter={(label: string) => formatDate(label)}
                   contentStyle={{
@@ -343,6 +356,21 @@ export function HarmonogramView() {
                   activeDot={false}
                   name="cel"
                 />
+                {/* Target line with excluded costs */}
+                {excludedTotal > 0 && (
+                  <Area
+                    type="stepAfter"
+                    dataKey="celFull"
+                    stroke={theme.palette.error.main}
+                    strokeWidth={1.5}
+                    strokeDasharray="3 3"
+                    fill="none"
+                    dot={false}
+                    activeDot={false}
+                    name="celFull"
+                    strokeOpacity={0.5}
+                  />
+                )}
                 {/* Actual/projected funds */}
                 <Area
                   type="stepAfter"
@@ -406,6 +434,12 @@ export function HarmonogramView() {
                 <Box sx={{ width: 16, height: 0, borderTop: `2px dashed ${theme.palette.warning.main}` }} />
                 <Typography variant="caption">Cel: <strong>{formatCurrency(summary.pozostaloDoZaplaty)}</strong> (tyle musisz zdobyć)</Typography>
               </Box>
+              {excludedTotal > 0 && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                  <Box sx={{ width: 16, height: 0, borderTop: `2px dashed ${theme.palette.error.main}`, opacity: 0.5 }} />
+                  <Typography variant="caption">Z pominięte: <strong>{formatCurrency(summary.pozostaloDoZaplaty + excludedTotal)}</strong></Typography>
+                </Box>
+              )}
               {milestones.length > 0 && (
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
                   <Box sx={{ width: 16, height: 0, borderTop: `2px dashed ${theme.palette.error.main}` }} />
