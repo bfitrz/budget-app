@@ -19,6 +19,36 @@ import { generateId } from '@/utils/id';
 import { ImportResult } from '@/utils/excelImport';
 import { notify } from './notificationStore';
 
+// Generates a descriptive notification based on what was updated
+function describeUpdate(updates: Record<string, unknown>): string {
+  const keys = Object.keys(updates);
+  if (keys.includes('included')) {
+    return updates.included ? 'Przywrócono do budżetu' : 'Wyłączono z budżetu';
+  }
+  if (keys.includes('status')) {
+    return updates.status === 'Opłacone' ? 'Oznaczono jako opłacone' : 'Oznaczono jako do zapłaty';
+  }
+  if (keys.includes('alternatywy') && keys.length === 1) {
+    return 'Alternatywy zaktualizowane';
+  }
+  if (keys.includes('linki') && keys.length === 1) {
+    return 'Linki zaktualizowane';
+  }
+  if (keys.includes('uwagi') && keys.length === 1) {
+    return 'Uwagi zapisane';
+  }
+  if (keys.includes('uwagiMain')) {
+    return 'Uwagi zapisane';
+  }
+  if (keys.includes('cena') || keys.includes('kwota')) {
+    return 'Cena zaktualizowana';
+  }
+  if (keys.includes('wybranaAltId')) {
+    return 'Opcja płatności zapisana';
+  }
+  return 'Pozycja zapisana';
+}
+
 interface BudgetActions {
   importData: (data: ImportResult) => void;
   resetAndImport: (data: ImportResult) => void;
@@ -180,7 +210,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { meble };
       });
-      notify.success('Zapisano');
+      notify.success(describeUpdate(updates as Record<string, unknown>));
     },
     addMebleItem: (item) => {
       set((state) => {
@@ -209,7 +239,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { wykonczenie };
       });
-      notify.success('Zapisano');
+      notify.success(describeUpdate(updates as Record<string, unknown>));
     },
     addWykonczenieItem: (item) => {
       set((state) => {
@@ -238,7 +268,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { agd };
       });
-      notify.success('Zapisano');
+      notify.success(describeUpdate(updates as Record<string, unknown>));
     },
     addAGDItem: (item) => {
       set((state) => {
@@ -267,7 +297,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { pozostale };
       });
-      notify.success('Zapisano');
+      notify.success(describeUpdate(updates as Record<string, unknown>));
     },
     addPozostaleItem: (item) => {
       set((state) => {
@@ -296,7 +326,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
         persistState(getStateSnapshot(newState as BudgetStore));
         return { wyprowadzka };
       });
-      notify.success('Zapisano');
+      notify.success(describeUpdate(updates as Record<string, unknown>));
     },
     addWyprowadzkaItem: (item) => {
       set((state) => {

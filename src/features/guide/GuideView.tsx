@@ -18,7 +18,6 @@ import {
   Schedule as ScheduleIcon,
   SyncAlt as DataIcon,
   LocalShipping as ShippingIcon,
-  StickyNote2 as NotesIcon,
   SwapHoriz as AltIcon,
   TrendingDown as TrendingDownIcon,
   AttachMoney as MoneyIcon,
@@ -32,18 +31,7 @@ function Section({ title, icon, children }: { title: string; icon: React.ReactNo
     <Card sx={{ mb: 3 }}>
       <CardContent sx={{ p: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-          <Box
-            sx={{
-              width: 32,
-              height: 32,
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: alpha(theme.palette.primary.main, 0.1),
-              color: theme.palette.primary.main,
-            }}
-          >
+          <Box sx={{ width: 32, height: 32, borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: alpha(theme.palette.primary.main, 0.1), color: theme.palette.primary.main }}>
             {icon}
           </Box>
           <Typography variant="h6" sx={{ fontWeight: 600 }}>{title}</Typography>
@@ -57,17 +45,7 @@ function Section({ title, icon, children }: { title: string; icon: React.ReactNo
 function Tip({ children }: { children: React.ReactNode }) {
   const theme = useTheme();
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        gap: 1,
-        p: 1.5,
-        borderRadius: 2,
-        backgroundColor: alpha(theme.palette.info.main, 0.06),
-        border: `1px solid ${alpha(theme.palette.info.main, 0.12)}`,
-        mt: 1.5,
-      }}
-    >
+    <Box sx={{ display: 'flex', gap: 1, p: 1.5, borderRadius: 2, backgroundColor: alpha(theme.palette.info.main, 0.06), border: `1px solid ${alpha(theme.palette.info.main, 0.12)}`, mt: 1.5 }}>
       <Typography sx={{ fontSize: '0.8rem', lineHeight: 1.5, color: theme.palette.text.secondary }}>
         💡 {children}
       </Typography>
@@ -91,174 +69,164 @@ function Feature({ label, description }: { label: string; description: string })
 export function GuideView() {
   return (
     <Box>
-      {/* Header */}
       <Box sx={{ mb: 5 }}>
         <Typography variant="h2" sx={{ mb: 0.5 }}>Przewodnik</Typography>
         <Typography variant="body1" color="text.secondary">
-          Jak korzystać z aplikacji budżetowej — opis każdej sekcji, funkcji i wskazówki
+          Wszystko co musisz wiedzieć, żeby w pełni korzystać z aplikacji
         </Typography>
       </Box>
 
-      {/* Ogólne */}
-      <Section title="Do czego służy ta aplikacja?" icon={<DashboardIcon sx={{ fontSize: 18 }} />}>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.7 }}>
-          Planujesz wykończenie i wyposażenie mieszkania? Ta aplikacja pomoże Ci ogarnąć budżet — od pierwszego kosztorysu po ostatnią fakturę. Wrzuć dane z Excela lub dodaj ręcznie, porównuj warianty cenowe, śledź co już opłacone, a co jeszcze przed Tobą.
+      <Section title="Idea aplikacji" icon={<DashboardIcon sx={{ fontSize: 18 }} />}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.8 }}>
+          Ta aplikacja powstała, żeby dać Ci pełną kontrolę nad budżetem wykończenia mieszkania. To nie jest prosty arkusz wydatków — to narzędzie, które pozwala Ci:
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>
-          Dane przechowywane są lokalnie w przeglądarce (localStorage) — nie są wysyłane nigdzie. Możesz je wyeksportować do Excela jako backup.
+        <Feature label="Planować budżet z góry" description="Wpisujesz wszystkie przewidywane wydatki zanim jeszcze je poniesiesz. Widzisz ile potrzebujesz i czy Ci wystarczy." />
+        <Feature label="Śledzić co opłacone, a co jeszcze nie" description="Każda pozycja ma status 'Do zapłaty' lub 'Opłacone'. Na bieżąco widzisz postęp." />
+        <Feature label="Porównywać ceny (alternatywy)" description="Ten sam mebel w trzech sklepach? Dodaj alternatywy cenowe i porównaj. Aplikacja obliczy wariant najtańszy i najdroższy." />
+        <Feature label="Prognozować przyszłość" description="Wiesz, że za miesiąc dostaniesz wypłatę? Zaplanuj ją i zobacz na wykresie, kiedy budżet się domknie." />
+        <Feature label="Analizować ryzyko" description="Scenariusze 'najtaniej / plan / najdrożej' pokazują czy masz zapas czy jest ciasno." />
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 2, lineHeight: 1.8 }}>
+          Dane przechowywane są wyłącznie w Twojej przeglądarce (localStorage). Nie wysyłamy ich nigdzie. Dlatego ważne jest regularne eksportowanie danych do pliku Excel — to Twój backup.
         </Typography>
       </Section>
 
-      {/* Podsumowanie */}
-      <Section title="Podsumowanie" icon={<DashboardIcon sx={{ fontSize: 18 }} />}>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.7 }}>
-          Strona główna — pełen obraz budżetu na jednym ekranie. Odpowiada na pytanie: &quot;ile mam, ile wydaję i czy mi się to spina?&quot;
+      <Section title="Podsumowanie (strona główna)" icon={<DashboardIcon sx={{ fontSize: 18 }} />}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.8 }}>
+          To Twój dashboard — jeden ekran z odpowiedzią na pytanie „ile mam, ile wydaję i czy mi się to spina?". Nie musisz tu nic wpisywać — wszystko oblicza się automatycznie na podstawie danych z innych zakładek.
         </Typography>
-        <Feature label="Karty KPI" description="Wpływy, aktualne środki, łączny koszt, opłacone, do zapłaty, bilans." />
-        <Feature label="Bilans" description="Zielony = nadwyżka (masz więcej niż potrzebujesz), czerwony = niedobór." />
-        <Feature label="Wykresy" description="Podział kosztów (donut), breakdown wg kategorii, scenariusze min/max, postęp płatności." />
-        <Feature label="Scenariusze" description="Optymistyczny (min) / obecny / pesymistyczny (max) — na podstawie dodanych alternatyw." />
-        <Feature label="Pominięte w diagramach" description="Każdy widget i diagram pokazuje wersję 'z pominięte' mniejszym fontem — ile by kosztowało gdybyś nic nie wygasił." />
+        <Feature label="Karty na górze (KPI)" description="Cztery liczby: łączne wpływy (ile pieniędzy wpłynęło do budżetu), dostępne środki (ile zostało po opłaceniu), opłacone (ile już wydałeś), do zapłaty (ile jeszcze musisz wydać)." />
+        <Feature label="Bilans" description="Najważniejsza liczba. Zielona = masz więcej pieniędzy niż wydatków. Czerwona = brakuje Ci na pokrycie zaplanowanych kosztów. Bilans = wpływy minus łączne wydatki." />
+        <Feature label="Wykres 'Wydatki wg kategorii'" description="Poziomy wykres słupkowy. Każda kategoria (Meble, Wykończenie, AGD, Inne, Wyprowadzka) ma słupek podzielony na część zieloną (opłacone) i pomarańczową (jeszcze do zapłaty)." />
+        <Feature label="Wykres 'Struktura wydatków'" description="Donut (pierścień). Pokazuje procentowy udział każdej kategorii w całości budżetu. Szybko widzisz co zjada największą część." />
+        <Feature label="Wykres 'Zakres cenowy'" description="Porównanie wariantów min/max w każdej kategorii. Widoczny tylko jeśli masz dodane alternatywy cenowe. Pokazuje ile zaoszczędzisz wybierając najtańsze opcje." />
+        <Feature label="Scenariusze" description="Trzy warianty: 'Najtaniej' (gdybyś wszędzie wybrał najtańszą opcję), 'Obecny plan' (to co teraz masz wybrane), 'Najdrożej' (gdybyś wszędzie wybrał najdroższą). Przy każdym widzisz czy środki wystarczą." />
+        <Feature label="Postęp płatności" description="Progress bar dla każdej kategorii i globalny. Pokazuje jaki procent zaplanowanych wydatków już opłaciłeś." />
+        <Tip>Jeśli masz pozycje „pominięte" (wyłączone z budżetu), każdy widget pokazuje też wariant „razem z pominiętymi" — żebyś widział ile by kosztowało gdybyś nic nie wyłączał.</Tip>
       </Section>
 
-      {/* Środki */}
       <Section title="Środki" icon={<SaldoIcon sx={{ fontSize: 18 }} />}>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.7 }}>
-          Rejestruj wpływy pieniędzy do budżetu — wszystko co zasila Twoje konto na wykończenie: wypłaty, oszczędności, zwroty podatku, przelewy od rodziny.
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.8 }}>
+          Tutaj rejestrujesz każdy grosz, który wpływa do Twojego budżetu remontowego. Może to być wypłata, przelew z konta oszczędnościowego, pożyczka od rodziny, zwrot podatku — cokolwiek zasila Twoje środki na wykończenie.
         </Typography>
-        <Feature label="Dodaj wpływ" description="Przycisk '+' → data, opis, kwota. Np. 'Przelew z konta oszczędnościowego — 10 000 zł'." />
-        <Feature label="Aktualne środki" description="Automatycznie: suma wpływów minus wszystko co już opłacone." />
-        <Feature label="Ujemna kwota" description="Wpisz kwotę ujemną jako korektę (np. błędny wpis, zwrot który nie doszedł)." />
-        <Tip>Wpływy wpływają na bilans w dashboardzie i pasek budżetowy we wszystkich zakładkach kosztowych.</Tip>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.8 }}>
+          <strong>Jak działają „Dostępne środki"?</strong> To prosta matematyka: suma wszystkich wpływów minus suma pozycji oznaczonych jako „Opłacone" w zakładkach wydatków. Jeśli wpłaciłeś 100 000 zł i opłaciłeś wydatki za 40 000 zł, dostępne środki = 60 000 zł.
+        </Typography>
+        <Feature label="Dodaj wpływ" description="Kliknij przycisk 'Dodaj wpływ'. Podaj datę, opis (np. 'Wypłata lipiec') i kwotę. Wpływ natychmiast pojawi się w tabeli i zaktualizuje bilans." />
+        <Feature label="Wpływ bez daty = saldo początkowe" description="Jeśli zostawisz pole daty puste, wpływ traktowany jest jako pieniądze które miałeś na starcie. Przydatne gdy zaczynasz śledzić budżet w trakcie remontu." />
+        <Feature label="Ujemna kwota" description="Wpisz kwotę ujemną (np. -500) żeby skorygować błąd lub odnotować nieoczekiwany wydatek spoza kategorii." />
+        <Feature label="Edycja i usuwanie" description="Ikona ołówka = edytuj wpis. Ikona kosza = usuń. Każda zmiana natychmiast wpływa na bilans." />
+        <Tip>Wpływy tutaj to pieniądze które MASZ. Przyszłe, planowane wpływy (których jeszcze nie otrzymałeś) wpisujesz w zakładce „Harmonogram" — tam służą do prognozowania.</Tip>
       </Section>
 
-      {/* Harmonogram */}
-      <Section title="Harmonogram" icon={<ScheduleIcon sx={{ fontSize: 18 }} />}>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.7 }}>
-          Zaplanuj przyszłe wpływy i sprawdź na wykresie, kiedy zgromadzisz wystarczająco pieniędzy na pokrycie wszystkich kosztów. Odpowiada na pytanie: &quot;kiedy będę miał na wszystko?&quot;
+      <Section title="Harmonogram (prognoza)" icon={<ScheduleIcon sx={{ fontSize: 18 }} />}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.8 }}>
+          Harmonogram odpowiada na pytanie: „kiedy będę miał wystarczająco pieniędzy na pokrycie wszystkich wydatków?". Wpisujesz tu przyszłe wpływy (pieniądze których jeszcze NIE masz, ale spodziewasz się je otrzymać) i widzisz na wykresie jak Twoje środki rosną w czasie.
         </Typography>
-        <Feature label="Zaplanuj wpływ" description="Dodaj przyszłą wpłatę z datą — np. 'Wypłata wrzesień — 8 000 zł'." />
-        <Feature label="Wykres prognozowy" description="Niebieska linia = Twoje środki rosnące w czasie. Pomarańczowa linia = cel (ile łącznie musisz jeszcze zapłacić). Gdy niebieska przekroczy pomarańczową — masz wystarczająco." />
-        <Feature label="Zielony punkt" description="Pierwszy punkt na wykresie = Twoje aktualne środki dziś." />
-        <Feature label="Oznacz jako zrealizowane" description="Checkbox przy wpisie — zrealizowany wpływ przenosi się do środków." />
-        <Feature label="📌 Milestony" description="Deadline'y i ważne daty. Przycisk '📌 Milestone' → podaj datę i opis. Na wykresie pojawia się pionowa linia z bilansem." />
-        <Feature label="Bilans na milestone" description="Najedź na chip milestone pod wykresem — zobaczysz prognozowane środki, ile zostaje do zapłaty i bilans na tę datę." />
-        <Tip>Niezrealizowane wpływy nie wliczają się do aktualnego salda — tylko do prognozy na wykresie.</Tip>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.8 }}>
+          <strong>Różnica między „Środkami" a „Harmonogramem":</strong> W „Środkach" wpisujesz pieniądze które JUŻ masz (lub dostałeś). W „Harmonogramie" planujesz pieniądze które DOPIERO dostaniesz (np. przyszłomiesięczna wypłata).
+        </Typography>
+        <Feature label="Nowy wpływ" description="Kliknij 'Nowy wpływ'. Podaj datę (kiedy spodziewasz się pieniędzy), opis i kwotę. Pojawi się w tabeli i na wykresie." />
+        <Feature label="Wykres prognozowy" description="Niebieska linia = Twoje środki rosnące w czasie (aktualnie + zaplanowane wpływy). Pomarańczowa przerywana = cel (ile musisz jeszcze zapłacić). Gdy niebieska przekroczy pomarańczową — masz na wszystko." />
+        <Feature label="Zielony punkt na wykresie" description="Pierwszy punkt = Twoje dzisiejsze dostępne środki. Od niego linia rośnie z każdym zaplanowanym wpływem." />
+        <Feature label="Oznacz jako zrealizowany" description="Gdy pieniądze faktycznie wpłyną na konto, kliknij checkbox. Zrealizowany wpływ znika z prognozy (bo jest już w 'Środkach')." />
+        <Feature label="📌 Ważne daty" description="Przycisk 'Ważna data' pozwala oznaczyć deadline (np. 'Termin oddania kluczy'). Na wykresie pojawia się pionowa linia — widzisz ile środków będziesz miał w tym dniu i czy wystarczy." />
+        <Feature label="Komunikat pod wykresem" description="Zielony = zaplanowane wpływy wystarczą. Czerwony = nawet po wpływach brakuje pieniędzy — musisz znaleźć dodatkowe źródło." />
+        <Tip>Zaplanowane wpływy NIE wliczają się do dostępnych środków na dashboardzie. Pojawiają się tylko w prognozie na wykresie. Dopiero po oznaczeniu jako „zrealizowane" wpływają na bilans.</Tip>
       </Section>
 
-      {/* Kategorie kosztów */}
-      <Section title="Zakładki kosztowe" icon={<ChairIcon sx={{ fontSize: 18 }} />}>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.7 }}>
-          Pięć zakładek z wydatkami, każda z tabelą pozycji pogrupowanych tematycznie:
+      <Section title="Zakładki wydatków (Meble, Wykończenie, AGD, Inne, Wyprowadzka)" icon={<ChairIcon sx={{ fontSize: 18 }} />}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.8 }}>
+          Pięć zakładek, każda dla innego typu wydatków. Działają identycznie — różnią się tylko polami (meble mają „pomieszczenie" i „kategorię", wykończenie ma „etap", AGD ma „producenta" i „model"). Pozycje w każdej zakładce są pogrupowane:
         </Typography>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-          <Chip icon={<ChairIcon sx={{ fontSize: 14 }} />} label="Zakupy — meble i wyposażenie" size="small" />
-          <Chip icon={<BuildIcon sx={{ fontSize: 14 }} />} label="Wykończenie — prace ekip, materiały" size="small" />
-          <Chip icon={<KitchenIcon sx={{ fontSize: 14 }} />} label="AGD / RTV — sprzęt domowy" size="small" />
-          <Chip icon={<MoreIcon sx={{ fontSize: 14 }} />} label="Inne — pozostałe wydatki" size="small" />
-          <Chip icon={<ShippingIcon sx={{ fontSize: 14 }} />} label="Wyprowadzka — naprawy, transport" size="small" />
+          <Chip icon={<ChairIcon sx={{ fontSize: 14 }} />} label="Meble — pogrupowane wg pomieszczeń (salon, sypialnia...)" size="small" />
+          <Chip icon={<BuildIcon sx={{ fontSize: 14 }} />} label="Wykończenie — wg etapów (łazienka, elektryka...)" size="small" />
+          <Chip icon={<KitchenIcon sx={{ fontSize: 14 }} />} label="AGD / RTV — wg producenta (Bosch, Samsung...)" size="small" />
+          <Chip icon={<MoreIcon sx={{ fontSize: 14 }} />} label="Inne — wg dowolnych grup" size="small" />
+          <Chip icon={<ShippingIcon sx={{ fontSize: 14 }} />} label="Wyprowadzka — wg grup (transport, naprawy...)" size="small" />
         </Box>
-
         <Divider sx={{ my: 2 }} />
-
-        <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1.5 }}>Co możesz zrobić z każdą pozycją:</Typography>
-        <Feature label="Włącz / Wyłącz z budżetu" description="Ikona $ przy pozycji — wyłączone nie wliczają się do kosztów." />
-        <Feature label="Zmień status" description="Kliknij chip 'Do zapłaty' / 'Opłacone' żeby przełączyć." />
-        <Feature label="Menu ⋮ pozycji" description="Kliknij trzy kropki → edytuj, dodaj linki, alternatywy, usuń." />
-        <Feature label="Rozwiń szczegóły" description="Strzałka ▶ po lewej — pokazuje MAIN cenę i alternatywy z linkami." />
-        <Feature label="Uwagi" description="Pole tekstowe bezpośrednio w tabeli — wpisuj notatki na bieżąco." />
+        <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1.5 }}>Anatomia jednej pozycji:</Typography>
+        <Feature label="Strzałka ▶ (rozwiń)" description="Kliknij strzałkę po lewej aby zobaczyć szczegóły: cenę główną (GŁÓWNA), alternatywy (ALT), linki do sklepów i uwagi." />
+        <Feature label="Ikona $ (włącz/wyłącz)" description="Zielona = pozycja wliczona do budżetu. Kliknij aby wyłączyć — pozycja się przyciemni i przestanie wpływać na bilans. Przydatne do ukrywania opcjonalnych zakupów." />
+        <Feature label="Chip statusu (Do zapłaty / Opłacone)" description="Kliknij chip aby zmienić status. Gdy oznaczysz jako 'Opłacone', kwota zostanie odjęta od dostępnych środków. Jeśli pozycja ma alternatywy, pojawi się pytanie 'którą opcję opłaciłeś?'." />
+        <Feature label="Cena i zakres" description="Jeśli masz alternatywy, pod ceną główną zobaczysz zakres min—max. Zakres wpływa na scenariusze na dashboardzie." />
+        <Feature label="Menu ⋮ (trzy kropki)" description="Otwiera menu kontekstowe: Edytuj (zmień nazwę, cenę, grupę), Linki (dodaj URL do sklepu), Alternatywy (dodaj inną opcję cenową), Usuń." />
+        <Feature label="Ikona 💬 (uwagi)" description="Jeśli pozycja ma uwagi, pojawia się ikona bąbelka. Najedź aby zobaczyć treść. Uwagi dodajesz przez menu Edytuj." />
+        <Tip>Każda pozycja może mieć opcjonalne pole „Planowana data wydatku". Jeśli je podasz, na wykresie prognozowym koszt pojawi się dopiero od tej daty (linia celu podskoczy w tym dniu). Puste = potrzebne teraz.</Tip>
       </Section>
 
-      {/* Grupy */}
       <Section title="Grupy" icon={<MenuIcon sx={{ fontSize: 18 }} />}>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.7 }}>
-          Każda zakładka kosztowa organizuje pozycje w grupy (np. pomieszczenia, etapy prac, producenci). Grupy mają własne menu ⋮ z akcjami:
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.8 }}>
+          W każdej zakładce wydatków pozycje są zorganizowane w rozwijane grupy (accordiony). Grupy to np. pomieszczenia (dla mebli), etapy prac (dla wykończenia) lub producenci (dla AGD). Każda grupa ma swoje podsumowanie kosztów i menu ⋮ z akcjami.
         </Typography>
-        <Feature label="Wygaś grupę" description="Wyklucza wszystkie pozycje z grupy z budżetu — bez ich usuwania. Przydatne do ukrywania opcjonalnych zakupów." />
-        <Feature label="Zmień nazwę" description="Zmienia nazwę grupy na wszystkich pozycjach w niej." />
-        <Feature label="Usuń grupę" description="Usuwa grupę wraz ze WSZYSTKIMI pozycjami — nieodwracalne. Jeśli chcesz tylko wyłączyć, użyj 'Wygaś'." />
-        <Feature label="Nowa grupa" description="Przycisk w nagłówku strony — tworzy pustą grupę do której możesz dodawać pozycje." />
-        <Tip>Wygaszona grupa jest przygaszona wizualnie i ma badge &quot;wygaszona&quot; — łatwo ją odróżnić.</Tip>
+        <Feature label="Wyłącz grupę" description="Menu ⋮ → 'Wyłącz grupę'. Wyłącza WSZYSTKIE pozycje w grupie z budżetu naraz. Grupa się przyciemnia i dostaje badge 'wyłączona'. Przydatne gdy chcesz tymczasowo pominąć cały pokój (np. 'zobaczymy czy starczy na gabinet')." />
+        <Feature label="Włącz grupę" description="Menu ⋮ → 'Włącz grupę'. Przywraca wszystkie pozycje z powrotem do budżetu." />
+        <Feature label="Zmień nazwę" description="Menu ⋮ → 'Zmień nazwę'. Zmienia nazwę grupy na wszystkich pozycjach w niej. Np. 'Pokój 1' → 'Sypialnia'." />
+        <Feature label="Usuń grupę" description="Menu ⋮ → 'Usuń grupę'. UWAGA: usuwa grupę wraz ze WSZYSTKIMI pozycjami w środku. Nieodwracalne! Pojawi się dialog z potwierdzeniem i łączną wartością." />
+        <Feature label="Nowa grupa" description="Przycisk 'Nowa grupa' w nagłówku strony. Tworzy pustą grupę, do której możesz dodawać pozycje." />
+        <Feature label="Dodaj do grupy" description="Na dole każdej grupy jest przycisk 'Dodaj do {nazwa}'. Nowa pozycja automatycznie trafi do tej grupy." />
+        <Tip>Wyłączanie grupy to NIE to samo co usuwanie. Wyłączenie jest odwracalne — pozycje nadal istnieją, tylko nie wliczają się do budżetu. Usuwanie jest trwałe.</Tip>
       </Section>
 
-      {/* Alternatywy */}
       <Section title="Alternatywy cenowe" icon={<AltIcon sx={{ fontSize: 18 }} />}>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.7 }}>
-          Każda pozycja może mieć wiele wariantów cenowych (np. ten sam mebel w różnych sklepach, różne modele AGD). System automatycznie wylicza zakres min–max.
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.8 }}>
+          Kluczowa funkcja aplikacji. Pozwala Ci dodać wiele wariantów cenowych do jednej pozycji — np. ten sam stół w IKEA, Agata Meble i na Allegro. Albo trzy różne modele zmywarki. Aplikacja obliczy wariant najtańszy i najdroższy, co pozwoli Ci zobaczyć „rozpiętość" budżetu.
         </Typography>
-        <Feature label="Dodaj alternatywę" description="Menu ⋮ → 'Alternatywy' lub rozwiń pozycję i kliknij '+' w sekcji ALT." />
-        <Feature label="Ustaw jako MAIN" description="Rozwiń pozycję → kliknij ikonę ⇄ przy alternatywie → staje się nową ceną główną." />
-        <Feature label="Porównuj ceny" description="Strzałki ↑↓ przy alternatywach pokazują czy są droższe/tańsze od MAIN." />
-        <Feature label="Wpływ na scenariusze" description="Alternatywy tworzą rozpiętość min/max widoczną w dashboardzie i top barze." />
-        <Tip>Przy opłacaniu pozycji z alternatywami pojawia się dialog &quot;którą opcję opłaciłeś?&quot; — żeby prawidłowo zaksięgować kwotę.</Tip>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.8 }}>
+          <strong>Jak to działa:</strong> Każda pozycja ma jedną cenę „GŁÓWNĄ" (to Twój aktualny wybór) i dowolną liczbę alternatyw (ALT). Główna jest brana do obliczeń. Alternatywy służą do porównań i scenariuszy.
+        </Typography>
+        <Feature label="Dodaj alternatywę" description="Rozwiń pozycję (strzałka ▶) i dodaj przez menu ⋮ → 'Alternatywy'. Podaj nazwę (np. 'IKEA Kallax'), cenę i opcjonalnie link." />
+        <Feature label="Zamień na główną" description="Ikona ⇄ przy alternatywie. Klik zamienia ją z ceną główną — stara główna staje się alternatywą. Przydatne gdy zdecydujesz się na inną opcję." />
+        <Feature label="Porównanie cenowe" description="Strzałka ↓ (zielona) = tańsze niż główna. Strzałka ↑ (pomarańczowa) = droższe. Linia — = taka sama cena." />
+        <Feature label="Wyłącz alternatywę" description="Ikona $ przy alternatywie. Wyłączona alternatywa nie wlicza się do zakresu min/max. Przydatne gdy odrzuciłeś opcję." />
+        <Feature label="Wpływ na scenariusze" description="Dashboard bierze najtańszą i najdroższą alternatywę (ze wszystkich pozycji) i buduje scenariusze. Więcej alternatyw = lepszy obraz ryzyka." />
+        <Feature label="Opłacanie pozycji z alternatywami" description="Gdy klikniesz 'Opłacone' na pozycji z alternatywami, pojawi się pytanie 'Którą opcję opłaciłeś?'. Wybierz — cena się zaktualizuje i pozycja zostanie zaksięgowana prawidłowo." />
+        <Tip>Każda alternatywa może mieć własne linki i uwagi. Rozwiń pozycję i kliknij ikonę ołówka lub linku przy konkretnej alternatywie.</Tip>
       </Section>
 
-      {/* Top Bar */}
-      <Section title="Pasek budżetu (top bar)" icon={<TrendingDownIcon sx={{ fontSize: 18 }} />}>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.7 }}>
-          Widoczny na stronach kosztowych. Wizualizuje relację między dostępnymi środkami a kosztami:
+      <Section title="Pasek budżetu (widoczny w zakładkach wydatków)" icon={<TrendingDownIcon sx={{ fontSize: 18 }} />}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.8 }}>
+          Na stronach wydatków (Meble, Wykończenie, AGD, Inne, Wyprowadzka) na górze ekranu widzisz poziomy pasek z kolorowymi segmentami i markerami. To wizualne porównanie „ile mam" vs „ile wydaję":
         </Typography>
-        <Feature label="Zielony segment" description="Od 0 do poziomu budżetu — to ile masz pieniędzy." />
-        <Feature label="Czerwone segmenty" description="Koszty wykraczające poza budżet: ciemny = min, średni = plan, jasny = max." />
-        <Feature label="Markery" description="Nad barem: koszt min. i max. Pod barem: plan kosztów i nasz budżet. Najedź żeby zobaczyć kwotę." />
-        <Feature label="Kafelek bilansowy" description="Po prawej: nadwyżka (+) lub niedobór (−) — ile Ci brakuje lub zostaje." />
+        <Feature label="Zielony segment" description="Twoje dostępne środki (budżet). Im dłuższy, tym więcej masz." />
+        <Feature label="Czerwone segmenty" description="Wydatki wykraczające poza budżet. Ciemny czerwony = minimum (gdybyś wszędzie wybrał najtańsze). Średni = obecny plan. Jasny = maksimum (gdybyś wszędzie wybrał najdroższe)." />
+        <Feature label="Markery (kropki nad/pod barem)" description="Najedź na kropkę aby zobaczyć kwotę. Nad barem: koszt minimalny i maksymalny. Pod barem: plan wydatków i Twój budżet." />
+        <Feature label="Kafelek bilansu (po prawej)" description="Zielony z '+' = masz nadwyżkę (więcej niż potrzebujesz). Czerwony z '−' = brakuje Ci pieniędzy." />
       </Section>
 
-      {/* Import / Eksport */}
-      <Section title="Import / Eksport" icon={<DataIcon sx={{ fontSize: 18 }} />}>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.7 }}>
-          Zarządzanie danymi — wczytywanie z pliku Excel, eksportowanie aktualnego stanu, generowanie szablonu.
+      <Section title="Import i eksport danych" icon={<DataIcon sx={{ fontSize: 18 }} />}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.8 }}>
+          Zakładka do zarządzania danymi. Możesz zasilić aplikację danymi z pliku Excel, wyeksportować aktualny stan jako backup, lub pobrać pusty szablon do wypełnienia.
         </Typography>
-        <Feature label="Import" description="Przeciągnij plik .xlsx lub kliknij żeby wybrać. Dane z arkuszy zostają załadowane do aplikacji." />
-        <Feature label="Eksport" description="Pobiera plik .xlsx z WSZYSTKIMI danymi (koszty, saldo, harmonogram, notatki) — kompatybilny z importem." />
-        <Feature label="Szablon" description="Pobiera pusty plik .xlsx ze wszystkimi arkuszami i nagłówkami — gotowy do wypełnienia od zera." />
-        <Feature label="Re-import" description="Ponowny import ZASTĘPUJE istniejące dane. Przed reimportem warto wyeksportować aktualny stan jako backup." />
-        <Tip>Obsługiwane arkusze: Meble, Wykończenie, AGD, Pozostałe, Wyprowadzka, Saldo, Harmonogram, Notatki. Wystarczy jeden — reszta jest opcjonalna.</Tip>
+        <Feature label="Import (przeciągnij plik)" description="Przeciągnij plik .xlsx na strefę lub kliknij aby wybrać z dysku. Aplikacja przeczyta arkusze i załaduje dane. Obsługiwane arkusze: Meble, Wykończenie, AGD, Pozostałe, Wyprowadzka, Saldo, Harmonogram, Milestones, Notatki." />
+        <Feature label="Ponowny import" description="UWAGA: ponowny import ZASTĘPUJE wszystkie obecne dane. Zrób najpierw eksport jako backup!" />
+        <Feature label="Eksport" description="Pobiera plik .xlsx ze WSZYSTKIMI danymi (wydatki, wpływy, harmonogram, alternatywy, linki). Plik jest kompatybilny z importem — możesz go wczytać ponownie." />
+        <Feature label="Szablon" description="Pobiera pusty plik .xlsx ze wszystkimi arkuszami i nagłówkami. Przydatny gdy chcesz zacząć od zera w Excelu i potem zaimportować." />
+        <Feature label="Wyczyść dane" description="Czerwony przycisk na dole strony. Trwale usuwa WSZYSTKIE dane z przeglądarki. Nieodwracalne — pojawia się dialog z potwierdzeniem." />
+        <Tip>Dane przechowywane są w pamięci przeglądarki (localStorage). Wyczyszczenie danych przeglądarki, zmiana profilu lub reinstalacja = utrata danych. Regularnie rób eksporty!</Tip>
       </Section>
 
-      {/* Notatki */}
-      <Section title="Notatki (Sticky Notes)" icon={<NotesIcon sx={{ fontSize: 18 }} />}>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.7 }}>
-          Panel po prawej stronie ekranu — Twoja lista TODO i szybkie notatki, widoczne na każdej stronie:
+      <Section title="Wyłączanie z budżetu i strona 'Pominięte'" icon={<DisableIcon sx={{ fontSize: 18 }} />}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.8 }}>
+          Nie wszystko co zaplanowałeś musisz kupić. Funkcja wyłączania pozwala Ci tymczasowo pominąć pozycje lub całe grupy bez ich usuwania. Wyłączone pozycje przestają wpływać na bilans, ale nadal istnieją w systemie.
         </Typography>
-        <Feature label="Dodawanie" description="Kliknij '+' w nagłówku panelu. Nowa notka pojawia się z autofocusem." />
-        <Feature label="Edycja inline" description="Kliknij w tekst notki i zacznij pisać — bez modali." />
-        <Feature label="Kolory" description="Najedź na notkę → ikona kółka → 6 kolorów do wyboru." />
-        <Feature label="Oznacz jako zrobione" description="Checkbox po lewej — zrobione notatki idą na dół listy (przekreślone)." />
-        <Feature label="Ukryj/Pokaż panel" description="Kliknij 'Notatki' na dole sidebara żeby schować/pokazać panel." />
-        <Tip>Notatki są eksportowane wraz z danymi i przywracane przy imporcie.</Tip>
+        <Feature label="Wyłącz pojedynczą pozycję" description="Ikona $ przy pozycji w tabeli. Klik = wyłączenie. Pozycja się przyciemnia. Ponowny klik = przywrócenie." />
+        <Feature label="Wyłącz całą grupę" description="Menu ⋮ przy grupie → 'Wyłącz grupę'. Wyłącza naraz wszystkie pozycje w grupie." />
+        <Feature label="Strona 'Pominięte'" description="W menu nawigacyjnym, pod kategoriami wydatków. Zbiera wszystkie wyłączone pozycje w jednym miejscu. Widzisz ile łącznie zaoszczędziłeś pomijając te pozycje." />
+        <Feature label="Przywróć do budżetu" description="Na stronie 'Pominięte' przy każdej pozycji jest ikona ⊕. Klik przywraca ją do budżetu." />
+        <Feature label="Wpływ na dashboard" description="Dashboard pokazuje wersję 'razem z pominiętymi' przy każdym widgecie — żebyś widział ile by kosztowało gdybyś nic nie pomijał." />
+        <Tip>Wyłączanie jest w 100% odwracalne. To nie jest usuwanie — dane pozostają. Używaj do tymczasowego ukrywania opcjonalnych zakupów, np. 'jeśli starczy budżetu to wrócimy do tego'.</Tip>
       </Section>
 
-      {/* Wygaszanie */}
-      <Section title="Wygaszanie (wyłączanie z budżetu)" icon={<DisableIcon sx={{ fontSize: 18 }} />}>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.7 }}>
-          Dwa poziomy wygaszania — możesz wyłączyć z budżetu pojedyncze pozycje lub całe grupy:
-        </Typography>
-        <Feature label="Pozycja → ikona $" description="Kliknij $ przy pozycji — staje się przygaszona i nie wlicza się do kosztów." />
-        <Feature label="Grupa → menu ⋮ → Wygaś" description="Wygasza WSZYSTKIE pozycje w grupie naraz. Grupa jest wizualnie przygaszona." />
-        <Feature label="Ponowne włączenie" description="Kliknij ponownie $ lub wybierz 'Włącz grupę' z menu ⋮." />
-        <Tip>Wygaszanie jest odwracalne — nic nie jest usuwane. Przydatne do tymczasowego wykluczania opcjonalnych wydatków z analiz.</Tip>
-      </Section>
-
-      {/* Pominięte */}
-      <Section title="Pominięte" icon={<DisableIcon sx={{ fontSize: 18 }} />}>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.7 }}>
-          Strona zbierająca wszystkie pozycje wykluczone z budżetu — w jednym miejscu widzisz co pominąłeś i ile zaoszczędziłeś.
-        </Typography>
-        <Feature label="Lista wyklucz. pozycji" description="Tabela pogrupowana wg kategorii (Meblowanie, Wykończenie, AGD...) z grupą, nazwą i kwotą." />
-        <Feature label="Kafelek 'Zaoszczędzone'" description="Suma wszystkich pominiętych pozycji — ile nie wydasz." />
-        <Feature label="Przywróć do budżetu" description="Ikonka ⊕ przy każdej pozycji — klik przywraca ją do budżetu (included = true)." />
-        <Tip>Pominięte pozycje nie znikają z systemu — zawsze możesz je przywrócić jednym kliknięciem.</Tip>
-      </Section>
-
-      {/* Skróty */}
       <Section title="Skróty i wskazówki" icon={<MoneyIcon sx={{ fontSize: 18 }} />}>
-        <Feature label="Logo → Podsumowanie" description="Kliknij 'Budget' w sidebarze żeby wrócić na stronę główną." />
-        <Feature label="Motywy" description="Paleta kolorów na dole sidebara — 4 motywy: Ciemny, Stonowany, Jasny, Unicorn 🦄" />
-        <Feature label="Status jednym kliknięciem" description="Kliknij chip statusu ('Do zapłaty' / 'Opłacone') żeby przełączyć." />
-        <Feature label="Ikona ? przy tytule" description="Na stronach kosztowych — najedź żeby zobaczyć do czego służy dana zakładka." />
-        <Feature label="Dane lokalne" description="Wszystko jest w localStorage przeglądarki. Wyczyszczenie danych przeglądarki = utrata danych. Rób eksport jako backup!" />
-        <Feature label="Changelog" description="Strona w menu 'Ustawienia' — pełna historia zmian i nowych funkcji w każdej wersji." />
+        <Feature label="Logo → Podsumowanie" description="Kliknij logo 'Budget' w pasku bocznym aby wrócić na stronę główną (dashboard)." />
+        <Feature label="Motywy kolorystyczne" description="Paleta kolorów na dole paska bocznego. 4 motywy: Ciemny, Stonowany, Jasny, Unicorn 🦄. Wybór jest zapisywany między sesjami." />
+        <Feature label="Status jednym kliknięciem" description="Kliknij chip 'Do zapłaty' / 'Opłacone' bezpośrednio w tabeli aby przełączyć. Nie musisz otwierać modala edycji." />
+        <Feature label="Ikona ? przy tytule" description="Na stronach wydatków przy podtytule jest ikona znaku zapytania. Najedź aby zobaczyć krótki opis do czego służy dana zakładka." />
+        <Feature label="Notyfikacje" description="Po każdej akcji (dodanie, edycja, usunięcie) w prawym górnym rogu pojawia się krótki toast z potwierdzeniem. Znika po 5 sekundach." />
+        <Feature label="Linki do sklepów" description="Każda pozycja i alternatywa może mieć linki URL (np. do produktu w sklepie). Dodaj przez menu ⋮ → Linki lub rozwiń pozycję i kliknij ikonę linku." />
+        <Feature label="PWA (instalacja)" description="Aplikacja jest instalowalna jako PWA. W przeglądarce kliknij 'Zainstaluj' lub 'Dodaj do ekranu głównego'. Działa jak osobna apka." />
       </Section>
     </Box>
   );
