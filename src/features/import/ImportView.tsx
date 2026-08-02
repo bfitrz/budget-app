@@ -14,6 +14,7 @@ import {
 } from '@mui/icons-material';
 import { useBudgetStore } from '@/store';
 import { useNotesStore } from '@/store/notesStore';
+import { useCloudSync } from '@/hooks/useCloudSync';
 import { importExcelFile, exportToExcel, exportTemplate, clearLocalStorage } from '@/utils';
 import { exportToExcelBuffer } from '@/utils/excelExport';
 import { importExcelBuffer } from '@/utils/excelImport';
@@ -33,6 +34,7 @@ export function ImportView() {
   const [snackbar, setSnackbar] = useState<{ open: boolean; type: 'success' | 'error'; text: string }>({ open: false, type: 'success', text: '' });
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
   const [backupReminder, setBackupReminder] = useState(false);
+  const { lastEditor } = useCloudSync();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Cloud state
@@ -96,7 +98,7 @@ export function ImportView() {
         setCloudLoading(true);
         const gProvider = new GoogleDriveProvider();
         await gProvider.authenticate();
-        saveStorageConfig({ provider: 'google-drive', filePath: null, autoSync: true, syncInterval: 30000, lastSync: null });
+        saveStorageConfig({ provider: 'google-drive', filePath: null, autoSync: true, syncInterval: 30000, pollInterval: 30000, lastSync: null });
         const files = await gProvider.listFiles();
         setCloudFiles(files);
         setFilePickerOpen(true);
@@ -212,7 +214,7 @@ export function ImportView() {
 
   const handleSwitchProvider = (provider: 'dropbox' | 'google' | 'local') => {
     if (provider === 'local') {
-      saveStorageConfig({ provider: 'local', filePath: null, autoSync: false, syncInterval: 0, lastSync: null });
+      saveStorageConfig({ provider: 'local', filePath: null, autoSync: false, syncInterval: 0, pollInterval: 30000, lastSync: null });
       window.location.reload();
     } else {
       handleConnect(provider);
@@ -293,6 +295,7 @@ export function ImportView() {
               {config.lastSync && (
                 <Typography variant="caption" color="text.secondary">
                   Ostatnia sync: {new Date(config.lastSync).toLocaleString('pl-PL')}
+                  {lastEditor && <> · Ostatnio edytował: <strong>{lastEditor}</strong></>}
                 </Typography>
               )}
             </Box>
@@ -320,6 +323,23 @@ export function ImportView() {
                   <Typography variant="caption" color="text.secondary" sx={{ minWidth: 30 }}>{config.syncInterval / 1000}s</Typography>
                 </Box>
               )}
+            </Box>
+          )}
+
+          {/* Poll interval */}
+          {isCloud && config && (
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', mb: 2.5 }}>
+              <Typography variant="body2" sx={{ fontSize: '0.8rem', minWidth: 140 }}>Sprawdzaj zmiany co:</Typography>
+              <Slider
+                value={(config.pollInterval || 30000) / 1000}
+                onChange={(_, val) => updateConfig({ pollInterval: (val as number) * 1000 })}
+                min={10} max={120} step={10}
+                valueLabelDisplay="auto"
+                valueLabelFormat={(v) => `${v}s`}
+                size="small"
+                sx={{ flex: 1, minWidth: 100 }}
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ minWidth: 30 }}>{(config.pollInterval || 30000) / 1000}s</Typography>
             </Box>
           )}
 

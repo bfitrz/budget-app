@@ -20,6 +20,7 @@ export function useCloudSync() {
   const lastSyncRef = useRef<string | null>(config?.lastSync || null);
   const lastKnownModifiedRef = useRef<string | null>(null);
   const [remoteChanged, setRemoteChanged] = useState(false);
+  const [lastEditor, setLastEditor] = useState<string | null>(null);
 
   const getProvider = useCallback(() => {
     if (!config) return null;
@@ -99,16 +100,22 @@ export function useCloudSync() {
       // Only Google Drive for now — check modifiedTime
       if (config.provider === 'google-drive') {
         const response = await fetch(
-          `https://www.googleapis.com/drive/v3/files/${config.filePath}?fields=modifiedTime`,
+          `https://www.googleapis.com/drive/v3/files/${config.filePath}?fields=modifiedTime,lastModifyingUser`,
           { headers: { Authorization: `Bearer ${localStorage.getItem('budget-app-gdrive-token')}` } }
         );
         if (!response.ok) return;
         const data = await response.json();
         const remoteModified = data.modifiedTime;
 
+        // Track last editor
+        if (data.lastModifyingUser) {
+          setLastEditor(data.lastModifyingUser.displayName || data.lastModifyingUser.emailAddress || null);
+        }
+
         if (lastKnownModifiedRef.current && remoteModified > lastKnownModifiedRef.current) {
           setRemoteChanged(true);
-          notify.info('Plik został zmieniony przez inną osobę');
+          const editorName = data.lastModifyingUser?.displayName || 'inna osoba';
+          notify.info(`Plik zmieniony przez: ${editorName}`);
         }
         if (!lastKnownModifiedRef.current) {
           lastKnownModifiedRef.current = remoteModified;
@@ -133,16 +140,17 @@ export function useCloudSync() {
     };
   }, [isCloud, config?.autoSync, scheduleSyncToCloud]);
 
-  // Poll for remote changes every 30s
+  // Poll for remote changes
   useEffect(() => {
     if (!isCloud || !config?.filePath) return;
 
     // Initial check
     checkForRemoteChanges();
 
-    const pollInterval = setInterval(checkForRemoteChanges, 30000);
+    const interval = config.pollInterval || 30000;
+    const pollInterval = setInterval(checkForRemoteChanges, interval);
     return () => clearInterval(pollInterval);
-  }, [isCloud, config?.filePath, checkForRemoteChanges]);
+  }, [isCloud, config?.filePath, config?.pollInterval, checkForRemoteChanges]);
 
   return {
     isCloud,
@@ -151,6 +159,7 @@ export function useCloudSync() {
     lastSync: lastSyncRef.current,
     isSyncing,
     remoteChanged,
+    lastEditor,
     dismissRemoteChanged: () => setRemoteChanged(false),
   };
 }
