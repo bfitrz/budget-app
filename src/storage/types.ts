@@ -30,6 +30,7 @@ export interface StorageConfig {
   provider: 'local' | 'dropbox' | 'google-drive';
   filePath: string | null;
   autoSync: boolean;
+  autoPoll: boolean;
   syncInterval: number; // ms — auto-save interval
   pollInterval: number; // ms — check for remote changes interval
   lastSync: string | null; // ISO date

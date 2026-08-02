@@ -98,7 +98,7 @@ export function ImportView() {
         setCloudLoading(true);
         const gProvider = new GoogleDriveProvider();
         await gProvider.authenticate();
-        saveStorageConfig({ provider: 'google-drive', filePath: null, autoSync: true, syncInterval: 30000, pollInterval: 30000, lastSync: null });
+        saveStorageConfig({ provider: 'google-drive', filePath: null, autoSync: true, syncInterval: 30000, autoPoll: true, pollInterval: 30000, lastSync: null });
         const files = await gProvider.listFiles();
         setCloudFiles(files);
         setFilePickerOpen(true);
@@ -214,7 +214,7 @@ export function ImportView() {
 
   const handleSwitchProvider = (provider: 'dropbox' | 'google' | 'local') => {
     if (provider === 'local') {
-      saveStorageConfig({ provider: 'local', filePath: null, autoSync: false, syncInterval: 0, pollInterval: 30000, lastSync: null });
+      saveStorageConfig({ provider: 'local', filePath: null, autoSync: false, syncInterval: 0, autoPoll: true, pollInterval: 30000, lastSync: null });
       window.location.reload();
     } else {
       handleConnect(provider);
@@ -329,17 +329,25 @@ export function ImportView() {
           {/* Poll interval */}
           {isCloud && config && (
             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', mb: 2.5 }}>
-              <Typography variant="body2" sx={{ fontSize: '0.8rem', minWidth: 140 }}>Sprawdzaj zmiany co:</Typography>
-              <Slider
-                value={(config.pollInterval || 30000) / 1000}
-                onChange={(_, val) => updateConfig({ pollInterval: (val as number) * 1000 })}
-                min={10} max={120} step={10}
-                valueLabelDisplay="auto"
-                valueLabelFormat={(v) => `${v}s`}
-                size="small"
-                sx={{ flex: 1, minWidth: 100 }}
+              <FormControlLabel
+                control={<Switch size="small" checked={config.autoPoll !== false} onChange={(e) => updateConfig({ autoPoll: e.target.checked })} />}
+                label={<Typography variant="body2" sx={{ fontSize: '0.8rem' }}>Sprawdzaj zmiany</Typography>}
               />
-              <Typography variant="caption" color="text.secondary" sx={{ minWidth: 30 }}>{(config.pollInterval || 30000) / 1000}s</Typography>
+              {config.autoPoll !== false && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1, minWidth: 150 }}>
+                  <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>Co:</Typography>
+                  <Slider
+                    value={(config.pollInterval || 30000) / 1000}
+                    onChange={(_, val) => updateConfig({ pollInterval: (val as number) * 1000 })}
+                    min={10} max={120} step={10}
+                    valueLabelDisplay="auto"
+                    valueLabelFormat={(v) => `${v}s`}
+                    size="small"
+                    sx={{ flex: 1, minWidth: 100 }}
+                  />
+                  <Typography variant="caption" color="text.secondary" sx={{ minWidth: 30 }}>{(config.pollInterval || 30000) / 1000}s</Typography>
+                </Box>
+              )}
             </Box>
           )}
 

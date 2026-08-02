@@ -89,7 +89,7 @@ export function useCloudSync() {
 
   // Poll for remote changes
   useEffect(() => {
-    if (!isCloud || !config?.filePath) return;
+    if (!isCloud || !config?.filePath || config?.autoPoll === false) return;
 
     const token = localStorage.getItem('budget-app-gdrive-token');
     if (!token) return;

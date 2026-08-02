@@ -60,7 +60,7 @@ function App() {
         try {
           const provider = new DropboxProvider();
           await provider.handleCallback(dropboxCode);
-          saveStorageConfig({ provider: 'dropbox', filePath: null, autoSync: true, syncInterval: 30000, pollInterval: 30000, lastSync: null });
+          saveStorageConfig({ provider: 'dropbox', filePath: null, autoSync: true, syncInterval: 30000, autoPoll: true, pollInterval: 30000, lastSync: null });
           setStorageReady(true);
           setConnectedProvider('dropbox');
           const files = await provider.listFiles();
@@ -74,7 +74,7 @@ function App() {
   }, []);
 
   const handleSelectLocal = () => {
-    saveStorageConfig({ provider: 'local', filePath: null, autoSync: false, syncInterval: 0, pollInterval: 30000, lastSync: null });
+    saveStorageConfig({ provider: 'local', filePath: null, autoSync: false, syncInterval: 0, autoPoll: true, pollInterval: 30000, lastSync: null });
     setStorageReady(true);
   };
 
@@ -93,7 +93,7 @@ function App() {
       const provider = new GoogleDriveProvider();
       await provider.authenticate(); // Opens popup (GIS)
       // After popup closes, we have token
-      saveStorageConfig({ provider: 'google-drive', filePath: null, autoSync: true, syncInterval: 30000, pollInterval: 30000, lastSync: null });
+      saveStorageConfig({ provider: 'google-drive', filePath: null, autoSync: true, syncInterval: 30000, autoPoll: true, pollInterval: 30000, lastSync: null });
       setStorageReady(true);
       setConnectedProvider('google-drive');
       const files = await provider.listFiles();
@@ -107,7 +107,7 @@ function App() {
 
   const handlePickFile = (path: string) => {
     const provider = connectedProvider || 'dropbox';
-    saveStorageConfig({ provider, filePath: path, autoSync: true, syncInterval: 30000, pollInterval: 30000, lastSync: null });
+    saveStorageConfig({ provider, filePath: path, autoSync: true, syncInterval: 30000, autoPoll: true, pollInterval: 30000, lastSync: null });
     // TODO: load file content and import into store
     setStorageReady(true);
   };
@@ -115,7 +115,7 @@ function App() {
   const handleCreateNewFile = () => {
     const provider = connectedProvider || 'dropbox';
     const path = provider === 'dropbox' ? '/Budget.xlsx' : 'new';
-    saveStorageConfig({ provider, filePath: path, autoSync: true, syncInterval: 30000, pollInterval: 30000, lastSync: null });
+    saveStorageConfig({ provider, filePath: path, autoSync: true, syncInterval: 30000, autoPoll: true, pollInterval: 30000, lastSync: null });
     setStorageReady(true);
   };
 
