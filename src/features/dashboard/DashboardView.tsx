@@ -113,7 +113,13 @@ export function DashboardView() {
           />
         </Grid>
         <Grid item xs={12} sm={6} lg={3}>
-          <KPICard label="Do opłacenia" value={summary.pozostaloDoZaplaty} variant="warning" icon={<WarningIcon sx={{ fontSize: 16 }} />} />
+          <KPICard
+            label="Do opłacenia"
+            value={summary.pozostaloDoZaplaty}
+            variant="warning"
+            subtitle={excludedTotal > 0 ? `+ ${formatCurrency(excludedTotal)} pominięte` : undefined}
+            icon={<WarningIcon sx={{ fontSize: 16 }} />}
+          />
         </Grid>
       </Grid>
 

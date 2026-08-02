@@ -311,6 +311,11 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                     {totalIncluded > 0 ? `${Math.round((paidTotal / totalIncluded) * 100)}%` : '0%'}
                   </Typography>
                 </Box>
+                {hiddenCount > 0 && (
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5, fontSize: '0.55rem' }}>
+                    + {formatCurrency(items.filter(i => !i.included).reduce((s, i) => s + getCost(i), 0))} pominięte ({hiddenCount} poz.)
+                  </Typography>
+                )}
               </CardContent>
             </Card>
 
