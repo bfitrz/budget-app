@@ -16,6 +16,18 @@ interface ChangeEntry {
 
 const changelog: ChangeEntry[] = [
   {
+    version: '1.9.0',
+    date: '2026-08-02',
+    changes: [
+      { type: 'feat', text: 'Kompletna analiza UX Writing — dokument referencyjny ze wszystkimi tekstami UI' },
+      { type: 'feat', text: 'Przepisany przewodnik w stylu dokumentacji SaaS' },
+      { type: 'feat', text: 'Przepisany changelog językiem użytkownika (styl Linear/Notion)' },
+      { type: 'feat', text: 'Lista 15 problemów UX z priorytetami i rekomendacjami napraw' },
+      { type: 'style', text: 'Ujednolicona terminologia: „Dostępne środki", „Do zapłaty", „Opłacone"' },
+      { type: 'fix', text: 'Poprawka gramatyczna „z pominięte" → „razem z pominiętymi" (dokumentacja)' },
+    ],
+  },
+  {
     version: '1.8.0',
     date: '2026-08-02',
     changes: [
