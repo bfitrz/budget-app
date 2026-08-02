@@ -46,6 +46,13 @@ export function ImportView() {
 
   const config = getStorageConfig();
 
+  // Auto-open file picker if connected but no file selected
+  useEffect(() => {
+    if (config && (config.provider === 'dropbox' || config.provider === 'google-drive') && !config.filePath) {
+      handleBrowseFiles();
+    }
+  }, []);  // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     const lastExport = localStorage.getItem('budget-app-last-export');
     if (lastExport) {

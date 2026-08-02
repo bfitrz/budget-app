@@ -52,22 +52,22 @@ function App() {
   const [cloudFiles, setCloudFiles] = useState<StorageFile[]>([]);
   const [connectedProvider, setConnectedProvider] = useState<'dropbox' | 'google-drive' | null>(null);
 
-  // Handle OAuth callbacks on mount
+  // Handle OAuth callbacks on mount — always, regardless of storageReady
   useEffect(() => {
     const handleOAuthCallback = async () => {
       const dropboxCode = checkDropboxCallback();
       if (dropboxCode) {
         try {
-          setStorageLoading(true);
           const provider = new DropboxProvider();
           await provider.handleCallback(dropboxCode);
+          // Save config and reload
+          saveStorageConfig({ provider: 'dropbox', filePath: null, autoSync: true, syncInterval: 30000, lastSync: null });
+          setStorageReady(true);
           setConnectedProvider('dropbox');
           const files = await provider.listFiles();
           setCloudFiles(files);
         } catch (err) {
           setStorageError(err instanceof Error ? err.message : 'Błąd autoryzacji Dropbox');
-        } finally {
-          setStorageLoading(false);
         }
         return;
       }
@@ -75,16 +75,18 @@ function App() {
       const googleCode = checkGoogleDriveCallback();
       if (googleCode) {
         try {
-          setStorageLoading(true);
           const provider = new GoogleDriveProvider();
           await provider.handleCallback(googleCode);
+          // Save config — user needs to pick/create file next
+          saveStorageConfig({ provider: 'google-drive', filePath: null, autoSync: true, syncInterval: 30000, lastSync: null });
+          setStorageReady(true);
           setConnectedProvider('google-drive');
+          // Navigate to import page for file picker
+          window.location.hash = '#/import';
           const files = await provider.listFiles();
           setCloudFiles(files);
         } catch (err) {
           setStorageError(err instanceof Error ? err.message : 'Błąd autoryzacji Google');
-        } finally {
-          setStorageLoading(false);
         }
         return;
       }
