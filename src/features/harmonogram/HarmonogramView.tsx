@@ -331,6 +331,7 @@ export function HarmonogramView() {
                     const dateStr = label as string;
                     const wplywyDoTeraz = saldo - summary.aktualnieSrodki;
                     const brakuje = cel - saldo;
+                    const brakujeFull = celFull - saldo;
                     return (
                       <Box sx={{ p: 1.5, backgroundColor: theme.palette.background.paper, border: `1px solid ${theme.palette.divider}`, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column', gap: 0.5, maxWidth: 300 }}>
                         <Typography variant="caption" sx={{ fontWeight: 700 }}>{formatDate(dateStr)}</Typography>
@@ -339,10 +340,17 @@ export function HarmonogramView() {
                         <Typography variant="caption" sx={{ display: 'block', fontWeight: 600 }}>Prognoza środków: {formatCurrency(saldo)}</Typography>
                         <Box sx={{ borderTop: `1px solid ${alpha(theme.palette.divider, 0.3)}`, mt: 0.5, pt: 0.5 }}>
                           <Typography variant="caption" sx={{ display: 'block' }}>Cel (do zapłaty): {formatCurrency(cel)}</Typography>
-                          {celFull > cel && <Typography variant="caption" sx={{ display: 'block' }}>Cel z pominięte: {formatCurrency(celFull)}</Typography>}
                           <Typography variant="caption" sx={{ display: 'block', fontWeight: 700, color: brakuje <= 0 ? theme.palette.success.main : theme.palette.error.main }}>
                             {brakuje <= 0 ? `Nadwyżka: +${formatCurrency(Math.abs(brakuje))}` : `Brakuje: -${formatCurrency(brakuje)}`}
                           </Typography>
+                          {celFull > cel && (
+                            <Box sx={{ mt: 0.5, pt: 0.5, borderTop: `1px dashed ${alpha(theme.palette.divider, 0.2)}` }}>
+                              <Typography variant="caption" sx={{ display: 'block', fontSize: '0.6rem', color: 'text.secondary' }}>z pominięte: {formatCurrency(celFull)}</Typography>
+                              <Typography variant="caption" sx={{ display: 'block', fontSize: '0.6rem', color: brakujeFull <= 0 ? theme.palette.success.main : theme.palette.error.main }}>
+                                {brakujeFull <= 0 ? `nadwyżka: +${formatCurrency(Math.abs(brakujeFull))}` : `brakuje: -${formatCurrency(brakujeFull)}`}
+                              </Typography>
+                            </Box>
+                          )}
                         </Box>
                       </Box>
                     );
