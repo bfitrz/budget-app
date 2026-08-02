@@ -77,11 +77,11 @@ export function HarmonogramView() {
   const wyprowadzka = useBudgetStore((s) => s.wyprowadzka);
 
   const excludedTotal =
-    meble.filter(i => !i.included).reduce((s, i) => s + i.cena, 0) +
-    wykonczenie.filter(i => !i.included).reduce((s, i) => s + i.kwota, 0) +
-    agd.filter(i => !i.included).reduce((s, i) => s + i.cena, 0) +
-    pozostale.filter(i => !i.included).reduce((s, i) => s + i.cena, 0) +
-    wyprowadzka.filter(i => !i.included).reduce((s, i) => s + i.cena, 0);
+    meble.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.cena, 0) +
+    wykonczenie.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.kwota, 0) +
+    agd.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.cena, 0) +
+    pozostale.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.cena, 0) +
+    wyprowadzka.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.cena, 0);
   const addMilestone = useBudgetStore((s) => s.addMilestone);
   const deleteMilestone = useBudgetStore((s) => s.deleteMilestone);
 
@@ -136,11 +136,11 @@ export function HarmonogramView() {
   // Calculate cel (costs to cover) at a given date - respects dataRealizacji
   const getCelAtDate = (date: string): number => {
     const allItems = [
-      ...meble.filter(i => i.included && i.status !== 'Opłacone').map(i => ({ kwota: i.cena, dataRealizacji: i.dataRealizacji || '' })),
-      ...wykonczenie.filter(i => i.included && i.status !== 'Opłacone').map(i => ({ kwota: i.kwota, dataRealizacji: i.dataRealizacji || '' })),
-      ...agd.filter(i => i.included && i.status !== 'Opłacone').map(i => ({ kwota: i.cena, dataRealizacji: i.dataRealizacji || '' })),
-      ...pozostale.filter(i => i.included && i.status !== 'Opłacone').map(i => ({ kwota: i.cena, dataRealizacji: i.dataRealizacji || '' })),
-      ...wyprowadzka.filter(i => i.included && i.status !== 'Opłacone').map(i => ({ kwota: i.cena, dataRealizacji: i.dataRealizacji || '' })),
+      ...meble.filter(i => i.status === 'Do zapłaty').map(i => ({ kwota: i.cena, dataRealizacji: i.dataRealizacji || '' })),
+      ...wykonczenie.filter(i => i.status === 'Do zapłaty').map(i => ({ kwota: i.kwota, dataRealizacji: i.dataRealizacji || '' })),
+      ...agd.filter(i => i.status === 'Do zapłaty').map(i => ({ kwota: i.cena, dataRealizacji: i.dataRealizacji || '' })),
+      ...pozostale.filter(i => i.status === 'Do zapłaty').map(i => ({ kwota: i.cena, dataRealizacji: i.dataRealizacji || '' })),
+      ...wyprowadzka.filter(i => i.status === 'Do zapłaty').map(i => ({ kwota: i.cena, dataRealizacji: i.dataRealizacji || '' })),
     ];
     let cel = 0;
     for (const item of allItems) {

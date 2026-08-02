@@ -47,11 +47,11 @@ export function DashboardView() {
 
   // Wygaszone (excluded) totals
   const excludedTotal = 
-    meble.filter(i => !i.included).reduce((s, i) => s + i.cena, 0) +
-    wykonczenie.filter(i => !i.included).reduce((s, i) => s + i.kwota, 0) +
-    agd.filter(i => !i.included).reduce((s, i) => s + i.cena, 0) +
-    pozostale.filter(i => !i.included).reduce((s, i) => s + i.cena, 0) +
-    wyprowadzka.filter(i => !i.included).reduce((s, i) => s + i.cena, 0);
+    meble.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.cena, 0) +
+    wykonczenie.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.kwota, 0) +
+    agd.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.cena, 0) +
+    pozostale.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.cena, 0) +
+    wyprowadzka.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.cena, 0);
   const totalWithExcluded = summary.lacznyKoszt + excludedTotal;
 
   // Dane do wykresu scenariuszy (min/main/max)
@@ -80,11 +80,11 @@ export function DashboardView() {
 
   // Excluded per category
   const excludedPerCategory: Record<string, number> = {
-    'Meblowanie': meble.filter(i => !i.included).reduce((s, i) => s + i.cena, 0),
-    'Wykończenie': wykonczenie.filter(i => !i.included).reduce((s, i) => s + i.kwota, 0),
-    'AGD / RTV': agd.filter(i => !i.included).reduce((s, i) => s + i.cena, 0),
-    'Inne': pozostale.filter(i => !i.included).reduce((s, i) => s + i.cena, 0),
-    'Wyprowadzka': wyprowadzka.filter(i => !i.included).reduce((s, i) => s + i.cena, 0),
+    'Meblowanie': meble.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.cena, 0),
+    'Wykończenie': wykonczenie.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.kwota, 0),
+    'AGD / RTV': agd.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.cena, 0),
+    'Inne': pozostale.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.cena, 0),
+    'Wyprowadzka': wyprowadzka.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.cena, 0),
   };
 
   return (

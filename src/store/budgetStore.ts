@@ -22,11 +22,13 @@ import { notify } from './notificationStore';
 // Generates a descriptive notification based on what was updated
 function describeUpdate(updates: Record<string, unknown>): string {
   const keys = Object.keys(updates);
+  if (keys.includes('status')) {
+    if (updates.status === 'Opłacone') return 'Oznaczono jako opłacone';
+    if (updates.status === 'Pominięte') return 'Wyłączono z budżetu';
+    if (updates.status === 'Do zapłaty') return 'Oznaczono jako do zapłaty';
+  }
   if (keys.includes('included')) {
     return updates.included ? 'Przywrócono do budżetu' : 'Wyłączono z budżetu';
-  }
-  if (keys.includes('status')) {
-    return updates.status === 'Opłacone' ? 'Oznaczono jako opłacone' : 'Oznaczono jako do zapłaty';
   }
   if (keys.includes('alternatywy') && keys.length === 1) {
     return 'Alternatywy zaktualizowane';
@@ -144,6 +146,9 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       wybranaAltId: (item.wybranaAltId as string) || null,
       uwagiMain: (item.uwagiMain as string) || '',
       dataRealizacji: (item.dataRealizacji as string) || '',
+      // Migrate: if included===false, set status to 'Pominięte'
+      ...( item.included === false && item.status !== 'Pominięte' ? { status: 'Pominięte' as const } : {}),
+      included: item.included !== false,
     });
     const meble = (loaded.meble || []).map((item) => ({ ...item, ...migrateItem(item as unknown as Record<string, unknown>) }));
     const wykonczenie = (loaded.wykonczenie || []).map((item) => ({ ...item, ...migrateItem(item as unknown as Record<string, unknown>) }));
@@ -452,18 +457,18 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       // Wpływy = suma wszystkich wpisów w saldzie (pieniądze, które wpłynęły na budżet)
       const wplywy = state.saldo.reduce((sum, entry) => sum + entry.kwota, 0);
 
-      const mebleKoszt = state.meble.filter((i) => i.included).reduce((sum, i) => sum + i.cena, 0);
-      const wykonczenieKoszt = state.wykonczenie.filter((i) => i.included).reduce((sum, i) => sum + i.kwota, 0);
-      const agdKoszt = state.agd.filter((i) => i.included).reduce((sum, i) => sum + i.cena, 0);
-      const pozostaleKoszt = state.pozostale.filter((i) => i.included).reduce((sum, i) => sum + i.cena, 0);
-      const wyprowadzkaKoszt = state.wyprowadzka.filter((i) => i.included).reduce((sum, i) => sum + i.cena, 0);
+      const mebleKoszt = state.meble.filter((i) => i.status !== 'Pominięte').reduce((sum, i) => sum + i.cena, 0);
+      const wykonczenieKoszt = state.wykonczenie.filter((i) => i.status !== 'Pominięte').reduce((sum, i) => sum + i.kwota, 0);
+      const agdKoszt = state.agd.filter((i) => i.status !== 'Pominięte').reduce((sum, i) => sum + i.cena, 0);
+      const pozostaleKoszt = state.pozostale.filter((i) => i.status !== 'Pominięte').reduce((sum, i) => sum + i.cena, 0);
+      const wyprowadzkaKoszt = state.wyprowadzka.filter((i) => i.status !== 'Pominięte').reduce((sum, i) => sum + i.cena, 0);
       const lacznyKoszt = mebleKoszt + wykonczenieKoszt + agdKoszt + pozostaleKoszt + wyprowadzkaKoszt;
 
-      const mebleZaplacono = state.meble.filter((i) => i.included && i.status === 'Opłacone').reduce((sum, i) => sum + i.cena, 0);
-      const wykonczenieZaplacono = state.wykonczenie.filter((i) => i.included && i.status === 'Opłacone').reduce((sum, i) => sum + i.kwota, 0);
-      const agdZaplacono = state.agd.filter((i) => i.included && i.status === 'Opłacone').reduce((sum, i) => sum + i.cena, 0);
-      const pozostaleZaplacono = state.pozostale.filter((i) => i.included && i.status === 'Opłacone').reduce((sum, i) => sum + i.cena, 0);
-      const wyprowadzkaZaplacono = state.wyprowadzka.filter((i) => i.included && i.status === 'Opłacone').reduce((sum, i) => sum + i.cena, 0);
+      const mebleZaplacono = state.meble.filter((i) => i.status === 'Opłacone').reduce((sum, i) => sum + i.cena, 0);
+      const wykonczenieZaplacono = state.wykonczenie.filter((i) => i.status === 'Opłacone').reduce((sum, i) => sum + i.kwota, 0);
+      const agdZaplacono = state.agd.filter((i) => i.status === 'Opłacone').reduce((sum, i) => sum + i.cena, 0);
+      const pozostaleZaplacono = state.pozostale.filter((i) => i.status === 'Opłacone').reduce((sum, i) => sum + i.cena, 0);
+      const wyprowadzkaZaplacono = state.wyprowadzka.filter((i) => i.status === 'Opłacone').reduce((sum, i) => sum + i.cena, 0);
       const zaplacono = mebleZaplacono + wykonczenieZaplacono + agdZaplacono + pozostaleZaplacono + wyprowadzkaZaplacono;
 
       // Aktualne środki = wpływy - to co już zapłacono (pieniądze wyszły z konta)
@@ -480,11 +485,11 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
     getCategoryCosts: (): CategoryCost[] => {
       const state = get();
       const categories: CategoryCost[] = [
-        { name: 'Meblowanie', value: state.meble.filter((i) => i.included).reduce((sum, i) => sum + i.cena, 0) },
-        { name: 'Wykończenie', value: state.wykonczenie.filter((i) => i.included).reduce((sum, i) => sum + i.kwota, 0) },
-        { name: 'AGD / RTV', value: state.agd.filter((i) => i.included).reduce((sum, i) => sum + i.cena, 0) },
-        { name: 'Inne', value: state.pozostale.filter((i) => i.included).reduce((sum, i) => sum + i.cena, 0) },
-        { name: 'Wyprowadzka', value: state.wyprowadzka.filter((i) => i.included).reduce((sum, i) => sum + i.cena, 0) },
+        { name: 'Meblowanie', value: state.meble.filter((i) => i.status !== 'Pominięte').reduce((sum, i) => sum + i.cena, 0) },
+        { name: 'Wykończenie', value: state.wykonczenie.filter((i) => i.status !== 'Pominięte').reduce((sum, i) => sum + i.kwota, 0) },
+        { name: 'AGD / RTV', value: state.agd.filter((i) => i.status !== 'Pominięte').reduce((sum, i) => sum + i.cena, 0) },
+        { name: 'Inne', value: state.pozostale.filter((i) => i.status !== 'Pominięte').reduce((sum, i) => sum + i.cena, 0) },
+        { name: 'Wyprowadzka', value: state.wyprowadzka.filter((i) => i.status !== 'Pominięte').reduce((sum, i) => sum + i.cena, 0) },
       ];
       return categories.filter((c) => c.value > 0);
     },
@@ -493,10 +498,10 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       const state = get();
 
       // Helper: get min and max possible cost for items with alternatives
-      const getRange = (items: Array<{ included: boolean; cena?: number; kwota?: number; alternatywy: Array<{ cena: number }> }>, field: 'cena' | 'kwota') => {
+      const getRange = (items: Array<{ included: boolean; status: string; cena?: number; kwota?: number; alternatywy: Array<{ cena: number }> }>, field: 'cena' | 'kwota') => {
         let minTotal = 0;
         let maxTotal = 0;
-        for (const item of items.filter((i) => i.included)) {
+        for (const item of items.filter((i) => i.status !== 'Pominięte')) {
           const baseCost = field === 'cena' ? (item.cena || 0) : (item.kwota || 0);
           const allPrices = [baseCost, ...item.alternatywy.map((a) => a.cena)];
           minTotal += Math.min(...allPrices);
@@ -514,36 +519,36 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       return [
         {
           name: 'Meblowanie',
-          zaplacono: state.meble.filter((i) => i.included && i.status === 'Opłacone').reduce((s, i) => s + i.cena, 0),
-          doZaplaty: state.meble.filter((i) => i.included && i.status === 'Do zapłaty').reduce((s, i) => s + i.cena, 0),
+          zaplacono: state.meble.filter((i) => i.status === 'Opłacone').reduce((s, i) => s + i.cena, 0),
+          doZaplaty: state.meble.filter((i) => i.status === 'Do zapłaty').reduce((s, i) => s + i.cena, 0),
           minKoszt: mebleRange.minTotal,
           maxKoszt: mebleRange.maxTotal,
         },
         {
           name: 'Wykończenie',
-          zaplacono: state.wykonczenie.filter((i) => i.included && i.status === 'Opłacone').reduce((s, i) => s + i.kwota, 0),
-          doZaplaty: state.wykonczenie.filter((i) => i.included && i.status === 'Do zapłaty').reduce((s, i) => s + i.kwota, 0),
+          zaplacono: state.wykonczenie.filter((i) => i.status === 'Opłacone').reduce((s, i) => s + i.kwota, 0),
+          doZaplaty: state.wykonczenie.filter((i) => i.status === 'Do zapłaty').reduce((s, i) => s + i.kwota, 0),
           minKoszt: praceRange.minTotal,
           maxKoszt: praceRange.maxTotal,
         },
         {
           name: 'AGD / RTV',
-          zaplacono: state.agd.filter((i) => i.included && i.status === 'Opłacone').reduce((s, i) => s + i.cena, 0),
-          doZaplaty: state.agd.filter((i) => i.included && i.status === 'Do zapłaty').reduce((s, i) => s + i.cena, 0),
+          zaplacono: state.agd.filter((i) => i.status === 'Opłacone').reduce((s, i) => s + i.cena, 0),
+          doZaplaty: state.agd.filter((i) => i.status === 'Do zapłaty').reduce((s, i) => s + i.cena, 0),
           minKoszt: sprzetRange.minTotal,
           maxKoszt: sprzetRange.maxTotal,
         },
         {
           name: 'Inne',
-          zaplacono: state.pozostale.filter((i) => i.included && i.status === 'Opłacone').reduce((s, i) => s + i.cena, 0),
-          doZaplaty: state.pozostale.filter((i) => i.included && i.status === 'Do zapłaty').reduce((s, i) => s + i.cena, 0),
+          zaplacono: state.pozostale.filter((i) => i.status === 'Opłacone').reduce((s, i) => s + i.cena, 0),
+          doZaplaty: state.pozostale.filter((i) => i.status === 'Do zapłaty').reduce((s, i) => s + i.cena, 0),
           minKoszt: inneRange.minTotal,
           maxKoszt: inneRange.maxTotal,
         },
         {
           name: 'Wyprowadzka',
-          zaplacono: state.wyprowadzka.filter((i) => i.included && i.status === 'Opłacone').reduce((s, i) => s + i.cena, 0),
-          doZaplaty: state.wyprowadzka.filter((i) => i.included && i.status === 'Do zapłaty').reduce((s, i) => s + i.cena, 0),
+          zaplacono: state.wyprowadzka.filter((i) => i.status === 'Opłacone').reduce((s, i) => s + i.cena, 0),
+          doZaplaty: state.wyprowadzka.filter((i) => i.status === 'Do zapłaty').reduce((s, i) => s + i.cena, 0),
           minKoszt: wypRange.minTotal,
           maxKoszt: wypRange.maxTotal,
         },
@@ -563,11 +568,11 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
 
       // Collect all included items with their costs and optional dates
       const allItems: { kwota: number; dataRealizacji: string }[] = [
-        ...state.meble.filter(i => i.included && i.status !== 'Opłacone').map(i => ({ kwota: i.cena, dataRealizacji: i.dataRealizacji || '' })),
-        ...state.wykonczenie.filter(i => i.included && i.status !== 'Opłacone').map(i => ({ kwota: i.kwota, dataRealizacji: i.dataRealizacji || '' })),
-        ...state.agd.filter(i => i.included && i.status !== 'Opłacone').map(i => ({ kwota: i.cena, dataRealizacji: i.dataRealizacji || '' })),
-        ...state.pozostale.filter(i => i.included && i.status !== 'Opłacone').map(i => ({ kwota: i.cena, dataRealizacji: i.dataRealizacji || '' })),
-        ...state.wyprowadzka.filter(i => i.included && i.status !== 'Opłacone').map(i => ({ kwota: i.cena, dataRealizacji: i.dataRealizacji || '' })),
+        ...state.meble.filter(i => i.status === 'Do zapłaty').map(i => ({ kwota: i.cena, dataRealizacji: i.dataRealizacji || '' })),
+        ...state.wykonczenie.filter(i => i.status === 'Do zapłaty').map(i => ({ kwota: i.kwota, dataRealizacji: i.dataRealizacji || '' })),
+        ...state.agd.filter(i => i.status === 'Do zapłaty').map(i => ({ kwota: i.cena, dataRealizacji: i.dataRealizacji || '' })),
+        ...state.pozostale.filter(i => i.status === 'Do zapłaty').map(i => ({ kwota: i.cena, dataRealizacji: i.dataRealizacji || '' })),
+        ...state.wyprowadzka.filter(i => i.status === 'Do zapłaty').map(i => ({ kwota: i.cena, dataRealizacji: i.dataRealizacji || '' })),
       ];
 
       // Items without date = needed now, items with date = needed from that date

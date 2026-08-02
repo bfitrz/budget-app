@@ -43,20 +43,20 @@ export function WykluconeView() {
 
   const restoreItem = (row: ExcludedRow) => {
     switch (row.source) {
-      case 'meble': updateMebleItem(row.id, { included: true }); break;
-      case 'wykonczenie': updateWykonczenieItem(row.id, { included: true }); break;
-      case 'agd': updateAGDItem(row.id, { included: true }); break;
-      case 'pozostale': updatePozostaleItem(row.id, { included: true }); break;
-      case 'wyprowadzka': updateWyprowadzkaItem(row.id, { included: true }); break;
+      case 'meble': updateMebleItem(row.id, { included: true, status: 'Do zapłaty' }); break;
+      case 'wykonczenie': updateWykonczenieItem(row.id, { included: true, status: 'Do zapłaty' }); break;
+      case 'agd': updateAGDItem(row.id, { included: true, status: 'Do zapłaty' }); break;
+      case 'pozostale': updatePozostaleItem(row.id, { included: true, status: 'Do zapłaty' }); break;
+      case 'wyprowadzka': updateWyprowadzkaItem(row.id, { included: true, status: 'Do zapłaty' }); break;
     }
   };
 
   const excluded: ExcludedRow[] = [
-    ...meble.filter(i => !i.included).map(i => ({ id: i.id, kategoria: 'Meblowanie', source: 'meble' as const, grupa: i.pomieszczenie, nazwa: i.nazwa, kwota: i.cena })),
-    ...wykonczenie.filter(i => !i.included).map(i => ({ id: i.id, kategoria: 'Wykończenie', source: 'wykonczenie' as const, grupa: i.etap, nazwa: i.opis, kwota: i.kwota })),
-    ...agd.filter(i => !i.included).map(i => ({ id: i.id, kategoria: 'AGD / RTV', source: 'agd' as const, grupa: i.producent, nazwa: `${i.nazwa} ${i.model}`.trim(), kwota: i.cena })),
-    ...pozostale.filter(i => !i.included).map(i => ({ id: i.id, kategoria: 'Inne', source: 'pozostale' as const, grupa: i.grupa, nazwa: i.nazwa, kwota: i.cena })),
-    ...wyprowadzka.filter(i => !i.included).map(i => ({ id: i.id, kategoria: 'Wyprowadzka', source: 'wyprowadzka' as const, grupa: i.grupa, nazwa: i.nazwa, kwota: i.cena })),
+    ...meble.filter(i => i.status === 'Pominięte').map(i => ({ id: i.id, kategoria: 'Meblowanie', source: 'meble' as const, grupa: i.pomieszczenie, nazwa: i.nazwa, kwota: i.cena })),
+    ...wykonczenie.filter(i => i.status === 'Pominięte').map(i => ({ id: i.id, kategoria: 'Wykończenie', source: 'wykonczenie' as const, grupa: i.etap, nazwa: i.opis, kwota: i.kwota })),
+    ...agd.filter(i => i.status === 'Pominięte').map(i => ({ id: i.id, kategoria: 'AGD / RTV', source: 'agd' as const, grupa: i.producent, nazwa: `${i.nazwa} ${i.model}`.trim(), kwota: i.cena })),
+    ...pozostale.filter(i => i.status === 'Pominięte').map(i => ({ id: i.id, kategoria: 'Inne', source: 'pozostale' as const, grupa: i.grupa, nazwa: i.nazwa, kwota: i.cena })),
+    ...wyprowadzka.filter(i => i.status === 'Pominięte').map(i => ({ id: i.id, kategoria: 'Wyprowadzka', source: 'wyprowadzka' as const, grupa: i.grupa, nazwa: i.nazwa, kwota: i.cena })),
   ];
 
   const totalSaved = excluded.reduce((s, i) => s + i.kwota, 0);

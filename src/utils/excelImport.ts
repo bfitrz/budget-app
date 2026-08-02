@@ -14,9 +14,7 @@ import {
 } from '@/types';
 import { StickyNote } from '@/store/notesStore';
 import { generateId } from './id';
-
 // --- Raw row interfaces ---
-
 interface RawMebleRow {
   Pomieszczenie?: string;
   Kategoria?: string;
@@ -31,7 +29,6 @@ interface RawMebleRow {
   Alternatywy?: string;
   WybranaAltId?: string;
 }
-
 interface RawWykonczenieRow {
   Etap?: string;
   Opis?: string;
@@ -45,7 +42,6 @@ interface RawWykonczenieRow {
   Alternatywy?: string;
   WybranaAltId?: string;
 }
-
 interface RawAGDRow {
   Nazwa?: string;
   Producent?: string;
@@ -60,7 +56,6 @@ interface RawAGDRow {
   Alternatywy?: string;
   WybranaAltId?: string;
 }
-
 interface RawPozostaleRow {
   Grupa?: string;
   Nazwa?: string;
@@ -74,7 +69,6 @@ interface RawPozostaleRow {
   Alternatywy?: string;
   WybranaAltId?: string;
 }
-
 interface RawWyprowadzkaRow {
   Grupa?: string;
   Nazwa?: string;
@@ -88,39 +82,38 @@ interface RawWyprowadzkaRow {
   Alternatywy?: string;
   WybranaAltId?: string;
 }
-
 interface RawSaldoRow {
   Data?: string;
   Opis?: string;
   Kwota?: number;
 }
-
 interface RawHarmonogramRow {
   Data?: string;
   Opis?: string;
   Kwota?: number;
   Zrealizowane?: string;
 }
-
 interface RawNotatkaRow {
   Tekst?: string;
   Kolor?: string;
   Zrobione?: string;
   Data?: string;
 }
-
 // --- Parsers ---
-
 function parseStatus(status: string | undefined): PaymentStatus {
   if (status === 'Opłacone') return 'Opłacone';
+  if (status === 'Pominięte') return 'Pominięte';
   return 'Do zapłaty';
 }
-
 function parseIncluded(value: string | undefined): boolean {
   if (!value) return true;
   return value.toUpperCase() === 'TAK';
 }
-
+function parseStatusWithIncluded(statusValue: string | undefined, includedValue: string | undefined): { status: PaymentStatus; included: boolean } {
+  const included = parseIncluded(includedValue);
+  if (!included) return { status: 'Pominięte', included: false };
+  return { status: parseStatus(statusValue), included: true };
+}
 function parseLinki(value: string | undefined): ItemLink[] {
   if (!value) return [];
   return value.split(';;').filter(Boolean).map((entry) => {
@@ -131,7 +124,6 @@ function parseLinki(value: string | undefined): ItemLink[] {
     return { nazwa: entry, url: entry };
   });
 }
-
 function parseAlternatywy(value: string | undefined): AlternativeItem[] {
   if (!value) return [];
   try {
@@ -151,9 +143,7 @@ function parseAlternatywy(value: string | undefined): AlternativeItem[] {
   }
   return [];
 }
-
 // --- Result interface ---
-
 export interface ImportResult {
   meble: MebleItem[];
   wykonczenie: WykonczenieItem[];
@@ -165,13 +155,10 @@ export interface ImportResult {
   milestones: MilestoneEntry[];
   notes: StickyNote[];
 }
-
 // --- Main import function ---
-
 export async function importExcelFile(file: File): Promise<ImportResult> {
   const buffer = await file.arrayBuffer();
   const workbook = XLSX.read(buffer, { type: 'array' });
-
   const result: ImportResult = {
     meble: [],
     wykonczenie: [],
@@ -183,7 +170,6 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
     milestones: [],
     notes: [],
   };
-
   // Meble (support both old "MebleImport" and new "Meble" sheet names)
   const mebleSheet = workbook.SheetNames.find((n) => n === 'Meble' || n === 'MebleImport');
   if (mebleSheet) {
@@ -191,12 +177,11 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
     const rows = XLSX.utils.sheet_to_json<RawMebleRow>(sheet);
     result.meble = rows.map((row) => ({
       id: generateId(),
-      included: parseIncluded(row.Uwzględnij),
+      ...parseStatusWithIncluded(row.Status, row.Uwzględnij),
       pomieszczenie: row.Pomieszczenie || '',
       kategoria: row.Kategoria || '',
       nazwa: row.Nazwa || '',
       cena: Number(row.Cena) || 0,
-      status: parseStatus(row.Status),
       uwagi: row.Uwagi || '',
       uwagiMain: row.UwagiMain || '',
       dataRealizacji: row.DataRealizacji || '',
@@ -205,7 +190,6 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       wybranaAltId: row.WybranaAltId || null,
     }));
   }
-
   // Wykończenie (support both old "WykończenieImport" and new "Wykończenie")
   const wykSheet = workbook.SheetNames.find((n) => n === 'Wykończenie' || n === 'WykończenieImport');
   if (wykSheet) {
@@ -213,11 +197,10 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
     const rows = XLSX.utils.sheet_to_json<RawWykonczenieRow>(sheet);
     result.wykonczenie = rows.map((row) => ({
       id: generateId(),
-      included: parseIncluded(row.Uwzględnij),
+      ...parseStatusWithIncluded(row.Status, row.Uwzględnij),
       etap: row.Etap || '',
       opis: row.Opis || '',
       kwota: Number(row.Kwota) || 0,
-      status: parseStatus(row.Status),
       uwagi: row.Uwagi || '',
       uwagiMain: row.UwagiMain || '',
       dataRealizacji: row.DataRealizacji || '',
@@ -226,7 +209,6 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       wybranaAltId: row.WybranaAltId || null,
     }));
   }
-
   // AGD (support both old "AGDImport" and new "AGD")
   const agdSheet = workbook.SheetNames.find((n) => n === 'AGD' || n === 'AGDImport');
   if (agdSheet) {
@@ -234,12 +216,11 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
     const rows = XLSX.utils.sheet_to_json<RawAGDRow>(sheet);
     result.agd = rows.map((row) => ({
       id: generateId(),
-      included: parseIncluded(row.Uwzględnij),
+      ...parseStatusWithIncluded(row.Status, row.Uwzględnij),
       nazwa: row.Nazwa || '',
       producent: row.Producent || '',
       model: row.Model || '',
       cena: Number(row.Cena) || 0,
-      status: parseStatus(row.Status),
       uwagi: row.Uwagi || '',
       uwagiMain: row.UwagiMain || '',
       dataRealizacji: row.DataRealizacji || '',
@@ -248,7 +229,6 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       wybranaAltId: row.WybranaAltId || null,
     }));
   }
-
   // Pozostałe (support both old "PozostałeImport" and new "Pozostałe")
   const pozSheet = workbook.SheetNames.find((n) => n === 'Pozostałe' || n === 'PozostałeImport');
   if (pozSheet) {
@@ -256,11 +236,10 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
     const rows = XLSX.utils.sheet_to_json<RawPozostaleRow>(sheet);
     result.pozostale = rows.map((row) => ({
       id: generateId(),
-      included: parseIncluded(row.Uwzględnij),
+      ...parseStatusWithIncluded(row.Status, row.Uwzględnij),
       grupa: row.Grupa || 'Ogólne',
       nazwa: row.Nazwa || '',
       cena: Number(row.Cena) || 0,
-      status: parseStatus(row.Status),
       uwagi: row.Uwagi || '',
       uwagiMain: row.UwagiMain || '',
       dataRealizacji: row.DataRealizacji || '',
@@ -269,18 +248,16 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       wybranaAltId: row.WybranaAltId || null,
     }));
   }
-
   // Wyprowadzka
   if (workbook.SheetNames.includes('Wyprowadzka')) {
     const sheet = workbook.Sheets['Wyprowadzka'];
     const rows = XLSX.utils.sheet_to_json<RawWyprowadzkaRow>(sheet);
     result.wyprowadzka = rows.map((row) => ({
       id: generateId(),
-      included: parseIncluded(row.Uwzględnij),
+      ...parseStatusWithIncluded(row.Status, row.Uwzględnij),
       grupa: row.Grupa || 'Ogólne',
       nazwa: row.Nazwa || '',
       cena: Number(row.Cena) || 0,
-      status: parseStatus(row.Status),
       uwagi: row.Uwagi || '',
       uwagiMain: row.UwagiMain || '',
       dataRealizacji: row.DataRealizacji || '',
@@ -289,7 +266,6 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       wybranaAltId: row.WybranaAltId || null,
     }));
   }
-
   // Saldo
   if (workbook.SheetNames.includes('Saldo')) {
     const sheet = workbook.Sheets['Saldo'];
@@ -301,7 +277,6 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       kwota: Number(row.Kwota) || 0,
     }));
   }
-
   // Harmonogram
   if (workbook.SheetNames.includes('Harmonogram')) {
     const sheet = workbook.Sheets['Harmonogram'];
@@ -314,7 +289,6 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       zrealizowane: row.Zrealizowane?.toUpperCase() === 'TAK',
     }));
   }
-
   // Milestones
   if (workbook.SheetNames.includes('Milestones')) {
     const sheet = workbook.Sheets['Milestones'];
@@ -325,7 +299,6 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       opis: row.Opis || '',
     }));
   }
-
   // Notatki
   if (workbook.SheetNames.includes('Notatki')) {
     const sheet = workbook.Sheets['Notatki'];
@@ -338,6 +311,5 @@ export async function importExcelFile(file: File): Promise<ImportResult> {
       createdAt: row.Data || new Date().toISOString(),
     }));
   }
-
   return result;
 }
