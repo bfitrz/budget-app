@@ -26,4 +26,10 @@ export function loadFromLocalStorage(): BudgetState | null {
 
 export function clearLocalStorage(): void {
   localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem('budget-app-storage-config');
+  localStorage.removeItem('budget-app-dropbox-token');
+  localStorage.removeItem('budget-app-dropbox-refresh');
+  localStorage.removeItem('budget-app-dropbox-path');
+  localStorage.removeItem('budget-app-gdrive-token');
+  localStorage.removeItem('budget-app-gdrive-fileid');
 }

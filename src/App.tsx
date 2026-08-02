@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { Layout } from '@/components';
+import { StorageSetup } from '@/components/StorageSetup';
 import { DashboardView } from '@/features/dashboard';
 import { MebleView } from '@/features/meble';
 import { WykonczenieView } from '@/features/wykonczenie';
@@ -14,6 +15,7 @@ import { GuideView } from '@/features/guide';
 import { ChangelogView } from '@/features/changelog';
 import { WykluconeView } from '@/features/wykluczone';
 import { useBudgetStore } from '@/store';
+import { getStorageConfig, saveStorageConfig, clearStorageConfig, DropboxProvider, GoogleDriveProvider, checkDropboxCallback, checkGoogleDriveCallback, StorageFile } from '@/storage';
 
 export type ThemeVariant = 'dark' | 'light' | 'dim' | 'unicorn';
 
@@ -43,6 +45,89 @@ function getViewFromHash(): ViewId | null {
 
 function App() {
   const isDataLoaded = useBudgetStore((s) => s.isDataLoaded);
+  const [storageReady, setStorageReady] = useState(() => !!getStorageConfig());
+  const [storageError, setStorageError] = useState<string | null>(null);
+  const [storageLoading, setStorageLoading] = useState(false);
+  const [cloudFiles, setCloudFiles] = useState<StorageFile[]>([]);
+  const [connectedProvider, setConnectedProvider] = useState<'dropbox' | 'google-drive' | null>(null);
+
+  // Handle OAuth callbacks on mount
+  useEffect(() => {
+    const handleOAuthCallback = async () => {
+      const dropboxCode = checkDropboxCallback();
+      if (dropboxCode) {
+        try {
+          setStorageLoading(true);
+          const provider = new DropboxProvider();
+          await provider.handleCallback(dropboxCode);
+          setConnectedProvider('dropbox');
+          const files = await provider.listFiles();
+          setCloudFiles(files);
+        } catch (err) {
+          setStorageError(err instanceof Error ? err.message : 'Błąd autoryzacji Dropbox');
+        } finally {
+          setStorageLoading(false);
+        }
+        return;
+      }
+
+      const googleCode = checkGoogleDriveCallback();
+      if (googleCode) {
+        try {
+          setStorageLoading(true);
+          const provider = new GoogleDriveProvider();
+          await provider.handleCallback(googleCode);
+          setConnectedProvider('google-drive');
+          const files = await provider.listFiles();
+          setCloudFiles(files);
+        } catch (err) {
+          setStorageError(err instanceof Error ? err.message : 'Błąd autoryzacji Google');
+        } finally {
+          setStorageLoading(false);
+        }
+        return;
+      }
+    };
+    handleOAuthCallback();
+  }, []);
+
+  const handleSelectLocal = () => {
+    saveStorageConfig({ provider: 'local', filePath: null, autoSync: false, syncInterval: 0, lastSync: null });
+    setStorageReady(true);
+  };
+
+  const handleSelectDropbox = async () => {
+    try {
+      const provider = new DropboxProvider();
+      await provider.authenticate(); // Redirects to Dropbox
+    } catch (err) {
+      setStorageError(err instanceof Error ? err.message : 'Błąd połączenia z Dropbox');
+    }
+  };
+
+  const handleSelectGoogleDrive = async () => {
+    try {
+      const provider = new GoogleDriveProvider();
+      await provider.authenticate(); // Redirects to Google
+    } catch (err) {
+      setStorageError(err instanceof Error ? err.message : 'Błąd połączenia z Google Drive');
+    }
+  };
+
+  const handlePickFile = (path: string) => {
+    const provider = connectedProvider || 'dropbox';
+    saveStorageConfig({ provider, filePath: path, autoSync: true, syncInterval: 30000, lastSync: null });
+    // TODO: load file content and import into store
+    setStorageReady(true);
+  };
+
+  const handleCreateNewFile = () => {
+    const provider = connectedProvider || 'dropbox';
+    const path = provider === 'dropbox' ? '/Budget.xlsx' : 'new';
+    saveStorageConfig({ provider, filePath: path, autoSync: true, syncInterval: 30000, lastSync: null });
+    setStorageReady(true);
+  };
+
   const [currentView, setCurrentView] = useState<string>(() => {
     const hashView = getViewFromHash();
     if (hashView) return hashView;
@@ -309,6 +394,43 @@ function App() {
       default: return <DashboardView />;
     }
   };
+
+  // Show storage setup if not configured
+  if (!storageReady && !connectedProvider) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <StorageSetup
+          onSelectLocal={handleSelectLocal}
+          onSelectDropbox={handleSelectDropbox}
+          onSelectGoogleDrive={handleSelectGoogleDrive}
+          error={storageError}
+        />
+      </ThemeProvider>
+    );
+  }
+
+  // Show file picker after OAuth callback
+  if (!storageReady && connectedProvider) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <StorageSetup
+          onSelectLocal={handleSelectLocal}
+          onSelectDropbox={handleSelectDropbox}
+          onSelectGoogleDrive={handleSelectGoogleDrive}
+          isDropboxConnected={connectedProvider === 'dropbox'}
+          isGoogleConnected={connectedProvider === 'google-drive'}
+          dropboxFiles={connectedProvider === 'dropbox' ? cloudFiles : undefined}
+          googleFiles={connectedProvider === 'google-drive' ? cloudFiles : undefined}
+          onPickFile={handlePickFile}
+          onCreateNewFile={handleCreateNewFile}
+          isLoading={storageLoading}
+          error={storageError}
+        />
+      </ThemeProvider>
+    );
+  }
 
   return (
     <ThemeProvider theme={theme}>
