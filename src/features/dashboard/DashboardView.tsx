@@ -478,11 +478,16 @@ export function DashboardView() {
                       },
                     }}
                   />
-                  {(excludedPerCategory[cat.name] || 0) > 0 && (
-                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.55rem', mt: 0.25, display: 'block' }}>
-                      + {formatCurrency(excludedPerCategory[cat.name])} pominięte (łącznie: {formatCurrency(cat.total + excludedPerCategory[cat.name])})
-                    </Typography>
-                  )}
+                  {(excludedPerCategory[cat.name] || 0) > 0 && (() => {
+                    const excl = excludedPerCategory[cat.name];
+                    const totalFull = cat.total + excl;
+                    const percentFull = totalFull > 0 ? (cat.zaplacono / totalFull) * 100 : 0;
+                    return (
+                      <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.55rem', mt: 0.25, display: 'block' }}>
+                        z pominięte: {formatCurrency(cat.zaplacono)} / {formatCurrency(totalFull)} ({percentFull.toFixed(0)}%)
+                      </Typography>
+                    );
+                  })()}
                 </Box>
               ))}
             </Box>
@@ -527,7 +532,7 @@ export function DashboardView() {
           {excludedTotal > 0 && (
             <Box sx={{ mt: 1.5 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Z pominięte</Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Z pominięte: {formatCurrency(summary.zaplacono)} / {formatCurrency(totalWithExcluded)}</Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.6rem' }}>{totalWithExcluded > 0 ? Math.round((summary.zaplacono / totalWithExcluded) * 100) : 0}%</Typography>
               </Box>
               <Box sx={{ height: 4, borderRadius: 2, backgroundColor: alpha(theme.palette.text.secondary, 0.08), overflow: 'hidden' }}>
