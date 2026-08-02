@@ -87,8 +87,8 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
   const [editingGroupName, setEditingGroupName] = useState<{ oldName: string; newName: string } | null>(null);
   const [deleteGroupConfirm, setDeleteGroupConfirm] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'Do zapłaty' | 'Opłacone' | 'Wykluczone'>('all');
-  const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'name' | 'status'>('default');
+  const [statusFilter, setStatusFilter] = useState<Record<string, 'all' | 'Do zapłaty' | 'Opłacone' | 'Wykluczone'>>({});
+  const [sortBy, setSortBy] = useState<Record<string, 'default' | 'price-asc' | 'price-desc' | 'name' | 'status'>>({});
   const [disabledGroups, setDisabledGroups] = useState<Set<string>>(() => {
     // Initialize from data: group is disabled if ALL its items have status 'Wykluczone'
     const groups = new Map<string, boolean>();
@@ -112,30 +112,22 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
   const [mainMenuAnchor, setMainMenuAnchor] = useState<null | HTMLElement>(null);
   const [mainMenuTarget, setMainMenuTarget] = useState<CostItem | null>(null);
 
-  // Filtering
+  // Filtering (search only — status filter is per-group)
   const filteredItems = useMemo(() => {
-    let result = items;
-    if (statusFilter !== 'all') {
-      result = result.filter(i => i.status === statusFilter);
-    }
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
-      result = result.filter(i => {
-        // Search across all visible fields
-        for (const col of config.columns) {
-          const val = i[col.field];
-          if (val && String(val).toLowerCase().includes(q)) return true;
-        }
-        // Also search in group field
-        const grpVal = i[config.groupField];
-        if (grpVal && String(grpVal).toLowerCase().includes(q)) return true;
-        return false;
-      });
-    }
-    return result;
-  }, [items, searchQuery, statusFilter, config.columns, config.groupField]);
+    if (!searchQuery.trim()) return items;
+    const q = searchQuery.toLowerCase().trim();
+    return items.filter(i => {
+      for (const col of config.columns) {
+        const val = i[col.field];
+        if (val && String(val).toLowerCase().includes(q)) return true;
+      }
+      const grpVal = i[config.groupField];
+      if (grpVal && String(grpVal).toLowerCase().includes(q)) return true;
+      return false;
+    });
+  }, [items, searchQuery, config.columns, config.groupField]);
 
-  const isFiltering = searchQuery.trim() !== '' || statusFilter !== 'all';
+  const isFiltering = searchQuery.trim() !== '';
 
   // Grouping (uses filteredItems when filtering, items otherwise for totals)
   const groups = useMemo(() => {
@@ -150,9 +142,13 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
     }
     return Array.from(groupMap.entries()).map(([name, grpItems]) => {
       const isGroupDisabled = disabledGroups.has(name);
+      const groupSort = sortBy[name] || 'default';
+      const groupFilter = statusFilter[name] || 'all';
+      // Filter by status within group
+      const visibleItems = groupFilter === 'all' ? grpItems : grpItems.filter(i => i.status === groupFilter);
       // Sort items within group
-      const sortedItems = sortBy === 'default' ? grpItems : [...grpItems].sort((a, b) => {
-        switch (sortBy) {
+      const sortedItems = groupSort === 'default' ? visibleItems : [...visibleItems].sort((a, b) => {
+        switch (groupSort) {
           case 'price-asc': return getCost(a) - getCost(b);
           case 'price-desc': return getCost(b) - getCost(a);
           case 'name': return ((a[config.nameField] as string) || '').localeCompare((b[config.nameField] as string) || '');
@@ -160,9 +156,9 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
           default: return 0;
         }
       });
-      const active = sortedItems.filter((i) => i.status !== 'Wykluczone' && !isGroupDisabled);
+      const active = grpItems.filter((i) => i.status !== 'Wykluczone' && !isGroupDisabled);
       return {
-        name, items: sortedItems,
+        name, items: sortedItems, allItems: grpItems,
         disabled: isGroupDisabled,
         totalCost: active.reduce((s, i) => s + getCost(i), 0),
         paidCost: active.filter((i) => i.status === 'Opłacone').reduce((s, i) => s + getCost(i), 0),
@@ -170,7 +166,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
         totalCount: active.length,
       };
     });
-  }, [items, filteredItems, isFiltering, customGroups, config.groupField, config.nameField, disabledGroups, sortBy]);
+  }, [items, filteredItems, isFiltering, customGroups, config.groupField, config.nameField, disabledGroups, sortBy, statusFilter]);
 
   const allGroupNames = useMemo(() => {
     const names = new Set<string>();
@@ -345,7 +341,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
         </Box>
       </Box>
 
-      {/* Search & filter bar */}
+      {/* Search bar */}
       {items.length > 0 && (
         <Box sx={{ display: 'flex', gap: 1.5, mb: 2.5, flexWrap: 'wrap', alignItems: 'center' }}>
           <TextField
@@ -356,37 +352,11 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
             InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon sx={{ fontSize: 18, opacity: 0.5 }} /></InputAdornment>, endAdornment: searchQuery ? <InputAdornment position="end"><IconButton size="small" onClick={() => setSearchQuery('')} sx={{ p: 0.25 }}><CloseIcon sx={{ fontSize: 14 }} /></IconButton></InputAdornment> : undefined }}
             sx={{ flex: 1, minWidth: 160, maxWidth: 280, '& .MuiOutlinedInput-root': { borderRadius: 2, fontSize: '0.8rem' } }}
           />
-          <ToggleButtonGroup
-            value={statusFilter}
-            exclusive
-            onChange={(_, val) => { if (val !== null) setStatusFilter(val); }}
-            size="small"
-            sx={{ '& .MuiToggleButton-root': { fontSize: '0.65rem', px: 1.5, py: 0.5, borderRadius: '8px !important', textTransform: 'none' } }}
-          >
-            <ToggleButton value="all">Wszystkie</ToggleButton>
-            <ToggleButton value="Do zapłaty">Do zapłaty</ToggleButton>
-            <ToggleButton value="Opłacone">Opłacone</ToggleButton>
-            <ToggleButton value="Wykluczone">Wykluczone</ToggleButton>
-          </ToggleButtonGroup>
           {isFiltering && (
             <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
               {filteredItems.length} z {items.length} pozycji
             </Typography>
           )}
-          <FormControl size="small" sx={{ minWidth: 100 }}>
-            <Select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-              sx={{ fontSize: '0.7rem', borderRadius: 2, '& .MuiSelect-select': { py: 0.6, px: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }, '& .MuiOutlinedInput-notchedOutline': { borderColor: 'divider' } }}
-              startAdornment={<SortIcon sx={{ fontSize: 14, opacity: 0.5, mr: 0.5 }} />}
-            >
-              <MenuItem value="default" sx={{ fontSize: '0.8rem' }}>Domyślnie</MenuItem>
-              <MenuItem value="price-asc" sx={{ fontSize: '0.8rem' }}>Cena ↑</MenuItem>
-              <MenuItem value="price-desc" sx={{ fontSize: '0.8rem' }}>Cena ↓</MenuItem>
-              <MenuItem value="name" sx={{ fontSize: '0.8rem' }}>Nazwa A-Z</MenuItem>
-              <MenuItem value="status" sx={{ fontSize: '0.8rem' }}>Status</MenuItem>
-            </Select>
-          </FormControl>
         </Box>
       )}
 
@@ -513,7 +483,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
       {items.length === 0 && groups.length === 0 ? (
         <Card><CardContent sx={{ py: 8, textAlign: 'center' }}><Typography color="text.secondary">Brak pozycji — dodaj nową lub zaimportuj dane z Excela.</Typography></CardContent></Card>
       ) : isFiltering && filteredItems.length === 0 ? (
-        <Card><CardContent sx={{ py: 6, textAlign: 'center' }}><Typography color="text.secondary">Brak wyników dla „{searchQuery}" {statusFilter !== 'all' ? `(${statusFilter})` : ''}</Typography></CardContent></Card>
+        <Card><CardContent sx={{ py: 6, textAlign: 'center' }}><Typography color="text.secondary">Brak wyników dla „{searchQuery}"</Typography></CardContent></Card>
       ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
           {groups.filter(g => !isFiltering || g.items.length > 0).map((group) => (
@@ -548,6 +518,37 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                 </Box>
               </AccordionSummary>
               <AccordionDetails sx={{ p: 0 }}>
+                {/* Per-group sort & filter controls */}
+                {group.allItems.length > 2 && (
+                  <Box sx={{ display: 'flex', gap: 1, px: 2.5, py: 1, alignItems: 'center', borderBottom: `1px solid ${theme.palette.divider}`, flexWrap: 'wrap' }}>
+                    <ToggleButtonGroup
+                      value={statusFilter[group.name] || 'all'}
+                      exclusive
+                      onChange={(_, val) => { if (val !== null) setStatusFilter(prev => ({ ...prev, [group.name]: val })); }}
+                      size="small"
+                      sx={{ '& .MuiToggleButton-root': { fontSize: '0.6rem', px: 1, py: 0.25, borderRadius: '6px !important', textTransform: 'none' } }}
+                    >
+                      <ToggleButton value="all">Wszystkie</ToggleButton>
+                      <ToggleButton value="Do zapłaty">Do zapłaty</ToggleButton>
+                      <ToggleButton value="Opłacone">Opłacone</ToggleButton>
+                      <ToggleButton value="Wykluczone">Wykluczone</ToggleButton>
+                    </ToggleButtonGroup>
+                    <FormControl size="small">
+                      <Select
+                        value={sortBy[group.name] || 'default'}
+                        onChange={(e) => setSortBy(prev => ({ ...prev, [group.name]: e.target.value as 'default' | 'price-asc' | 'price-desc' | 'name' | 'status' }))}
+                        sx={{ fontSize: '0.65rem', borderRadius: 1.5, height: 24, '& .MuiSelect-select': { py: 0.25, px: 1 }, '& .MuiOutlinedInput-notchedOutline': { borderColor: 'divider' } }}
+                        startAdornment={<SortIcon sx={{ fontSize: 12, opacity: 0.5, mr: 0.5 }} />}
+                      >
+                        <MenuItem value="default" sx={{ fontSize: '0.75rem' }}>Domyślnie</MenuItem>
+                        <MenuItem value="price-asc" sx={{ fontSize: '0.75rem' }}>Cena ↑</MenuItem>
+                        <MenuItem value="price-desc" sx={{ fontSize: '0.75rem' }}>Cena ↓</MenuItem>
+                        <MenuItem value="name" sx={{ fontSize: '0.75rem' }}>Nazwa A-Z</MenuItem>
+                        <MenuItem value="status" sx={{ fontSize: '0.75rem' }}>Status</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Box>
+                )}
                 <TableContainer>
                   <Table size="small">
                     <TableHead>
