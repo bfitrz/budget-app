@@ -440,7 +440,10 @@ function App() {
         {remoteChanged && (
           <Alert
             severity="info"
-            sx={{ mx: { xs: 2, sm: 3, md: 4 }, mt: 2, borderRadius: 2 }}
+            sx={{ 
+              mx: { xs: 2, sm: 3, md: 4 }, mt: 1, mb: 1, borderRadius: 2,
+              position: 'sticky', top: 0, zIndex: 10,
+            }}
             action={
               <Box sx={{ display: 'flex', gap: 1 }}>
                 <Button color="inherit" size="small" onClick={loadFromCloud}>Wczytaj zmiany</Button>
