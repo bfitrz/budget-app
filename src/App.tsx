@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+import { ThemeProvider, createTheme, CssBaseline, Alert, Button, Box } from '@mui/material';
 import { Layout } from '@/components';
 import { StorageSetup } from '@/components/StorageSetup';
 import { DashboardView } from '@/features/dashboard';
@@ -119,8 +119,8 @@ function App() {
     setStorageReady(true);
   };
 
-  // Cloud sync hook (auto-saves after changes)
-  useCloudSync();
+  // Cloud sync hook (auto-saves after changes + polls for remote changes)
+  const { remoteChanged, loadFromCloud, dismissRemoteChanged } = useCloudSync();
 
   const [currentView, setCurrentView] = useState<string>(() => {
     const hashView = getViewFromHash();
@@ -437,6 +437,20 @@ function App() {
         onCycleTheme={cycleTheme}
         onSetTheme={setTheme}
       >
+        {remoteChanged && (
+          <Alert
+            severity="info"
+            sx={{ mx: { xs: 2, sm: 3, md: 4 }, mt: 2, borderRadius: 2 }}
+            action={
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button color="inherit" size="small" onClick={loadFromCloud}>Wczytaj zmiany</Button>
+                <Button color="inherit" size="small" onClick={dismissRemoteChanged}>Ignoruj</Button>
+              </Box>
+            }
+          >
+            Plik został zmieniony przez inną osobę. Wczytać nową wersję?
+          </Alert>
+        )}
         {renderView()}
       </Layout>
     </ThemeProvider>
