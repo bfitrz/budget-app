@@ -75,6 +75,7 @@ function scheduleSave() {
 export function useCloudSync() {
   const [remoteChanged, setRemoteChanged] = useState(false);
   const [lastEditor, setLastEditor] = useState<string | null>(null);
+  const [lastModified, setLastModified] = useState<string | null>(null);
   const lastKnownModifiedRef = useRef<string | null>(null);
   const subscribedRef = useRef(false);
 
@@ -140,6 +141,8 @@ export function useCloudSync() {
         const data = await response.json();
         const remoteModified = data.modifiedTime;
         const isMe = data.lastModifyingUser?.me === true;
+
+        setLastModified(remoteModified);
 
         if (data.lastModifyingUser && !isMe) {
           setLastEditor(data.lastModifyingUser.displayName || data.lastModifyingUser.emailAddress || null);
@@ -208,6 +211,7 @@ export function useCloudSync() {
     syncToCloud,
     loadFromCloud,
     lastSync: config?.lastSync || null,
+    lastModified,
     isSyncing,
     remoteChanged,
     lastEditor,

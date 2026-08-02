@@ -34,7 +34,7 @@ export function ImportView() {
   const [snackbar, setSnackbar] = useState<{ open: boolean; type: 'success' | 'error'; text: string }>({ open: false, type: 'success', text: '' });
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
   const [backupReminder, setBackupReminder] = useState(false);
-  const { lastEditor } = useCloudSync();
+  const { lastEditor, lastModified } = useCloudSync();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Cloud state
@@ -295,7 +295,8 @@ export function ImportView() {
               {config.lastSync && (
                 <Typography variant="caption" color="text.secondary">
                   Ostatnia sync: {new Date(config.lastSync).toLocaleString('pl-PL')}
-                  {lastEditor && <> · Ostatnio edytował: <strong>{lastEditor}</strong></>}
+                  {lastModified && <> · Plik edytowany: {new Date(lastModified).toLocaleString('pl-PL')}</>}
+                  {lastEditor && <> · Przez: <strong>{lastEditor}</strong></>}
                 </Typography>
               )}
             </Box>
