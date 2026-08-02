@@ -13,6 +13,7 @@ import { notify } from '@/store/notificationStore';
 
 let syncTimeout: ReturnType<typeof setTimeout> | null = null;
 let isSyncing = false;
+let skipNextPoll = false;
 
 export function useCloudSync() {
   const config = getStorageConfig();
@@ -33,10 +34,14 @@ export function useCloudSync() {
   const syncToCloud = useCallback(async () => {
     if (!config || !isCloud || !config.filePath || isSyncing) return;
     const provider = getProvider();
-    if (!provider || !provider.isAuthenticated()) return;
+    if (!provider || !provider.isAuthenticated()) {
+      console.log('Sync skipped: not authenticated');
+      return;
+    }
 
     isSyncing = true;
     try {
+      console.log('Syncing to cloud...');
       const state = useBudgetStore.getState();
       const notes = useNotesStore.getState().notes;
       const buffer = exportToExcelBuffer(state, notes);
@@ -44,8 +49,10 @@ export function useCloudSync() {
 
       const now = new Date().toISOString();
       lastSyncRef.current = now;
-      lastKnownModifiedRef.current = now;
+      // Don't set lastKnownModifiedRef here — let next poll pick up the real server time
       saveStorageConfig({ ...config, lastSync: now });
+      skipNextPoll = true; // Don't trigger "changed by someone" for our own save
+      console.log('Sync complete:', now);
     } catch (err) {
       console.error('Cloud sync failed:', err);
       notify.error('Synchronizacja nie powiodła się');
@@ -127,9 +134,15 @@ export function useCloudSync() {
         if (remoteModified > lastKnownModifiedRef.current) {
           // Update ref so we don't spam notifications
           lastKnownModifiedRef.current = remoteModified;
-          setRemoteChanged(true);
-          const editorName = data.lastModifyingUser?.displayName || 'inna osoba';
-          notify.info(`Plik zmieniony przez: ${editorName}`);
+          
+          if (skipNextPoll) {
+            // This was our own save — ignore
+            skipNextPoll = false;
+          } else {
+            setRemoteChanged(true);
+            const editorName = data.lastModifyingUser?.displayName || 'inna osoba';
+            notify.info(`Plik zmieniony przez: ${editorName}`);
+          }
         }
       }
     } catch (err) {
