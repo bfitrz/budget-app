@@ -736,16 +736,17 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         slotProps={{ paper: { sx: { minWidth: 200, borderRadius: 2, mt: 0.5 } } }}
+        disableRestoreFocus
       >
-        <MenuItem onClick={() => { if (groupMenuTarget) { handleToggleGroup(groupMenuTarget); } setGroupMenuAnchor(null); setGroupMenuTarget(null); }}>
+        <MenuItem onClick={() => { const target = groupMenuTarget; setGroupMenuAnchor(null); setGroupMenuTarget(null); if (target) { handleToggleGroup(target); } }}>
           <ListItemIcon>{disabledGroups.has(groupMenuTarget || '') ? <EnableGroupIcon fontSize="small" /> : <DisableGroupIcon fontSize="small" />}</ListItemIcon>
           <ListItemText>{disabledGroups.has(groupMenuTarget || '') ? 'Włącz grupę' : 'Wygaś grupę (wyklucz z budżetu)'}</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => { if (groupMenuTarget) setEditingGroupName({ oldName: groupMenuTarget, newName: groupMenuTarget }); setGroupMenuAnchor(null); setGroupMenuTarget(null); }}>
+        <MenuItem onClick={() => { const target = groupMenuTarget; setGroupMenuAnchor(null); setGroupMenuTarget(null); if (target) setEditingGroupName({ oldName: target, newName: target }); }}>
           <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
           <ListItemText>Zmień nazwę</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => { if (groupMenuTarget) setDeleteGroupConfirm(groupMenuTarget); setGroupMenuAnchor(null); setGroupMenuTarget(null); }} sx={{ color: theme.palette.error.main }}>
+        <MenuItem onClick={() => { const target = groupMenuTarget; setGroupMenuAnchor(null); setGroupMenuTarget(null); if (target) setDeleteGroupConfirm(target); }} sx={{ color: theme.palette.error.main }}>
           <ListItemIcon><DeleteIcon fontSize="small" sx={{ color: theme.palette.error.main }} /></ListItemIcon>
           <ListItemText>Usuń grupę</ListItemText>
         </MenuItem>
@@ -759,20 +760,21 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         slotProps={{ paper: { sx: { minWidth: 180, borderRadius: 2, mt: 0.5 } } }}
+        disableRestoreFocus
       >
-        <MenuItem onClick={() => { if (itemMenuTarget) openEditDialog(itemMenuTarget); setItemMenuAnchor(null); setItemMenuTarget(null); }}>
+        <MenuItem onClick={() => { const target = itemMenuTarget; setItemMenuAnchor(null); setItemMenuTarget(null); if (target) openEditDialog(target); }}>
           <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
           <ListItemText>Edytuj</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => { if (itemMenuTarget) setLinksItem(itemMenuTarget); setItemMenuAnchor(null); setItemMenuTarget(null); }}>
+        <MenuItem onClick={() => { const target = itemMenuTarget; setItemMenuAnchor(null); setItemMenuTarget(null); if (target) setLinksItem(target); }}>
           <ListItemIcon><LinkIcon fontSize="small" /></ListItemIcon>
           <ListItemText>Linki</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => { if (itemMenuTarget) setAltItem(itemMenuTarget); setItemMenuAnchor(null); setItemMenuTarget(null); }}>
+        <MenuItem onClick={() => { const target = itemMenuTarget; setItemMenuAnchor(null); setItemMenuTarget(null); if (target) setAltItem(target); }}>
           <ListItemIcon><AltIcon fontSize="small" /></ListItemIcon>
           <ListItemText>Alternatywy</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => { if (itemMenuTarget) setDeleteConfirmItem(itemMenuTarget); setItemMenuAnchor(null); setItemMenuTarget(null); }} sx={{ color: theme.palette.error.main }}>
+        <MenuItem onClick={() => { const target = itemMenuTarget; setItemMenuAnchor(null); setItemMenuTarget(null); if (target) setDeleteConfirmItem(target); }} sx={{ color: theme.palette.error.main }}>
           <ListItemIcon><DeleteIcon fontSize="small" sx={{ color: theme.palette.error.main }} /></ListItemIcon>
           <ListItemText>Usuń</ListItemText>
         </MenuItem>
@@ -786,20 +788,21 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         slotProps={{ paper: { sx: { minWidth: 180, borderRadius: 2, mt: 0.5 } } }}
+        disableRestoreFocus
       >
-        <MenuItem onClick={() => { if (altMenuTarget) { const { item, alt } = altMenuTarget; const oldMain: AlternativeItem = { id: generateId(), included: true, nazwa: (item[swapField] as string) || 'Poprzednia opcja', cena: getCost(item), linki: item.linki || [], uwagi: (item.uwagiMain as string) || '' }; const newAlts = [oldMain, ...(item.alternatywy || []).filter((a) => a.id !== alt.id)]; updateItem(item.id, { [swapField]: alt.nazwa, [costField]: alt.cena, linki: alt.linki || [], uwagiMain: alt.uwagi || '', alternatywy: newAlts } as Partial<CostItem>); } setAltMenuAnchor(null); setAltMenuTarget(null); }}>
+        <MenuItem onClick={() => { const target = altMenuTarget; setAltMenuAnchor(null); setAltMenuTarget(null); if (target) { const { item, alt } = target; const oldMain: AlternativeItem = { id: generateId(), included: true, nazwa: (item[swapField] as string) || 'Poprzednia opcja', cena: getCost(item), linki: item.linki || [], uwagi: (item.uwagiMain as string) || '' }; const newAlts = [oldMain, ...(item.alternatywy || []).filter((a) => a.id !== alt.id)]; updateItem(item.id, { [swapField]: alt.nazwa, [costField]: alt.cena, linki: alt.linki || [], uwagiMain: alt.uwagi || '', alternatywy: newAlts } as Partial<CostItem>); } }}>
           <ListItemIcon><AltIcon fontSize="small" /></ListItemIcon>
           <ListItemText>Ustaw jako MAIN</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => { if (altMenuTarget) setLinksAlt({ itemId: altMenuTarget.item.id, alt: altMenuTarget.alt }); setAltMenuAnchor(null); setAltMenuTarget(null); }}>
+        <MenuItem onClick={() => { const target = altMenuTarget; setAltMenuAnchor(null); setAltMenuTarget(null); if (target) setLinksAlt({ itemId: target.item.id, alt: target.alt }); }}>
           <ListItemIcon><LinkIcon fontSize="small" /></ListItemIcon>
           <ListItemText>Linki</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => { if (altMenuTarget) setEditingAlt({ itemId: altMenuTarget.item.id, alt: altMenuTarget.alt }); setAltMenuAnchor(null); setAltMenuTarget(null); }}>
+        <MenuItem onClick={() => { const target = altMenuTarget; setAltMenuAnchor(null); setAltMenuTarget(null); if (target) setEditingAlt({ itemId: target.item.id, alt: target.alt }); }}>
           <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
           <ListItemText>Edytuj</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => { if (altMenuTarget) { const { item, alt } = altMenuTarget; const newAlts = (item.alternatywy || []).filter((a) => a.id !== alt.id); updateItem(item.id, { alternatywy: newAlts }); } setAltMenuAnchor(null); setAltMenuTarget(null); }} sx={{ color: theme.palette.error.main }}>
+        <MenuItem onClick={() => { const target = altMenuTarget; setAltMenuAnchor(null); setAltMenuTarget(null); if (target) { const { item, alt } = target; const newAlts = (item.alternatywy || []).filter((a) => a.id !== alt.id); updateItem(item.id, { alternatywy: newAlts }); } }} sx={{ color: theme.palette.error.main }}>
           <ListItemIcon><DeleteIcon fontSize="small" sx={{ color: theme.palette.error.main }} /></ListItemIcon>
           <ListItemText>Usuń</ListItemText>
         </MenuItem>
@@ -813,17 +816,18 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         slotProps={{ paper: { sx: { minWidth: 180, borderRadius: 2, mt: 0.5 } } }}
+        disableRestoreFocus
       >
-        <MenuItem onClick={() => { if (mainMenuTarget) setLinksItem(mainMenuTarget); setMainMenuAnchor(null); setMainMenuTarget(null); }}>
+        <MenuItem onClick={() => { const target = mainMenuTarget; setMainMenuAnchor(null); setMainMenuTarget(null); if (target) setLinksItem(target); }}>
           <ListItemIcon><LinkIcon fontSize="small" /></ListItemIcon>
           <ListItemText>Linki</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => { if (mainMenuTarget) setEditingMainPrice(mainMenuTarget); setMainMenuAnchor(null); setMainMenuTarget(null); }}>
+        <MenuItem onClick={() => { const target = mainMenuTarget; setMainMenuAnchor(null); setMainMenuTarget(null); if (target) setEditingMainPrice(target); }}>
           <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
           <ListItemText>Edytuj</ListItemText>
         </MenuItem>
         {mainMenuTarget && (mainMenuTarget.alternatywy || []).length > 0 && (
-          <MenuItem onClick={() => { if (mainMenuTarget) setDeleteChoiceItem(mainMenuTarget); setMainMenuAnchor(null); setMainMenuTarget(null); }} sx={{ color: theme.palette.error.main }}>
+          <MenuItem onClick={() => { const target = mainMenuTarget; setMainMenuAnchor(null); setMainMenuTarget(null); if (target) setDeleteChoiceItem(target); }} sx={{ color: theme.palette.error.main }}>
             <ListItemIcon><DeleteIcon fontSize="small" sx={{ color: theme.palette.error.main }} /></ListItemIcon>
             <ListItemText>Zastąp inną opcją</ListItemText>
           </MenuItem>
