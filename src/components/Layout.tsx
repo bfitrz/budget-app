@@ -282,7 +282,7 @@ export function Layout({ children, currentView, onViewChange, themeVariant, them
           open={mobileOpen}
           onOpen={() => setMobileOpen(true)}
           onClose={() => setMobileOpen(false)}
-          swipeAreaWidth={Math.round(window.innerWidth * 0.4)}
+          swipeAreaWidth={20}
           minFlingVelocity={300}
           hysteresis={0.35}
           disableBackdropTransition
