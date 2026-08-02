@@ -112,6 +112,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       alternatywy: Array.isArray(item.alternatywy) ? item.alternatywy : [],
       wybranaAltId: (item.wybranaAltId as string) || null,
       uwagiMain: (item.uwagiMain as string) || '',
+      dataRealizacji: (item.dataRealizacji as string) || '',
     });
     const meble = (loaded.meble || []).map((item) => ({ ...item, ...migrateItem(item as unknown as Record<string, unknown>) }));
     const wykonczenie = (loaded.wykonczenie || []).map((item) => ({ ...item, ...migrateItem(item as unknown as Record<string, unknown>) }));
@@ -504,29 +505,56 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       const summary = get().getDashboardSummary();
       const startingSaldo = summary.aktualnieSrodki;
 
+      // Collect all included items with their costs and optional dates
+      const allItems: { kwota: number; dataRealizacji: string }[] = [
+        ...state.meble.filter(i => i.included && i.status !== 'Opłacone').map(i => ({ kwota: i.cena, dataRealizacji: i.dataRealizacji || '' })),
+        ...state.wykonczenie.filter(i => i.included && i.status !== 'Opłacone').map(i => ({ kwota: i.kwota, dataRealizacji: i.dataRealizacji || '' })),
+        ...state.agd.filter(i => i.included && i.status !== 'Opłacone').map(i => ({ kwota: i.cena, dataRealizacji: i.dataRealizacji || '' })),
+        ...state.pozostale.filter(i => i.included && i.status !== 'Opłacone').map(i => ({ kwota: i.cena, dataRealizacji: i.dataRealizacji || '' })),
+        ...state.wyprowadzka.filter(i => i.included && i.status !== 'Opłacone').map(i => ({ kwota: i.cena, dataRealizacji: i.dataRealizacji || '' })),
+      ];
+
+      // Items without date = needed now, items with date = needed from that date
+      const immediateTotal = allItems.filter(i => !i.dataRealizacji).reduce((s, i) => s + i.kwota, 0);
+      const datedItems = allItems.filter(i => !!i.dataRealizacji).sort((a, b) => a.dataRealizacji.localeCompare(b.dataRealizacji));
+
+      // Function to calculate cel (target) at a given date
+      const getCelAtDate = (date: string): number => {
+        let cel = immediateTotal;
+        for (const item of datedItems) {
+          if (item.dataRealizacji <= date) {
+            cel += item.kwota;
+          }
+        }
+        return cel;
+      };
+
       // Get future (unrealized) planned incomes sorted by date
       const futureEntries = [...state.harmonogram]
         .filter((e) => !e.zrealizowane)
         .sort((a, b) => a.data.localeCompare(b.data));
 
-      const points: CashFlowPoint[] = [];
-
-      // Start with current state (today): aktualne środki (wpływy - zapłacone)
+      // Collect all significant dates (today, income dates, cost dates)
       const today = new Date().toISOString().split('T')[0];
-      points.push({
-        data: today,
-        label: 'Dziś (aktualne środki)',
-        saldo: startingSaldo,
-      });
+      const allDates = new Set<string>([today]);
+      futureEntries.forEach(e => allDates.add(e.data));
+      datedItems.forEach(i => allDates.add(i.dataRealizacji));
 
-      // Each planned income increases the saldo
+      const sortedDates = Array.from(allDates).sort();
+
+      const points: CashFlowPoint[] = [];
       let runningSaldo = startingSaldo;
-      for (const entry of futureEntries) {
-        runningSaldo += entry.kwota;
+
+      for (const date of sortedDates) {
+        // Add income for this date
+        const income = futureEntries.filter(e => e.data === date).reduce((s, e) => s + e.kwota, 0);
+        if (date !== today) runningSaldo += income;
+
         points.push({
-          data: entry.data,
-          label: entry.opis,
+          data: date,
+          label: date === today ? 'Dziś' : futureEntries.find(e => e.data === date)?.opis || datedItems.find(i => i.dataRealizacji === date) ? 'Nowy koszt' : '',
           saldo: runningSaldo,
+          cel: getCelAtDate(date),
         });
       }
 

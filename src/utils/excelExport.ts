@@ -26,6 +26,7 @@ export function exportToExcel(state: BudgetState, notes?: StickyNote[]): void {
       Uwzględnij: item.included ? 'TAK' : 'NIE',
       Uwagi: item.uwagi || '',
       UwagiMain: item.uwagiMain || '',
+      DataRealizacji: item.dataRealizacji || '',
       Linki: serializeLinki(item.linki),
       Alternatywy: serializeAlternatywy(item.alternatywy),
       WybranaAltId: item.wybranaAltId || '',
@@ -44,6 +45,7 @@ export function exportToExcel(state: BudgetState, notes?: StickyNote[]): void {
       Uwzględnij: item.included ? 'TAK' : 'NIE',
       Uwagi: item.uwagi || '',
       UwagiMain: item.uwagiMain || '',
+      DataRealizacji: item.dataRealizacji || '',
       Linki: serializeLinki(item.linki),
       Alternatywy: serializeAlternatywy(item.alternatywy),
       WybranaAltId: item.wybranaAltId || '',
@@ -63,6 +65,7 @@ export function exportToExcel(state: BudgetState, notes?: StickyNote[]): void {
       Uwzględnij: item.included ? 'TAK' : 'NIE',
       Uwagi: item.uwagi || '',
       UwagiMain: item.uwagiMain || '',
+      DataRealizacji: item.dataRealizacji || '',
       Linki: serializeLinki(item.linki),
       Alternatywy: serializeAlternatywy(item.alternatywy),
       WybranaAltId: item.wybranaAltId || '',
@@ -81,6 +84,7 @@ export function exportToExcel(state: BudgetState, notes?: StickyNote[]): void {
       Uwzględnij: item.included ? 'TAK' : 'NIE',
       Uwagi: item.uwagi || '',
       UwagiMain: item.uwagiMain || '',
+      DataRealizacji: item.dataRealizacji || '',
       Linki: serializeLinki(item.linki),
       Alternatywy: serializeAlternatywy(item.alternatywy),
       WybranaAltId: item.wybranaAltId || '',
@@ -99,6 +103,7 @@ export function exportToExcel(state: BudgetState, notes?: StickyNote[]): void {
       Uwzględnij: item.included ? 'TAK' : 'NIE',
       Uwagi: item.uwagi || '',
       UwagiMain: item.uwagiMain || '',
+      DataRealizacji: item.dataRealizacji || '',
       Linki: serializeLinki(item.linki),
       Alternatywy: serializeAlternatywy(item.alternatywy),
       WybranaAltId: item.wybranaAltId || '',
@@ -161,27 +166,27 @@ export function exportTemplate(): void {
   const workbook = XLSX.utils.book_new();
 
   // Meble
-  const mebleHeaders = [['Pomieszczenie', 'Kategoria', 'Nazwa', 'Cena', 'Status', 'Uwzględnij', 'Uwagi', 'Linki', 'Alternatywy', 'WybranaAltId']];
+  const mebleHeaders = [['Pomieszczenie', 'Kategoria', 'Nazwa', 'Cena', 'Status', 'Uwzględnij', 'Uwagi', 'Linki', 'Alternatywy', 'UwagiMain', 'DataRealizacji', 'WybranaAltId']];
   const wsMeble = XLSX.utils.aoa_to_sheet(mebleHeaders);
   XLSX.utils.book_append_sheet(workbook, wsMeble, 'Meble');
 
   // Wykończenie
-  const wykHeaders = [['Etap', 'Opis', 'Kwota', 'Status', 'Uwzględnij', 'Uwagi', 'Linki', 'Alternatywy', 'WybranaAltId']];
+  const wykHeaders = [['Etap', 'Opis', 'Kwota', 'Status', 'Uwzględnij', 'Uwagi', 'Linki', 'Alternatywy', 'UwagiMain', 'DataRealizacji', 'WybranaAltId']];
   const wsWyk = XLSX.utils.aoa_to_sheet(wykHeaders);
   XLSX.utils.book_append_sheet(workbook, wsWyk, 'Wykończenie');
 
   // AGD
-  const agdHeaders = [['Nazwa', 'Producent', 'Model', 'Cena', 'Status', 'Uwzględnij', 'Uwagi', 'Linki', 'Alternatywy', 'WybranaAltId']];
+  const agdHeaders = [['Nazwa', 'Producent', 'Model', 'Cena', 'Status', 'Uwzględnij', 'Uwagi', 'Linki', 'Alternatywy', 'UwagiMain', 'DataRealizacji', 'WybranaAltId']];
   const wsAgd = XLSX.utils.aoa_to_sheet(agdHeaders);
   XLSX.utils.book_append_sheet(workbook, wsAgd, 'AGD');
 
   // Pozostałe
-  const pozHeaders = [['Grupa', 'Nazwa', 'Cena', 'Status', 'Uwzględnij', 'Uwagi', 'Linki', 'Alternatywy', 'WybranaAltId']];
+  const pozHeaders = [['Grupa', 'Nazwa', 'Cena', 'Status', 'Uwzględnij', 'Uwagi', 'Linki', 'Alternatywy', 'UwagiMain', 'DataRealizacji', 'WybranaAltId']];
   const wsPoz = XLSX.utils.aoa_to_sheet(pozHeaders);
   XLSX.utils.book_append_sheet(workbook, wsPoz, 'Pozostałe');
 
   // Wyprowadzka
-  const wypHeaders = [['Grupa', 'Nazwa', 'Cena', 'Status', 'Uwzględnij', 'Uwagi', 'Linki', 'Alternatywy', 'WybranaAltId']];
+  const wypHeaders = [['Grupa', 'Nazwa', 'Cena', 'Status', 'Uwzględnij', 'Uwagi', 'Linki', 'Alternatywy', 'UwagiMain', 'DataRealizacji', 'WybranaAltId']];
   const wsWyp = XLSX.utils.aoa_to_sheet(wypHeaders);
   XLSX.utils.book_append_sheet(workbook, wsWyp, 'Wyprowadzka');
 

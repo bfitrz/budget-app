@@ -16,6 +16,17 @@ interface ChangeEntry {
 
 const changelog: ChangeEntry[] = [
   {
+    version: '1.8.0',
+    date: '2026-08-02',
+    changes: [
+      { type: 'feat', text: 'Planowana data wydatku — opcjonalne pole daty na każdej pozycji kosztowej' },
+      { type: 'feat', text: 'Wykres harmonogramu — linia "cel" rośnie schodkowo wg dat realizacji kosztów' },
+      { type: 'feat', text: 'Tooltip z ? przy polu daty wyjaśniający mechanizm' },
+      { type: 'feat', text: 'Export/import pola DataRealizacji (wszystkie arkusze + szablon)' },
+      { type: 'fix', text: 'Wygaszone grupy zachowują stan po odświeżeniu strony (obliczane z danych)' },
+    ],
+  },
+  {
     version: '1.7.0',
     date: '2026-08-02',
     changes: [

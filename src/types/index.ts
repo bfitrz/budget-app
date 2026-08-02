@@ -26,6 +26,7 @@ export interface MebleItem {
   uwagiMain: string;
   linki: ItemLink[];
   alternatywy: AlternativeItem[];
+  dataRealizacji: string;
   wybranaAltId: string | null;
 }
 
@@ -40,6 +41,7 @@ export interface WykonczenieItem {
   uwagiMain: string;
   linki: ItemLink[];
   alternatywy: AlternativeItem[];
+  dataRealizacji: string;
   wybranaAltId: string | null;
 }
 
@@ -55,6 +57,7 @@ export interface AGDItem {
   uwagiMain: string;
   linki: ItemLink[];
   alternatywy: AlternativeItem[];
+  dataRealizacji: string;
   wybranaAltId: string | null;
 }
 
@@ -69,6 +72,7 @@ export interface PozostaleItem {
   uwagiMain: string;
   linki: ItemLink[];
   alternatywy: AlternativeItem[];
+  dataRealizacji: string;
   wybranaAltId: string | null;
 }
 
@@ -83,6 +87,7 @@ export interface WyprowadzkaItem {
   uwagiMain: string;
   linki: ItemLink[];
   alternatywy: AlternativeItem[];
+  dataRealizacji: string;
   wybranaAltId: string | null;
 }
 
@@ -145,4 +150,5 @@ export interface CashFlowPoint {
   data: string;
   label: string;
   saldo: number;
+  cel: number;
 }

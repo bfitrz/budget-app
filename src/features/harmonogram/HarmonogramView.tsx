@@ -287,13 +287,16 @@ export function HarmonogramView() {
               <AreaChart data={(() => {
                 // Merge cashFlow with milestone dates for ReferenceLine to work
                 const celZPominietymi = summary.pozostaloDoZaplaty + excludedTotal;
-                const baseData = cashFlow.map(p => ({ ...p, cel: summary.pozostaloDoZaplaty, celFull: celZPominietymi }));
+                const baseData = cashFlow.map(p => ({ ...p, celFull: p.cel + excludedTotal }));
                 const existingDates = new Set(baseData.map(p => p.data));
                 // Add milestone dates that don't exist in cashFlow
                 for (const ms of milestones) {
                   if (!existingDates.has(ms.data)) {
                     const saldo = getSaldoAtDate(ms.data);
-                    baseData.push({ data: ms.data, label: ms.opis, saldo, cel: summary.pozostaloDoZaplaty, celFull: celZPominietymi });
+                    // Find cel at this date by interpolation from nearest point
+                    const nearestPoint = baseData.filter(p => p.data <= ms.data).pop();
+                    const celAtDate = nearestPoint?.cel || summary.pozostaloDoZaplaty;
+                    baseData.push({ data: ms.data, label: ms.opis, saldo, cel: celAtDate, celFull: celAtDate + excludedTotal });
                   }
                 }
                 // Sort by date

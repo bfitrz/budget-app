@@ -19,6 +19,7 @@ import { AlternativeItem, ItemLink, PaymentStatus } from '@/types';
 import { formatCurrency, formatCurrencyOrDash, generateId } from '@/utils';
 import { LinksModal } from './LinksEditor';
 import { AlternativesModal } from './AlternativesModal';
+import { DateField } from './DateField';
 
 export interface CostItem {
   id: string;
@@ -26,6 +27,7 @@ export interface CostItem {
   status: PaymentStatus;
   uwagi: string;
   uwagiMain: string;
+  dataRealizacji: string;
   linki: ItemLink[];
   alternatywy: AlternativeItem[];
   wybranaAltId: string | null;
@@ -82,7 +84,20 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
   const [deleteConfirmItem, setDeleteConfirmItem] = useState<CostItem | null>(null);
   const [editingGroupName, setEditingGroupName] = useState<{ oldName: string; newName: string } | null>(null);
   const [deleteGroupConfirm, setDeleteGroupConfirm] = useState<string | null>(null);
-  const [disabledGroups, setDisabledGroups] = useState<Set<string>>(new Set());
+  const [disabledGroups, setDisabledGroups] = useState<Set<string>>(() => {
+    // Initialize from data: group is disabled if ALL its items are !included
+    const groups = new Map<string, boolean>();
+    for (const item of items) {
+      const grp = (item[config.groupField] as string) || 'Bez grupy';
+      if (!groups.has(grp)) groups.set(grp, true);
+      if (item.included) groups.set(grp, false);
+    }
+    const disabled = new Set<string>();
+    for (const [name, allDisabled] of groups) {
+      if (allDisabled && items.some(i => (i[config.groupField] as string) === name)) disabled.add(name);
+    }
+    return disabled;
+  });
   const [groupMenuAnchor, setGroupMenuAnchor] = useState<null | HTMLElement>(null);
   const [groupMenuTarget, setGroupMenuTarget] = useState<string | null>(null);
   const [itemMenuAnchor, setItemMenuAnchor] = useState<null | HTMLElement>(null);
@@ -161,6 +176,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
     config.addFields.forEach(f => { data[f.field] = item[f.field] as string || ''; });
     data[costField] = getCost(item);
     data.uwagi = (item.uwagi as string) || '';
+    data.dataRealizacji = (item.dataRealizacji as string) || '';
     setFormData(data);
     setDialogOpen(true);
   };
@@ -172,9 +188,10 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
       config.addFields.forEach(f => { updates[f.field] = formData[f.field]; });
       updates[costField] = Number(formData[costField]) || 0;
       updates.uwagi = formData.uwagi || '';
+      updates.dataRealizacji = formData.dataRealizacji || '';
       updateItem(editingItem.id, updates as Partial<CostItem>);
     } else {
-      const newItem: Record<string, unknown> = { included: true, [costField]: Number(formData[costField]) || 0, status: 'Do zapłaty', uwagi: formData.uwagi || '', uwagiMain: '', linki: [], alternatywy: [], wybranaAltId: null };
+      const newItem: Record<string, unknown> = { included: true, [costField]: Number(formData[costField]) || 0, status: 'Do zapłaty', uwagi: formData.uwagi || '', uwagiMain: '', dataRealizacji: formData.dataRealizacji || '', linki: [], alternatywy: [], wybranaAltId: null };
       newItem[config.groupField] = formData[config.groupField];
       config.addFields.forEach(f => { newItem[f.field] = formData[f.field]; });
       addItem(newItem as Omit<CostItem, 'id'>);
@@ -603,6 +620,22 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
           ))}
           <TextField label={costField === 'kwota' ? 'Kwota (PLN)' : 'Cena (PLN)'} type="number" value={formData[costField] || ''} onChange={(e) => setFormData(p => ({ ...p, [costField]: e.target.value }))} fullWidth />
           <TextField label="Uwagi" value={formData.uwagi || ''} onChange={(e) => setFormData(p => ({ ...p, uwagi: e.target.value }))} fullWidth multiline rows={2} />
+          <Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>Planowana data wydatku</Typography>
+              <Tooltip title="Kiedy faktycznie poniesiesz ten koszt? Jeśli nie wiesz lub potrzebujesz teraz — zostaw puste. Jeśli podasz datę, koszt pojawi się na wykresie harmonogramu dopiero od tego terminu (linia 'cel' podskoczy w górę w tym dniu)." arrow slotProps={{ tooltip: { sx: { maxWidth: 300, fontSize: '0.75rem', lineHeight: 1.5, p: 1.5 } } }}>
+                <HelpIcon sx={{ fontSize: 14, color: 'text.secondary', opacity: 0.5, cursor: 'help' }} />
+              </Tooltip>
+            </Box>
+            <DateField
+              label=""
+              value={formData.dataRealizacji || ''}
+              onChange={(e) => setFormData(p => ({ ...p, dataRealizacji: (e.target as HTMLInputElement).value }))}
+              onClear={() => setFormData(p => ({ ...p, dataRealizacji: '' }))}
+              helperText="Puste = potrzebne teraz"
+              fullWidth
+            />
+          </Box>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2.5, justifyContent: 'space-between' }}>
           <Button onClick={() => { setDialogOpen(false); setEditingItem(null); }}>Zamknij</Button>
