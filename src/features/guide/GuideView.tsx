@@ -125,11 +125,11 @@ export function GuideView() {
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.8 }}>
           <strong>Różnica między „Środkami" a „Harmonogramem":</strong> W „Środkach" wpisujesz pieniądze które JUŻ masz (lub dostałeś). W „Harmonogramie" planujesz pieniądze które DOPIERO dostaniesz (np. przyszłomiesięczna wypłata).
         </Typography>
-        <Feature label="Nowy wpływ" description="Kliknij 'Nowy wpływ'. Podaj datę (kiedy spodziewasz się pieniędzy), opis i kwotę. Pojawi się w tabeli i na wykresie." />
+        <Feature label="Nowy wpływ" description="Kliknij '+ Wpływ'. Podaj datę (kiedy spodziewasz się pieniędzy), opis i kwotę. Pojawi się w tabeli i na wykresie." />
         <Feature label="Wykres prognozowy" description="Niebieska linia = Twoje środki rosnące w czasie (aktualnie + zaplanowane wpływy). Pomarańczowa przerywana = cel (ile musisz jeszcze zapłacić). Gdy niebieska przekroczy pomarańczową — masz na wszystko." />
         <Feature label="Zielony punkt na wykresie" description="Pierwszy punkt = Twoje dzisiejsze dostępne środki. Od niego linia rośnie z każdym zaplanowanym wpływem." />
         <Feature label="Oznacz jako zrealizowany" description="Gdy pieniądze faktycznie wpłyną na konto, kliknij checkbox. Zrealizowany wpływ znika z prognozy (bo jest już w 'Środkach')." />
-        <Feature label="📌 Ważne daty" description="Przycisk 'Ważna data' pozwala oznaczyć deadline (np. 'Termin oddania kluczy'). Na wykresie pojawia się pionowa linia — widzisz ile środków będziesz miał w tym dniu i czy wystarczy." />
+        <Feature label="📌 Milestone (ważna data)" description="Przycisk 'Milestone' pozwala oznaczyć deadline (np. 'Termin oddania kluczy'). Na wykresie pojawia się pionowa linia — widzisz ile środków będziesz miał w tym dniu i czy wystarczy." />
         <Feature label="Komunikat pod wykresem" description="Zielony = zaplanowane wpływy wystarczą. Czerwony = nawet po wpływach brakuje pieniędzy — musisz znaleźć dodatkowe źródło." />
         <Tip>Zaplanowane wpływy NIE wliczają się do dostępnych środków na dashboardzie. Pojawiają się tylko w prognozie na wykresie. Dopiero po oznaczeniu jako „zrealizowane" wpływają na bilans.</Tip>
       </Section>
@@ -160,13 +160,13 @@ export function GuideView() {
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.8 }}>
           W każdej zakładce wydatków pozycje są zorganizowane w rozwijane grupy (accordiony). Grupy to np. pomieszczenia (dla mebli), etapy prac (dla wykończenia) lub producenci (dla AGD). Każda grupa ma swoje podsumowanie kosztów i menu ⋮ z akcjami.
         </Typography>
-        <Feature label="Wyłącz grupę" description="Menu ⋮ → 'Wyłącz grupę'. Wyłącza WSZYSTKIE pozycje w grupie z budżetu naraz. Grupa się przyciemnia i dostaje badge 'wyłączona'. Przydatne gdy chcesz tymczasowo pominąć cały pokój (np. 'zobaczymy czy starczy na gabinet')." />
+        <Feature label="Wygaś grupę" description="Menu ⋮ → 'Wygaś grupę (wyklucz z budżetu)'. Wyłącza WSZYSTKIE pozycje w grupie z budżetu naraz. Grupa się przyciemnia i dostaje badge 'wygaszona'. Przydatne gdy chcesz tymczasowo pominąć cały pokój (np. 'zobaczymy czy starczy na gabinet')." />
         <Feature label="Włącz grupę" description="Menu ⋮ → 'Włącz grupę'. Przywraca wszystkie pozycje z powrotem do budżetu." />
         <Feature label="Zmień nazwę" description="Menu ⋮ → 'Zmień nazwę'. Zmienia nazwę grupy na wszystkich pozycjach w niej. Np. 'Pokój 1' → 'Sypialnia'." />
         <Feature label="Usuń grupę" description="Menu ⋮ → 'Usuń grupę'. UWAGA: usuwa grupę wraz ze WSZYSTKIMI pozycjami w środku. Nieodwracalne! Pojawi się dialog z potwierdzeniem i łączną wartością." />
         <Feature label="Nowa grupa" description="Przycisk 'Nowa grupa' w nagłówku strony. Tworzy pustą grupę, do której możesz dodawać pozycje." />
         <Feature label="Dodaj do grupy" description="Na dole każdej grupy jest przycisk 'Dodaj do {nazwa}'. Nowa pozycja automatycznie trafi do tej grupy." />
-        <Tip>Wyłączanie grupy to NIE to samo co usuwanie. Wyłączenie jest odwracalne — pozycje nadal istnieją, tylko nie wliczają się do budżetu. Usuwanie jest trwałe.</Tip>
+        <Tip>Wygaszenie grupy to NIE to samo co usuwanie. Wygaszenie jest odwracalne — pozycje nadal istnieją, tylko nie wliczają się do budżetu. Usuwanie jest trwałe.</Tip>
       </Section>
 
       <Section title="Alternatywy cenowe" icon={<AltIcon sx={{ fontSize: 18 }} />}>
@@ -174,10 +174,10 @@ export function GuideView() {
           Kluczowa funkcja aplikacji. Pozwala Ci dodać wiele wariantów cenowych do jednej pozycji — np. ten sam stół w IKEA, Agata Meble i na Allegro. Albo trzy różne modele zmywarki. Aplikacja obliczy wariant najtańszy i najdroższy, co pozwoli Ci zobaczyć „rozpiętość" budżetu.
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.8 }}>
-          <strong>Jak to działa:</strong> Każda pozycja ma jedną cenę „GŁÓWNĄ" (to Twój aktualny wybór) i dowolną liczbę alternatyw (ALT). Główna jest brana do obliczeń. Alternatywy służą do porównań i scenariuszy.
+          <strong>Jak to działa:</strong> Każda pozycja ma jedną cenę „MAIN" (to Twój aktualny wybór) i dowolną liczbę alternatyw (ALT). Główna jest brana do obliczeń. Alternatywy służą do porównań i scenariuszy.
         </Typography>
-        <Feature label="Dodaj alternatywę" description="Rozwiń pozycję (strzałka ▶) i dodaj przez menu ⋮ → 'Alternatywy'. Podaj nazwę (np. 'IKEA Kallax'), cenę i opcjonalnie link." />
-        <Feature label="Zamień na główną" description="Ikona ⇄ przy alternatywie. Klik zamienia ją z ceną główną — stara główna staje się alternatywą. Przydatne gdy zdecydujesz się na inną opcję." />
+        <Feature label="Dodaj alternatywę" description="W tabeli kliknij menu ⋮ przy pozycji → 'Alternatywy'. Podaj nazwę (np. 'IKEA Kallax'), cenę i opcjonalnie link." />
+        <Feature label="Zamień na główną (Ustaw jako MAIN)" description="W menu ⋮ przy alternatywie → 'Ustaw jako MAIN'. Zamienia ją z ceną główną — stara główna staje się alternatywą. Przydatne gdy zdecydujesz się na inną opcję." />
         <Feature label="Porównanie cenowe" description="Strzałka ↓ (zielona) = tańsze niż główna. Strzałka ↑ (pomarańczowa) = droższe. Linia — = taka sama cena." />
         <Feature label="Wyłącz alternatywę" description="Ikona $ przy alternatywie. Wyłączona alternatywa nie wlicza się do zakresu min/max. Przydatne gdy odrzuciłeś opcję." />
         <Feature label="Wpływ na scenariusze" description="Dashboard bierze najtańszą i najdroższą alternatywę (ze wszystkich pozycji) i buduje scenariusze. Więcej alternatyw = lepszy obraz ryzyka." />
@@ -212,11 +212,11 @@ export function GuideView() {
           Nie wszystko co zaplanowałeś musisz kupić. Funkcja wyłączania pozwala Ci tymczasowo pominąć pozycje lub całe grupy bez ich usuwania. Wyłączone pozycje przestają wpływać na bilans, ale nadal istnieją w systemie.
         </Typography>
         <Feature label="Wyłącz pojedynczą pozycję" description="Ikona $ przy pozycji w tabeli. Klik = wyłączenie. Pozycja się przyciemnia. Ponowny klik = przywrócenie." />
-        <Feature label="Wyłącz całą grupę" description="Menu ⋮ przy grupie → 'Wyłącz grupę'. Wyłącza naraz wszystkie pozycje w grupie." />
+        <Feature label="Wygaś całą grupę" description="Menu ⋮ przy grupie → 'Wygaś grupę (wyklucz z budżetu)'. Wyłącza naraz wszystkie pozycje w grupie." />
         <Feature label="Strona 'Pominięte'" description="W menu nawigacyjnym, pod kategoriami wydatków. Zbiera wszystkie wyłączone pozycje w jednym miejscu. Widzisz ile łącznie zaoszczędziłeś pomijając te pozycje." />
-        <Feature label="Przywróć do budżetu" description="Na stronie 'Pominięte' przy każdej pozycji jest ikona ⊕. Klik przywraca ją do budżetu." />
+        <Feature label="Przywróć do budżetu" description="Na stronie 'Pominięte' przy każdej pozycji jest ikona przywrócenia (↺). Klik przywraca ją do budżetu." />
         <Feature label="Wpływ na dashboard" description="Dashboard pokazuje wersję 'razem z pominiętymi' przy każdym widgecie — żebyś widział ile by kosztowało gdybyś nic nie pomijał." />
-        <Tip>Wyłączanie jest w 100% odwracalne. To nie jest usuwanie — dane pozostają. Używaj do tymczasowego ukrywania opcjonalnych zakupów, np. 'jeśli starczy budżetu to wrócimy do tego'.</Tip>
+        <Tip>Wygaszanie/wyłączanie jest w 100% odwracalne. To nie jest usuwanie — dane pozostają. Używaj do tymczasowego ukrywania opcjonalnych zakupów, np. 'jeśli starczy budżetu to wrócimy do tego'.</Tip>
       </Section>
 
       <Section title="Skróty i wskazówki" icon={<MoneyIcon sx={{ fontSize: 18 }} />}>
