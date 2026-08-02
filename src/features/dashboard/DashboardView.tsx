@@ -639,7 +639,7 @@ function ScenarioRow({ label, cost, available, color, costWithExcluded }: Scenar
           </Typography>
           {diffWithExcl !== null && (
             <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.55rem', display: 'block' }}>
-              {diffWithExcl >= 0 ? '+' : ''}{formatCurrency(diffWithExcl)}
+              z pominięte: {diffWithExcl >= 0 ? '+' : ''}{formatCurrency(diffWithExcl)}
             </Typography>
           )}
         </Box>
