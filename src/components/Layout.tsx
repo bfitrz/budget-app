@@ -28,6 +28,7 @@ import {
   Check as CheckIcon,
   LocalShipping as ShippingIcon,
   HelpOutline as HelpIcon,
+  Refresh as RefreshIcon,
 } from '@mui/icons-material';
 import { ThemeVariant } from '@/App';
 import { NotificationToasts } from './NotificationToasts';
@@ -123,13 +124,21 @@ export function Layout({ children, currentView, onViewChange, themeVariant, them
           </Typography>
         </Box>
         {isMobile && (
-          <IconButton size="small" onClick={() => setMobileOpen(false)}>
-            <CloseIcon sx={{ fontSize: 18 }} />
+          <Box sx={{ display: 'flex', gap: 0.5 }}>
+            <IconButton size="small" onClick={() => window.location.reload()} title="Odśwież">
+              <RefreshIcon sx={{ fontSize: 16 }} />
+            </IconButton>
+            <IconButton size="small" onClick={() => setMobileOpen(false)}>
+              <CloseIcon sx={{ fontSize: 18 }} />
+            </IconButton>
+          </Box>
+        )}
+        {!isMobile && (
+          <IconButton size="small" onClick={() => window.location.reload()} title="Odśwież" sx={{ opacity: 0.4, '&:hover': { opacity: 1 } }}>
+            <RefreshIcon sx={{ fontSize: 16 }} />
           </IconButton>
         )}
       </Box>
-
-      {/* Navigation */}
       <Box sx={{ flex: 1, overflow: 'auto' }}>
         <List disablePadding>
           {navigationItems.map((item, index) => (
