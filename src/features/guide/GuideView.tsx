@@ -101,7 +101,7 @@ export function GuideView() {
         <Feature label="Wykres 'Zakres cenowy'" description="Porównanie wariantów min/max w każdej kategorii. Widoczny tylko jeśli masz dodane alternatywy cenowe. Pokazuje ile zaoszczędzisz wybierając najtańsze opcje." />
         <Feature label="Scenariusze" description="Trzy warianty: 'Najtaniej' (gdybyś wszędzie wybrał najtańszą opcję), 'Obecny plan' (to co teraz masz wybrane), 'Najdrożej' (gdybyś wszędzie wybrał najdroższą). Przy każdym widzisz czy środki wystarczą." />
         <Feature label="Postęp płatności" description="Progress bar dla każdej kategorii i globalny. Pokazuje jaki procent zaplanowanych wydatków już opłaciłeś." />
-        <Tip>Jeśli masz pozycje „pominięte" (wyłączone z budżetu), każdy widget pokazuje też wariant „razem z pominiętymi" — żebyś widział ile by kosztowało gdybyś nic nie wyłączał.</Tip>
+        <Tip>Jeśli masz pozycje „wykluczone" (wykluczone z budżetu), każdy widget pokazuje też wariant „razem z wykluczonymi" — żebyś widział ile by kosztowało gdybyś nic nie wykluczał.</Tip>
       </Section>
 
       <Section title="Środki" icon={<SaldoIcon sx={{ fontSize: 18 }} />}>
@@ -148,7 +148,7 @@ export function GuideView() {
         <Divider sx={{ my: 2 }} />
         <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1.5 }}>Anatomia jednej pozycji:</Typography>
         <Feature label="Strzałka ▶ (rozwiń)" description="Kliknij strzałkę po lewej aby zobaczyć szczegóły: cenę główną (GŁÓWNA), alternatywy (ALT), linki do sklepów i uwagi." />
-        <Feature label="Ikona $ (włącz/wyłącz)" description="Zielona = pozycja wliczona do budżetu. Kliknij aby wyłączyć — pozycja się przyciemni i przestanie wpływać na bilans. Przydatne do ukrywania opcjonalnych zakupów." />
+        <Feature label="Status pozycji (dropdown)" description="Każda pozycja ma dropdown statusu: 'Do zapłaty', 'Opłacone' lub 'Wykluczone'. Ustaw 'Wykluczone' aby tymczasowo usunąć pozycję z budżetu bez jej kasowania." />
         <Feature label="Chip statusu (Do zapłaty / Opłacone)" description="Kliknij chip aby zmienić status. Gdy oznaczysz jako 'Opłacone', kwota zostanie odjęta od dostępnych środków. Jeśli pozycja ma alternatywy, pojawi się pytanie 'którą opcję opłaciłeś?'." />
         <Feature label="Cena i zakres" description="Jeśli masz alternatywy, pod ceną główną zobaczysz zakres min—max. Zakres wpływa na scenariusze na dashboardzie." />
         <Feature label="Menu ⋮ (trzy kropki)" description="Otwiera menu kontekstowe: Edytuj (zmień nazwę, cenę, grupę), Linki (dodaj URL do sklepu), Alternatywy (dodaj inną opcję cenową), Usuń." />
@@ -160,13 +160,13 @@ export function GuideView() {
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.8 }}>
           W każdej zakładce wydatków pozycje są zorganizowane w rozwijane grupy (accordiony). Grupy to np. pomieszczenia (dla mebli), etapy prac (dla wykończenia) lub producenci (dla AGD). Każda grupa ma swoje podsumowanie kosztów i menu ⋮ z akcjami.
         </Typography>
-        <Feature label="Wygaś grupę" description="Menu ⋮ → 'Wygaś grupę (wyklucz z budżetu)'. Wyłącza WSZYSTKIE pozycje w grupie z budżetu naraz. Grupa się przyciemnia i dostaje badge 'wygaszona'. Przydatne gdy chcesz tymczasowo pominąć cały pokój (np. 'zobaczymy czy starczy na gabinet')." />
+        <Feature label="Wyklucz grupę" description="Menu ⋮ → 'Wyklucz grupę'. Wyklucza WSZYSTKIE pozycje w grupie z budżetu naraz. Grupa się przyciemnia i dostaje badge 'wykluczona'. Przydatne gdy chcesz tymczasowo wykluczyć cały pokój (np. 'zobaczymy czy starczy na gabinet')." />
         <Feature label="Włącz grupę" description="Menu ⋮ → 'Włącz grupę'. Przywraca wszystkie pozycje z powrotem do budżetu." />
         <Feature label="Zmień nazwę" description="Menu ⋮ → 'Zmień nazwę'. Zmienia nazwę grupy na wszystkich pozycjach w niej. Np. 'Pokój 1' → 'Sypialnia'." />
         <Feature label="Usuń grupę" description="Menu ⋮ → 'Usuń grupę'. UWAGA: usuwa grupę wraz ze WSZYSTKIMI pozycjami w środku. Nieodwracalne! Pojawi się dialog z potwierdzeniem i łączną wartością." />
         <Feature label="Nowa grupa" description="Przycisk 'Nowa grupa' w nagłówku strony. Tworzy pustą grupę, do której możesz dodawać pozycje." />
         <Feature label="Dodaj do grupy" description="Na dole każdej grupy jest przycisk 'Dodaj do {nazwa}'. Nowa pozycja automatycznie trafi do tej grupy." />
-        <Tip>Wygaszenie grupy to NIE to samo co usuwanie. Wygaszenie jest odwracalne — pozycje nadal istnieją, tylko nie wliczają się do budżetu. Usuwanie jest trwałe.</Tip>
+        <Tip>Wykluczenie grupy to NIE to samo co usuwanie. Wykluczenie jest odwracalne — pozycje nadal istnieją, tylko nie wliczają się do budżetu. Usuwanie jest trwałe.</Tip>
       </Section>
 
       <Section title="Alternatywy cenowe" icon={<AltIcon sx={{ fontSize: 18 }} />}>
@@ -207,16 +207,16 @@ export function GuideView() {
         <Tip>Dane przechowywane są w pamięci przeglądarki (localStorage). Wyczyszczenie danych przeglądarki, zmiana profilu lub reinstalacja = utrata danych. Regularnie rób eksporty!</Tip>
       </Section>
 
-      <Section title="Wyłączanie z budżetu i strona 'Pominięte'" icon={<DisableIcon sx={{ fontSize: 18 }} />}>
+      <Section title="Wykluczanie z budżetu" icon={<DisableIcon sx={{ fontSize: 18 }} />}>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.8 }}>
-          Nie wszystko co zaplanowałeś musisz kupić. Funkcja wyłączania pozwala Ci tymczasowo pominąć pozycje lub całe grupy bez ich usuwania. Wyłączone pozycje przestają wpływać na bilans, ale nadal istnieją w systemie.
+          Nie wszystko co zaplanowałeś musisz kupić. Funkcja wykluczania pozwala Ci tymczasowo wykluczyć pozycje lub całe grupy bez ich usuwania. Wykluczone pozycje przestają wpływać na bilans, ale nadal istnieją w systemie.
         </Typography>
-        <Feature label="Wyłącz pojedynczą pozycję" description="Ikona $ przy pozycji w tabeli. Klik = wyłączenie. Pozycja się przyciemnia. Ponowny klik = przywrócenie." />
-        <Feature label="Wygaś całą grupę" description="Menu ⋮ przy grupie → 'Wygaś grupę (wyklucz z budżetu)'. Wyłącza naraz wszystkie pozycje w grupie." />
-        <Feature label="Strona 'Pominięte'" description="W menu nawigacyjnym, pod kategoriami wydatków. Zbiera wszystkie wyłączone pozycje w jednym miejscu. Widzisz ile łącznie zaoszczędziłeś pomijając te pozycje." />
-        <Feature label="Przywróć do budżetu" description="Na stronie 'Pominięte' przy każdej pozycji jest ikona przywrócenia (↺). Klik przywraca ją do budżetu." />
-        <Feature label="Wpływ na dashboard" description="Dashboard pokazuje wersję 'razem z pominiętymi' przy każdym widgecie — żebyś widział ile by kosztowało gdybyś nic nie pomijał." />
-        <Tip>Wygaszanie/wyłączanie jest w 100% odwracalne. To nie jest usuwanie — dane pozostają. Używaj do tymczasowego ukrywania opcjonalnych zakupów, np. 'jeśli starczy budżetu to wrócimy do tego'.</Tip>
+        <Feature label="Wyklucz pojedynczą pozycję" description="W dropdownie statusu wybierz 'Wykluczone'. Pozycja się przyciemnia i przestaje wpływać na bilans. Zmień status z powrotem na 'Do zapłaty' aby przywrócić." />
+        <Feature label="Wyklucz całą grupę" description="Menu ⋮ przy grupie → 'Wyklucz grupę'. Wyklucza naraz wszystkie pozycje w grupie." />
+        <Feature label="Strona 'Wykluczone'" description="W menu nawigacyjnym, pod kategoriami wydatków. Zbiera wszystkie wykluczone pozycje w jednym miejscu. Widzisz ile łącznie zaoszczędziłeś wykluczając te pozycje." />
+        <Feature label="Przywróć do budżetu" description="Na stronie 'Wykluczone' przy każdej pozycji jest ikona przywrócenia (↺). Klik przywraca ją do budżetu." />
+        <Feature label="Wpływ na dashboard" description="Dashboard pokazuje wersję 'razem z wykluczonymi' przy każdym widgecie — żebyś widział ile by kosztowało gdybyś nic nie wykluczał." />
+        <Tip>Wykluczenie jest w 100% odwracalne. To nie jest usuwanie — dane pozostają. Używaj do tymczasowego ukrywania opcjonalnych zakupów, np. 'jeśli starczy budżetu to wrócimy do tego'.</Tip>
       </Section>
 
       <Section title="Skróty i wskazówki" icon={<MoneyIcon sx={{ fontSize: 18 }} />}>

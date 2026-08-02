@@ -52,11 +52,11 @@ export function WykluconeView() {
   };
 
   const excluded: ExcludedRow[] = [
-    ...meble.filter(i => i.status === 'Pominięte').map(i => ({ id: i.id, kategoria: 'Meblowanie', source: 'meble' as const, grupa: i.pomieszczenie, nazwa: i.nazwa, kwota: i.cena })),
-    ...wykonczenie.filter(i => i.status === 'Pominięte').map(i => ({ id: i.id, kategoria: 'Wykończenie', source: 'wykonczenie' as const, grupa: i.etap, nazwa: i.opis, kwota: i.kwota })),
-    ...agd.filter(i => i.status === 'Pominięte').map(i => ({ id: i.id, kategoria: 'AGD / RTV', source: 'agd' as const, grupa: i.producent, nazwa: `${i.nazwa} ${i.model}`.trim(), kwota: i.cena })),
-    ...pozostale.filter(i => i.status === 'Pominięte').map(i => ({ id: i.id, kategoria: 'Inne', source: 'pozostale' as const, grupa: i.grupa, nazwa: i.nazwa, kwota: i.cena })),
-    ...wyprowadzka.filter(i => i.status === 'Pominięte').map(i => ({ id: i.id, kategoria: 'Wyprowadzka', source: 'wyprowadzka' as const, grupa: i.grupa, nazwa: i.nazwa, kwota: i.cena })),
+    ...meble.filter(i => i.status === 'Wykluczone').map(i => ({ id: i.id, kategoria: 'Meblowanie', source: 'meble' as const, grupa: i.pomieszczenie, nazwa: i.nazwa, kwota: i.cena })),
+    ...wykonczenie.filter(i => i.status === 'Wykluczone').map(i => ({ id: i.id, kategoria: 'Wykończenie', source: 'wykonczenie' as const, grupa: i.etap, nazwa: i.opis, kwota: i.kwota })),
+    ...agd.filter(i => i.status === 'Wykluczone').map(i => ({ id: i.id, kategoria: 'AGD / RTV', source: 'agd' as const, grupa: i.producent, nazwa: `${i.nazwa} ${i.model}`.trim(), kwota: i.cena })),
+    ...pozostale.filter(i => i.status === 'Wykluczone').map(i => ({ id: i.id, kategoria: 'Inne', source: 'pozostale' as const, grupa: i.grupa, nazwa: i.nazwa, kwota: i.cena })),
+    ...wyprowadzka.filter(i => i.status === 'Wykluczone').map(i => ({ id: i.id, kategoria: 'Wyprowadzka', source: 'wyprowadzka' as const, grupa: i.grupa, nazwa: i.nazwa, kwota: i.cena })),
   ];
 
   const totalSaved = excluded.reduce((s, i) => s + i.kwota, 0);
@@ -72,7 +72,7 @@ export function WykluconeView() {
   return (
     <Box>
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4">Pominięte</Typography>
+        <Typography variant="h4">Wykluczone</Typography>
         <Typography variant="body2" color="text.secondary">
           Pozycje wykluczone z budżetu — nie wliczają się do kosztów, ale masz je tu na oku
         </Typography>
@@ -85,7 +85,7 @@ export function WykluconeView() {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}><SavingsIcon sx={{ fontSize: 14, color: 'text.secondary', opacity: 0.6 }} /><Typography variant="overline" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Zaoszczędzone</Typography></Box>
             <Typography variant="h5" sx={{ fontWeight: 700, color: theme.palette.success.main }}>{formatCurrency(totalSaved)}</Typography>
             <Typography variant="caption" color="text.secondary">
-              {excluded.length} pozycji pominiętych w budżecie
+              {excluded.length} pozycji wykluczonych z budżetu
             </Typography>
           </CardContent>
         </Card>
@@ -94,7 +94,7 @@ export function WykluconeView() {
       {excluded.length === 0 ? (
         <Card>
           <CardContent sx={{ py: 6, textAlign: 'center' }}>
-            <Typography color="text.secondary">Brak pominiętych pozycji — wszystko jest uwzględnione w budżecie.</Typography>
+            <Typography color="text.secondary">Brak wykluczonych pozycji — wszystko jest uwzględnione w budżecie.</Typography>
           </CardContent>
         </Card>
       ) : (
@@ -144,7 +144,7 @@ export function WykluconeView() {
                 {/* Total row */}
                 <TableRow>
                   <TableCell colSpan={4} sx={{ fontWeight: 700, borderTop: `2px solid ${theme.palette.divider}` }}>
-                    <Typography variant="body2" sx={{ fontWeight: 700 }}>Razem pominięte</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 700 }}>Razem wykluczone</Typography>
                   </TableCell>
                   <TableCell align="right" sx={{ borderTop: `2px solid ${theme.palette.divider}` }}>
                     <Typography variant="body2" sx={{ fontWeight: 700, fontFamily: 'monospace', color: theme.palette.success.main }}>

@@ -24,11 +24,11 @@ function describeUpdate(updates: Record<string, unknown>): string {
   const keys = Object.keys(updates);
   if (keys.includes('status')) {
     if (updates.status === 'Opłacone') return 'Oznaczono jako opłacone';
-    if (updates.status === 'Pominięte') return 'Wyłączono z budżetu';
+    if (updates.status === 'Wykluczone') return 'Wykluczone z budżetu';
     if (updates.status === 'Do zapłaty') return 'Oznaczono jako do zapłaty';
   }
   if (keys.includes('included')) {
-    return updates.included ? 'Przywrócono do budżetu' : 'Wyłączono z budżetu';
+    return updates.included ? 'Przywrócono do budżetu' : 'Wykluczone z budżetu';
   }
   if (keys.includes('alternatywy') && keys.length === 1) {
     return 'Alternatywy zaktualizowane';
@@ -146,8 +146,9 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       wybranaAltId: (item.wybranaAltId as string) || null,
       uwagiMain: (item.uwagiMain as string) || '',
       dataRealizacji: (item.dataRealizacji as string) || '',
-      // Migrate: if included===false, set status to 'Pominięte'
-      ...( item.included === false && item.status !== 'Pominięte' ? { status: 'Pominięte' as const } : {}),
+      // Migrate: if included===false or old 'Pominięte' status, set to 'Wykluczone'
+      ...( item.included === false && item.status !== 'Wykluczone' ? { status: 'Wykluczone' as const } : {}),
+      ...( item.status === 'Pominięte' ? { status: 'Wykluczone' as const } : {}),
       included: item.included !== false,
     });
     const meble = (loaded.meble || []).map((item) => ({ ...item, ...migrateItem(item as unknown as Record<string, unknown>) }));
@@ -457,11 +458,11 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       // Wpływy = suma wszystkich wpisów w saldzie (pieniądze, które wpłynęły na budżet)
       const wplywy = state.saldo.reduce((sum, entry) => sum + entry.kwota, 0);
 
-      const mebleKoszt = state.meble.filter((i) => i.status !== 'Pominięte').reduce((sum, i) => sum + i.cena, 0);
-      const wykonczenieKoszt = state.wykonczenie.filter((i) => i.status !== 'Pominięte').reduce((sum, i) => sum + i.kwota, 0);
-      const agdKoszt = state.agd.filter((i) => i.status !== 'Pominięte').reduce((sum, i) => sum + i.cena, 0);
-      const pozostaleKoszt = state.pozostale.filter((i) => i.status !== 'Pominięte').reduce((sum, i) => sum + i.cena, 0);
-      const wyprowadzkaKoszt = state.wyprowadzka.filter((i) => i.status !== 'Pominięte').reduce((sum, i) => sum + i.cena, 0);
+      const mebleKoszt = state.meble.filter((i) => i.status !== 'Wykluczone').reduce((sum, i) => sum + i.cena, 0);
+      const wykonczenieKoszt = state.wykonczenie.filter((i) => i.status !== 'Wykluczone').reduce((sum, i) => sum + i.kwota, 0);
+      const agdKoszt = state.agd.filter((i) => i.status !== 'Wykluczone').reduce((sum, i) => sum + i.cena, 0);
+      const pozostaleKoszt = state.pozostale.filter((i) => i.status !== 'Wykluczone').reduce((sum, i) => sum + i.cena, 0);
+      const wyprowadzkaKoszt = state.wyprowadzka.filter((i) => i.status !== 'Wykluczone').reduce((sum, i) => sum + i.cena, 0);
       const lacznyKoszt = mebleKoszt + wykonczenieKoszt + agdKoszt + pozostaleKoszt + wyprowadzkaKoszt;
 
       const mebleZaplacono = state.meble.filter((i) => i.status === 'Opłacone').reduce((sum, i) => sum + i.cena, 0);
@@ -485,11 +486,11 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
     getCategoryCosts: (): CategoryCost[] => {
       const state = get();
       const categories: CategoryCost[] = [
-        { name: 'Meblowanie', value: state.meble.filter((i) => i.status !== 'Pominięte').reduce((sum, i) => sum + i.cena, 0) },
-        { name: 'Wykończenie', value: state.wykonczenie.filter((i) => i.status !== 'Pominięte').reduce((sum, i) => sum + i.kwota, 0) },
-        { name: 'AGD / RTV', value: state.agd.filter((i) => i.status !== 'Pominięte').reduce((sum, i) => sum + i.cena, 0) },
-        { name: 'Inne', value: state.pozostale.filter((i) => i.status !== 'Pominięte').reduce((sum, i) => sum + i.cena, 0) },
-        { name: 'Wyprowadzka', value: state.wyprowadzka.filter((i) => i.status !== 'Pominięte').reduce((sum, i) => sum + i.cena, 0) },
+        { name: 'Meblowanie', value: state.meble.filter((i) => i.status !== 'Wykluczone').reduce((sum, i) => sum + i.cena, 0) },
+        { name: 'Wykończenie', value: state.wykonczenie.filter((i) => i.status !== 'Wykluczone').reduce((sum, i) => sum + i.kwota, 0) },
+        { name: 'AGD / RTV', value: state.agd.filter((i) => i.status !== 'Wykluczone').reduce((sum, i) => sum + i.cena, 0) },
+        { name: 'Inne', value: state.pozostale.filter((i) => i.status !== 'Wykluczone').reduce((sum, i) => sum + i.cena, 0) },
+        { name: 'Wyprowadzka', value: state.wyprowadzka.filter((i) => i.status !== 'Wykluczone').reduce((sum, i) => sum + i.cena, 0) },
       ];
       return categories.filter((c) => c.value > 0);
     },
@@ -501,7 +502,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       const getRange = (items: Array<{ included: boolean; status: string; cena?: number; kwota?: number; alternatywy: Array<{ cena: number }> }>, field: 'cena' | 'kwota') => {
         let minTotal = 0;
         let maxTotal = 0;
-        for (const item of items.filter((i) => i.status !== 'Pominięte')) {
+        for (const item of items.filter((i) => i.status !== 'Wykluczone')) {
           const baseCost = field === 'cena' ? (item.cena || 0) : (item.kwota || 0);
           const allPrices = [baseCost, ...item.alternatywy.map((a) => a.cena)];
           minTotal += Math.min(...allPrices);

@@ -45,13 +45,13 @@ export function DashboardView() {
   const categoryBreakdown = getCategoryBreakdown();
   const progress = getPaymentProgress();
 
-  // Wygaszone (excluded) totals
+  // Wykluczone totals
   const excludedTotal = 
-    meble.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.cena, 0) +
-    wykonczenie.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.kwota, 0) +
-    agd.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.cena, 0) +
-    pozostale.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.cena, 0) +
-    wyprowadzka.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.cena, 0);
+    meble.filter(i => i.status === 'Wykluczone').reduce((s, i) => s + i.cena, 0) +
+    wykonczenie.filter(i => i.status === 'Wykluczone').reduce((s, i) => s + i.kwota, 0) +
+    agd.filter(i => i.status === 'Wykluczone').reduce((s, i) => s + i.cena, 0) +
+    pozostale.filter(i => i.status === 'Wykluczone').reduce((s, i) => s + i.cena, 0) +
+    wyprowadzka.filter(i => i.status === 'Wykluczone').reduce((s, i) => s + i.cena, 0);
   const totalWithExcluded = summary.lacznyKoszt + excludedTotal;
 
   // Dane do wykresu scenariuszy (min/main/max)
@@ -80,11 +80,11 @@ export function DashboardView() {
 
   // Excluded per category
   const excludedPerCategory: Record<string, number> = {
-    'Meblowanie': meble.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.cena, 0),
-    'Wykończenie': wykonczenie.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.kwota, 0),
-    'AGD / RTV': agd.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.cena, 0),
-    'Inne': pozostale.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.cena, 0),
-    'Wyprowadzka': wyprowadzka.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.cena, 0),
+    'Meblowanie': meble.filter(i => i.status === 'Wykluczone').reduce((s, i) => s + i.cena, 0),
+    'Wykończenie': wykonczenie.filter(i => i.status === 'Wykluczone').reduce((s, i) => s + i.kwota, 0),
+    'AGD / RTV': agd.filter(i => i.status === 'Wykluczone').reduce((s, i) => s + i.cena, 0),
+    'Inne': pozostale.filter(i => i.status === 'Wykluczone').reduce((s, i) => s + i.cena, 0),
+    'Wyprowadzka': wyprowadzka.filter(i => i.status === 'Wykluczone').reduce((s, i) => s + i.cena, 0),
   };
 
   return (
@@ -117,7 +117,7 @@ export function DashboardView() {
             label="Opłacono"
             value={summary.zaplacono}
             variant="positive"
-            subtitle={excludedTotal > 0 ? `${progress.toFixed(0)}% aktywnych · ${totalWithExcluded > 0 ? Math.round((summary.zaplacono / totalWithExcluded) * 100) : 0}% z pominięte` : `${progress.toFixed(0)}% całości`}
+            subtitle={excludedTotal > 0 ? `${progress.toFixed(0)}% aktywnych · ${totalWithExcluded > 0 ? Math.round((summary.zaplacono / totalWithExcluded) * 100) : 0}% z wykluczonymi` : `${progress.toFixed(0)}% całości`}
             icon={<PaidIcon sx={{ fontSize: 16 }} />}
           />
         </Grid>
@@ -126,7 +126,7 @@ export function DashboardView() {
             label="Do opłacenia"
             value={summary.pozostaloDoZaplaty}
             variant="warning"
-            subtitle={excludedTotal > 0 ? `z pominięte: ${formatCurrency(summary.pozostaloDoZaplaty + excludedTotal)}` : undefined}
+            subtitle={excludedTotal > 0 ? `z wykluczonymi: ${formatCurrency(summary.pozostaloDoZaplaty + excludedTotal)}` : undefined}
             icon={<WarningIcon sx={{ fontSize: 16 }} />}
           />
         </Grid>
@@ -162,7 +162,7 @@ export function DashboardView() {
               </Typography>
               {excludedTotal > 0 && (
                 <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block', fontSize: '0.65rem' }}>
-                  Bilans z pominięte: <strong style={{ color: (summary.bilans - excludedTotal) >= 0 ? theme.palette.success.main : theme.palette.error.main }}>{formatCurrency(summary.bilans - excludedTotal)}</strong>
+                  Bilans z wykluczonymi: <strong style={{ color: (summary.bilans - excludedTotal) >= 0 ? theme.palette.success.main : theme.palette.error.main }}>{formatCurrency(summary.bilans - excludedTotal)}</strong>
                 </Typography>
               )}
             </Box>
@@ -175,7 +175,7 @@ export function DashboardView() {
               {excludedTotal > 0 && (
                 <Box sx={{ mt: 1 }}>
                   <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.6rem' }}>
-                    z pominięte: {formatCurrency(totalWithExcluded)}
+                    z wykluczonymi: {formatCurrency(totalWithExcluded)}
                   </Typography>
                   <Typography variant="caption" sx={{ color: theme.palette.success.main, fontSize: '0.6rem' }}>
                     oszczędzasz: {formatCurrency(excludedTotal)}
@@ -258,13 +258,13 @@ export function DashboardView() {
           <Card sx={{ height: '100%' }}>
             <CardContent sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ mb: 0.5 }}>Struktura kosztów</Typography>
-              <Typography variant="caption" color="text.secondary">Procentowy podział wg kategorii{excludedTotal > 0 ? ' (+ pominięte)' : ''}</Typography>
+              <Typography variant="caption" color="text.secondary">Procentowy podział wg kategorii{excludedTotal > 0 ? ' (+ wykluczone)' : ''}</Typography>
               {categoryCosts.length > 0 ? (
                 <Box sx={{ mt: 2 }}>
                   <ResponsiveContainer width="100%" height={200}>
                     <PieChart>
                       <Pie
-                        data={excludedTotal > 0 ? [...categoryCosts, { name: 'Pominięte', value: excludedTotal }] : categoryCosts}
+                        data={excludedTotal > 0 ? [...categoryCosts, { name: 'Wykluczone', value: excludedTotal }] : categoryCosts}
                         cx="50%"
                         cy="50%"
                         innerRadius={55}
@@ -476,7 +476,7 @@ export function DashboardView() {
                     const percentFull = totalFull > 0 ? (cat.zaplacono / totalFull) * 100 : 0;
                     return (
                       <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.55rem', mt: 0.25, display: 'block' }}>
-                        z pominięte: {formatCurrency(cat.zaplacono)} / {formatCurrency(totalFull)} ({percentFull.toFixed(0)}%)
+                        z wykluczonymi: {formatCurrency(cat.zaplacono)} / {formatCurrency(totalFull)} ({percentFull.toFixed(0)}%)
                       </Typography>
                     );
                   })()}
@@ -496,7 +496,7 @@ export function DashboardView() {
             <Box>
               <Typography variant="h6">Postęp płatności</Typography>
               <Typography variant="caption" color="text.secondary">
-                {formatCurrency(summary.zaplacono)} z {formatCurrency(summary.lacznyKoszt)} opłacone{excludedTotal > 0 ? ` (z pominięte: ${formatCurrency(totalWithExcluded)})` : ''}
+                {formatCurrency(summary.zaplacono)} z {formatCurrency(summary.lacznyKoszt)} opłacone{excludedTotal > 0 ? ` (z wykluczonymi: ${formatCurrency(totalWithExcluded)})` : ''}
               </Typography>
             </Box>
             <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.primary.main }}>
@@ -524,7 +524,7 @@ export function DashboardView() {
           {excludedTotal > 0 && (
             <Box sx={{ mt: 1.5 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Z pominięte: {formatCurrency(summary.zaplacono)} / {formatCurrency(totalWithExcluded)}</Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Z wykluczonymi: {formatCurrency(summary.zaplacono)} / {formatCurrency(totalWithExcluded)}</Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.6rem' }}>{totalWithExcluded > 0 ? Math.round((summary.zaplacono / totalWithExcluded) * 100) : 0}%</Typography>
               </Box>
               <Box sx={{ height: 4, borderRadius: 2, backgroundColor: alpha(theme.palette.text.secondary, 0.08), overflow: 'hidden' }}>
@@ -614,7 +614,7 @@ function ScenarioRow({ label, cost, available, color, costWithExcluded }: Scenar
           </Typography>
           {costWithExcluded && (
             <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.55rem', display: 'block' }}>
-              z pominięte: {formatCurrency(costWithExcluded)}
+              z wykluczonymi: {formatCurrency(costWithExcluded)}
             </Typography>
           )}
         </Box>
@@ -636,7 +636,7 @@ function ScenarioRow({ label, cost, available, color, costWithExcluded }: Scenar
           </Typography>
           {diffWithExcl !== null && (
             <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.55rem', display: 'block' }}>
-              z pominięte: {diffWithExcl >= 0 ? '+' : ''}{formatCurrency(diffWithExcl)}
+              z wykluczonymi: {diffWithExcl >= 0 ? '+' : ''}{formatCurrency(diffWithExcl)}
             </Typography>
           )}
         </Box>

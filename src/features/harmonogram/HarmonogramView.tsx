@@ -77,11 +77,11 @@ export function HarmonogramView() {
   const wyprowadzka = useBudgetStore((s) => s.wyprowadzka);
 
   const excludedTotal =
-    meble.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.cena, 0) +
-    wykonczenie.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.kwota, 0) +
-    agd.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.cena, 0) +
-    pozostale.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.cena, 0) +
-    wyprowadzka.filter(i => i.status === 'Pominięte').reduce((s, i) => s + i.cena, 0);
+    meble.filter(i => i.status === 'Wykluczone').reduce((s, i) => s + i.cena, 0) +
+    wykonczenie.filter(i => i.status === 'Wykluczone').reduce((s, i) => s + i.kwota, 0) +
+    agd.filter(i => i.status === 'Wykluczone').reduce((s, i) => s + i.cena, 0) +
+    pozostale.filter(i => i.status === 'Wykluczone').reduce((s, i) => s + i.cena, 0) +
+    wyprowadzka.filter(i => i.status === 'Wykluczone').reduce((s, i) => s + i.cena, 0);
   const addMilestone = useBudgetStore((s) => s.addMilestone);
   const deleteMilestone = useBudgetStore((s) => s.deleteMilestone);
 
@@ -369,7 +369,7 @@ export function HarmonogramView() {
                           </Typography>
                           {celFull > cel && (
                             <Box sx={{ mt: 0.5, pt: 0.5, borderTop: `1px dashed ${alpha(theme.palette.divider, 0.2)}` }}>
-                              <Typography variant="caption" sx={{ display: 'block', fontSize: '0.6rem', color: 'text.secondary' }}>z pominięte: {formatCurrency(celFull)}</Typography>
+                              <Typography variant="caption" sx={{ display: 'block', fontSize: '0.6rem', color: 'text.secondary' }}>z wykluczonymi: {formatCurrency(celFull)}</Typography>
                               <Typography variant="caption" sx={{ display: 'block', fontSize: '0.6rem', color: brakujeFull <= 0 ? theme.palette.success.main : theme.palette.error.main }}>
                                 {brakujeFull <= 0 ? `nadwyżka: +${formatCurrency(Math.abs(brakujeFull))}` : `brakuje: -${formatCurrency(brakujeFull)}`}
                               </Typography>
@@ -481,7 +481,7 @@ export function HarmonogramView() {
               {excludedTotal > 0 && (
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
                   <Box sx={{ width: 16, height: 0, borderTop: `2px dashed ${theme.palette.error.main}`, opacity: 0.5 }} />
-                  <Typography variant="caption">Z pominięte: <strong>{formatCurrency(summary.pozostaloDoZaplaty + excludedTotal)}</strong></Typography>
+                  <Typography variant="caption">Z wykluczonymi: <strong>{formatCurrency(summary.pozostaloDoZaplaty + excludedTotal)}</strong></Typography>
                 </Box>
               )}
               {milestones.length > 0 && (

@@ -1,4 +1,4 @@
-export type PaymentStatus = 'Opłacone' | 'Do zapłaty' | 'Pominięte';
+export type PaymentStatus = 'Opłacone' | 'Do zapłaty' | 'Wykluczone';
 
 export interface ItemLink {
   nazwa: string;

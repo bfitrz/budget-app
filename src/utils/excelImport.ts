@@ -102,7 +102,7 @@ interface RawNotatkaRow {
 // --- Parsers ---
 function parseStatus(status: string | undefined): PaymentStatus {
   if (status === 'Opłacone') return 'Opłacone';
-  if (status === 'Pominięte') return 'Pominięte';
+  if (status === 'Wykluczone' || status === 'Pominięte') return 'Wykluczone';
   return 'Do zapłaty';
 }
 function parseIncluded(value: string | undefined): boolean {
@@ -111,7 +111,7 @@ function parseIncluded(value: string | undefined): boolean {
 }
 function parseStatusWithIncluded(statusValue: string | undefined, includedValue: string | undefined): { status: PaymentStatus; included: boolean } {
   const included = parseIncluded(includedValue);
-  if (!included) return { status: 'Pominięte', included: false };
+  if (!included) return { status: 'Wykluczone', included: false };
   return { status: parseStatus(statusValue), included: true };
 }
 function parseLinki(value: string | undefined): ItemLink[] {

@@ -51,7 +51,7 @@ const navigationItems: NavigationItem[] = [
   { id: 'agd', label: 'AGD / RTV', icon: <KitchenIcon /> },
   { id: 'pozostale', label: 'Inne', icon: <MoreIcon /> },
   { id: 'wyprowadzka', label: 'Wyprowadzka', icon: <ShippingIcon /> },
-  { id: 'wykluczone', label: 'Pominięte', icon: <MoreIcon /> },
+  { id: 'wykluczone', label: 'Wykluczone', icon: <MoreIcon /> },
   { id: 'import', label: 'Import / Eksport', icon: <DataIcon />, section: 'Ustawienia' },
   { id: 'guide', label: 'Przewodnik', icon: <HelpIcon /> },
   { id: 'changelog', label: 'Changelog', icon: <HelpIcon /> },

@@ -85,12 +85,12 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
   const [editingGroupName, setEditingGroupName] = useState<{ oldName: string; newName: string } | null>(null);
   const [deleteGroupConfirm, setDeleteGroupConfirm] = useState<string | null>(null);
   const [disabledGroups, setDisabledGroups] = useState<Set<string>>(() => {
-    // Initialize from data: group is disabled if ALL its items have status 'Pominięte'
+    // Initialize from data: group is disabled if ALL its items have status 'Wykluczone'
     const groups = new Map<string, boolean>();
     for (const item of items) {
       const grp = (item[config.groupField] as string) || 'Bez grupy';
       if (!groups.has(grp)) groups.set(grp, true);
-      if (item.status !== 'Pominięte') groups.set(grp, false);
+      if (item.status !== 'Wykluczone') groups.set(grp, false);
     }
     const disabled = new Set<string>();
     for (const [name, allDisabled] of groups) {
@@ -119,7 +119,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
     }
     return Array.from(groupMap.entries()).map(([name, grpItems]) => {
       const isGroupDisabled = disabledGroups.has(name);
-      const active = grpItems.filter((i) => i.status !== 'Pominięte' && !isGroupDisabled);
+      const active = grpItems.filter((i) => i.status !== 'Wykluczone' && !isGroupDisabled);
       return {
         name, items: grpItems,
         disabled: isGroupDisabled,
@@ -140,7 +140,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
 
   const totalIncluded = items.filter((i) => {
     const grp = (i[config.groupField] as string) || 'Bez grupy';
-    return i.status !== 'Pominięte' && !disabledGroups.has(grp);
+    return i.status !== 'Wykluczone' && !disabledGroups.has(grp);
   }).reduce((s, i) => s + getCost(i), 0);
   const paidTotal = items.filter((i) => {
     const grp = (i[config.groupField] as string) || 'Bez grupy';
@@ -153,7 +153,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
   }).length;
   const totalCount = items.filter((i) => {
     const grp = (i[config.groupField] as string) || 'Bez grupy';
-    return i.status !== 'Pominięte' && !disabledGroups.has(grp);
+    return i.status !== 'Wykluczone' && !disabledGroups.has(grp);
   }).length;
 
   // Form helpers
@@ -216,13 +216,13 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
     const groupItems = items.filter(i => (i[config.groupField] as string || '') === matchValue);
     groupItems.forEach(item => {
       if (isCurrentlyDisabled) {
-        // Restore: set to 'Do zapłaty' only if currently 'Pominięte'
-        if (item.status === 'Pominięte') {
+        // Restore: set to 'Do zapłaty' only if currently 'Wykluczone'
+        if (item.status === 'Wykluczone') {
           updateItem(item.id, { status: 'Do zapłaty', included: true } as Partial<CostItem>);
         }
       } else {
-        // Disable: set to 'Pominięte'
-        updateItem(item.id, { status: 'Pominięte', included: false } as Partial<CostItem>);
+        // Disable: set to 'Wykluczone'
+        updateItem(item.id, { status: 'Wykluczone', included: false } as Partial<CostItem>);
       }
     });
     // Track visual state
@@ -306,7 +306,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
 
       {/* Summary cards */}
       {(() => {
-        const activeItems = items.filter((i) => { const grp = (i[config.groupField] as string) || 'Bez grupy'; return i.status !== 'Pominięte' && !disabledGroups.has(grp); });
+        const activeItems = items.filter((i) => { const grp = (i[config.groupField] as string) || 'Bez grupy'; return i.status !== 'Wykluczone' && !disabledGroups.has(grp); });
         const hiddenCount = items.length - activeItems.length;
         const altCount = items.reduce((s, i) => s + (i.alternatywy || []).length, 0);
         const commentCount = items.filter((i) => i.uwagi).length;
@@ -344,7 +344,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                 </Box>
                 {hiddenCount > 0 && (
                   <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5, fontSize: '0.55rem' }}>
-                    + {formatCurrency(items.filter(i => i.status === 'Pominięte').reduce((s, i) => s + getCost(i), 0))} pominięte ({hiddenCount} poz.)
+                    + {formatCurrency(items.filter(i => i.status === 'Wykluczone').reduce((s, i) => s + getCost(i), 0))} wykluczone ({hiddenCount} poz.)
                   </Typography>
                 )}
               </CardContent>
@@ -435,7 +435,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, textDecoration: group.disabled ? 'line-through' : 'none' }}>{group.name}</Typography>
                     <Chip label={`${group.items.length} poz.`} size="small" sx={{ fontSize: '0.65rem', height: 20 }} />
-                    {group.disabled && <Chip label="wygaszona" size="small" sx={{ fontSize: '0.6rem', height: 18, backgroundColor: alpha(theme.palette.text.secondary, 0.08), color: theme.palette.text.secondary }} />}
+                    {group.disabled && <Chip label="wykluczona" size="small" sx={{ fontSize: '0.6rem', height: 18, backgroundColor: alpha(theme.palette.text.secondary, 0.08), color: theme.palette.text.secondary }} />}
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                     {!group.disabled && (
@@ -474,7 +474,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                         const hasRange = minPrice !== maxPrice;
                         return (
                           <React.Fragment key={item.id}>
-                            <TableRow sx={{ opacity: item.status === 'Pominięte' ? 0.4 : 1, '& > td': { borderBottom: (item.alternatywy || []).length > 0 || (item.linki || []).length > 0 ? 'none' : undefined } }}>
+                            <TableRow sx={{ opacity: item.status === 'Wykluczone' ? 0.4 : 1, '& > td': { borderBottom: (item.alternatywy || []).length > 0 || (item.linki || []).length > 0 ? 'none' : undefined } }}>
                               <TableCell sx={{ width: 30, p: 0.5 }}>
                                 <IconButton size="small" onClick={() => setExpandedItems(prev => { const next = new Set(prev); if (next.has(item.id)) next.delete(item.id); else next.add(item.id); return next; })} sx={{ width: 22, height: 22 }}>
                                   {expandedItems.has(item.id) ? <ArrowDownIcon sx={{ fontSize: 14 }} /> : <ArrowRightIcon sx={{ fontSize: 14 }} />}
@@ -506,8 +506,8 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                                       if (newStatus === 'Opłacone' && item.status !== 'Opłacone') {
                                         if ((item.alternatywy || []).filter(a => a.included).length > 0) { setPayChoiceItem(item); return; }
                                         updateItem(item.id, { status: 'Opłacone', included: true, wybranaAltId: null } as Partial<CostItem>);
-                                      } else if (newStatus === 'Pominięte') {
-                                        updateItem(item.id, { status: 'Pominięte', included: false } as Partial<CostItem>);
+                                      } else if (newStatus === 'Wykluczone') {
+                                        updateItem(item.id, { status: 'Wykluczone', included: false } as Partial<CostItem>);
                                       } else {
                                         updateItem(item.id, { status: newStatus, included: true } as Partial<CostItem>);
                                       }
@@ -515,8 +515,8 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                                     sx={{
                                       fontSize: '0.7rem', fontWeight: 600, height: 28,
                                       borderRadius: 2,
-                                      backgroundColor: item.status === 'Opłacone' ? alpha(theme.palette.success.main, 0.1) : item.status === 'Pominięte' ? alpha(theme.palette.text.secondary, 0.08) : alpha(theme.palette.warning.main, 0.1),
-                                      color: item.status === 'Opłacone' ? theme.palette.success.main : item.status === 'Pominięte' ? theme.palette.text.secondary : theme.palette.warning.main,
+                                      backgroundColor: item.status === 'Opłacone' ? alpha(theme.palette.success.main, 0.1) : item.status === 'Wykluczone' ? alpha(theme.palette.text.secondary, 0.08) : alpha(theme.palette.warning.main, 0.1),
+                                      color: item.status === 'Opłacone' ? theme.palette.success.main : item.status === 'Wykluczone' ? theme.palette.text.secondary : theme.palette.warning.main,
                                       '& .MuiSelect-select': { py: 0.5, px: 1.5 },
                                       '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
                                       '& .MuiSvgIcon-root': { fontSize: 16, color: 'inherit' },
@@ -524,7 +524,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                                   >
                                     <MenuItem value="Do zapłaty" sx={{ fontSize: '0.8rem' }}>Do zapłaty</MenuItem>
                                     <MenuItem value="Opłacone" sx={{ fontSize: '0.8rem' }}>Opłacone</MenuItem>
-                                    <MenuItem value="Pominięte" sx={{ fontSize: '0.8rem' }}>Pominięte</MenuItem>
+                                    <MenuItem value="Wykluczone" sx={{ fontSize: '0.8rem' }}>Wykluczone</MenuItem>
                                   </Select>
                                 </FormControl>
                               </TableCell>
@@ -547,7 +547,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                               </TableCell>
                             </TableRow>
                             {/* Collapsible MAIN + ALT */}
-                            <TableRow sx={{ opacity: item.status === 'Pominięte' ? 0.35 : 1 }}>
+                            <TableRow sx={{ opacity: item.status === 'Wykluczone' ? 0.35 : 1 }}>
                               <TableCell colSpan={7 + config.columns.length} sx={{ py: 0, px: 0, border: 'none' }}>
                                 <Collapse in={expandedItems.has(item.id)} timeout="auto" unmountOnExit>
                                   <Box sx={{ pl: 2, pr: 2, pb: 1.5, pt: 0.5, display: 'flex', flexDirection: 'column', gap: 0.75 }}>
@@ -580,7 +580,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
                                     {/* ALTs */}
                                     {(item.alternatywy || []).map((alt) => (
                                       <Box key={alt.id} sx={{ display: 'grid', gridTemplateColumns: '24px 50px 1fr 120px 80px auto', alignItems: 'center', gap: 2, px: 1.5, py: 0.75, borderRadius: 1.5, backgroundColor: alpha(theme.palette.info.main, 0.02), border: `1px solid ${alpha(theme.palette.info.main, 0.08)}`, opacity: alt.included ? 1 : 0.4 }}>
-                                        <Tooltip title={alt.included ? 'Kliknij aby wykluczyć z budżetu' : 'Kliknij aby wliczyć do budżetu'}>
+                                        <Tooltip title={alt.included ? 'Wyklucz z zakresu cenowego' : 'Włącz do zakresu cenowego'}>
                                           <IconButton size="small" onClick={() => { const newAlts = (item.alternatywy || []).map((a) => a.id === alt.id ? { ...a, included: !a.included } : a); updateItem(item.id, { alternatywy: newAlts }); }} sx={{ p: 0, width: 20, height: 20, color: alt.included ? theme.palette.success.main : theme.palette.text.secondary, opacity: alt.included ? 0.7 : 0.3, '&:hover': { opacity: 1 } }}>
                                             {alt.included ? <IncludedIcon sx={{ fontSize: 13 }} /> : <ExcludedIcon sx={{ fontSize: 13 }} />}
                                           </IconButton>
@@ -773,7 +773,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
       >
         <MenuItem onClick={() => { const target = groupMenuTarget; setGroupMenuAnchor(null); setGroupMenuTarget(null); if (target) { handleToggleGroup(target); } }}>
           <ListItemIcon>{disabledGroups.has(groupMenuTarget || '') ? <EnableGroupIcon fontSize="small" /> : <DisableGroupIcon fontSize="small" />}</ListItemIcon>
-          <ListItemText>{disabledGroups.has(groupMenuTarget || '') ? 'Włącz grupę' : 'Wygaś grupę (wyklucz z budżetu)'}</ListItemText>
+          <ListItemText>{disabledGroups.has(groupMenuTarget || '') ? 'Przywróć grupę' : 'Wyklucz grupę'}</ListItemText>
         </MenuItem>
         <MenuItem onClick={() => { const target = groupMenuTarget; setGroupMenuAnchor(null); setGroupMenuTarget(null); if (target) setEditingGroupName({ oldName: target, newName: target }); }}>
           <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
@@ -928,7 +928,7 @@ export function CostCategoryView({ config, items, updateItem, addItem, deleteIte
             ) : null;
           })()}
           <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-            Ta operacja jest nieodwracalna. Jeśli chcesz tylko wyłączyć grupę z budżetu, użyj przycisku „Wygaś".
+            Ta operacja jest nieodwracalna. Jeśli chcesz tylko wykluczyć grupę z budżetu, użyj opcji „Wyklucz grupę".
           </Typography>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2.5, justifyContent: 'space-between' }}>
