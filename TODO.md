@@ -38,13 +38,55 @@
 
 ## Do realizacji
 
-### 8. Współdzielenie (sync)
-- [ ] Backend: Firebase/Supabase realtime DB
-- [ ] Logowanie (email/Google)
-- [ ] Link do współdzielenia budżetu z partnerem
-- [ ] Sync w czasie rzeczywistym
-- [ ] Conflict resolution (last-write-wins lub merge)
-- [ ] Offline-first z sync po połączeniu
+### 8. Współdzielenie / sync (Dropbox)
+- [ ] Dropbox PKCE OAuth (bez backendu)
+- [ ] Użytkownik wskazuje folder na Dropbox
+- [ ] Auto-save pliku .xlsx co 5 minut (lub po zmianach, z debounce)
+- [ ] Wczytywanie z Dropbox przy starcie
+- [ ] Partner otwiera ten sam folder — współdzielenie przez sync pliku
+- [ ] Ustawienia: włącz/wyłącz auto-sync, interwał
+
+### 9. Duplikowanie pozycji
+- [ ] Menu ⋮ → "Duplikuj" — tworzy kopię pozycji w tej samej grupie
+- [ ] Kopia ma nowe ID, status "Do zapłaty", bez alternatyw
+- [ ] Przydatne gdy kupujesz te same rzeczy do kilku pokoi
+
+### 10. Podsumowanie "ile zostało" na grupie
+- [ ] Pod progress barem: "Zostało X zł do zapłaty"
+- [ ] Wyróżnione kolorem (pomarańczowy)
+
+### 11. Szybka notatka na dashboardzie
+- [ ] Jedno pole tekstowe "Co dalej?" na górze dashboardu
+- [ ] Zapisywane w localStorage
+- [ ] Widoczne zawsze — jako przypomnienie co jest priorytetem
+
+### 12. Podsumowanie miesięczne w harmonogramie
+- [ ] Tabela/wykres: miesiąc po miesiącu
+- [ ] Ile wpływów planowanych w danym miesiącu
+- [ ] Ile wydatków z dataRealizacji w tym miesiącu
+- [ ] Saldo na koniec każdego miesiąca
+
+### 13. Eksport jednej kategorii
+- [ ] Przycisk "Eksportuj" na stronie kategorii (np. Meble)
+- [ ] Generuje plik .xlsx lub PDF tylko z tą kategorią
+- [ ] Przydatne do wysłania ekipie/partnerowi
+
+### 14. Zdjęcia / screenshoty produktów
+- [ ] Mini-galeria przy pozycji (w rozwinięciu)
+- [ ] Dodawanie URL do zdjęcia lub upload (base64 w localStorage)
+- [ ] Podgląd thumbnailów
+- [ ] Przydatne przy porównywaniu alternatyw wizualnie
+
+### 15. Porównanie z budżetem początkowym
+- [ ] Opcja "Zapisz snapshot budżetu" jako baseline
+- [ ] Widok: ile planowałeś vs ile teraz (delta per kategoria)
+- [ ] Wykres słupkowy: plan vs rzeczywistość
+
+### 16. Powiadomienia push (PWA)
+- [ ] PWA Notification API — prośba o pozwolenie
+- [ ] Przypomnienie X dni przed dataRealizacji
+- [ ] Podsumowanie tygodniowe: "3 pozycje zbliżają się do terminu"
+- [ ] Ustawienia: włącz/wyłącz, ile dni przed terminem
 
 ---
 
