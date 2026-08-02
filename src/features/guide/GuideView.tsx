@@ -218,6 +218,32 @@ export function GuideView() {
         <Tip>Wykluczenie jest w 100% odwracalne. To nie jest usuwanie — dane pozostają. Używaj do tymczasowego ukrywania opcjonalnych zakupów, np. 'jeśli starczy budżetu to wrócimy do tego'.</Tip>
       </Section>
 
+      <Section title="Wyszukiwanie, filtrowanie i sortowanie" icon={<MoneyIcon sx={{ fontSize: 18 }} />}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.8 }}>
+          Na stronach wydatków pod nagłówkiem znajduje się pasek narzędzi: pole wyszukiwania, szybkie filtry statusu i sortowanie.
+        </Typography>
+        <Feature label="Wyszukiwanie" description="Wpisz fragment nazwy, grupy lub innego pola — lista filtruje się na żywo. Grupy bez wyników znikają, pozostałe rozwijają się automatycznie." />
+        <Feature label="Filtry statusu" description="Toggle buttons: Wszystkie / Do zapłaty / Opłacone / Wykluczone. Kliknij aby zobaczyć tylko pozycje z danym statusem." />
+        <Feature label="Sortowanie" description="Dropdown: Domyślnie / Cena ↑ / Cena ↓ / Nazwa A-Z / Status. Sortuje pozycje wewnątrz każdej grupy." />
+        <Feature label="Licznik wyników" description="Przy aktywnym filtrze wyświetla 'X z Y pozycji' — żebyś wiedział ile zostało ukryte." />
+        <Tip>Wyszukiwanie i filtry działają razem — możesz wpisać „IKEA" i wybrać filtr „Do zapłaty" żeby zobaczyć co z IKEA jeszcze nie opłacone.</Tip>
+      </Section>
+
+      <Section title="Undo / Redo" icon={<MoneyIcon sx={{ fontSize: 18 }} />}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.8 }}>
+          Przypadkowo usunąłeś pozycję lub zmieniłeś status? Ctrl+Z cofnie ostatnią akcję.
+        </Typography>
+        <Feature label="Cofnij (Ctrl+Z / Cmd+Z)" description="Cofa ostatnią zmianę — dodanie, usunięcie, edycję, zmianę statusu. Działa na max 30 ostatnich kroków." />
+        <Feature label="Przywróć (Ctrl+Shift+Z)" description="Przywraca cofniętą akcję. Działa do momentu aż wykonasz nową zmianę." />
+        <Feature label="Toast 'Cofnięto'" description="Po cofnięciu w prawym górnym rogu pojawia się potwierdzenie." />
+      </Section>
+
+      <Section title="Przeterminowane pozycje i backup" icon={<MoneyIcon sx={{ fontSize: 18 }} />}>
+        <Feature label="Czerwona data = przeterminowane" description="Jeśli pozycja ma datę realizacji w przeszłości i status 'Do zapłaty', chip z datą zmienia kolor na czerwony. Łatwo widać co jest po terminie." />
+        <Feature label="Najtańsza alternatywa podświetlona" description="W rozwinięciu pozycji najtańsza ALT (tańsza niż MAIN) ma zielone obramowanie — szybko widzisz najlepszą cenę." />
+        <Feature label="Reminder o backupie" description="Jeśli minęło >7 dni od ostatniego eksportu, na stronie Import/Eksport pojawi się alert z przypomnieniem i przyciskiem 'Eksportuj teraz'." />
+      </Section>
+
       <Section title="Skróty i wskazówki" icon={<MoneyIcon sx={{ fontSize: 18 }} />}>
         <Feature label="Nawigacja mobilna (swipe)" description="Na telefonie przesuń palcem z lewej do prawej aby otworzyć menu nawigacji. Przesuń z powrotem lub kliknij poza menu aby zamknąć." />
         <Feature label="Logo → Podsumowanie" description="Kliknij logo 'Budget' w pasku bocznym aby wrócić na stronę główną (dashboard)." />
