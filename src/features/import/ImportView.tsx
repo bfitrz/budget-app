@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -34,7 +34,28 @@ export function ImportView() {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [snackbar, setSnackbar] = useState<{ open: boolean; type: 'success' | 'error'; text: string }>({ open: false, type: 'success', text: '' });
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
+  const [backupReminder, setBackupReminder] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Check if backup is overdue (>7 days since last export)
+  useEffect(() => {
+    const lastExport = localStorage.getItem('budget-app-last-export');
+    if (lastExport) {
+      const daysSince = (Date.now() - Number(lastExport)) / (1000 * 60 * 60 * 24);
+      if (daysSince > 7 && isDataLoaded) setBackupReminder(true);
+    } else if (isDataLoaded) {
+      setBackupReminder(true);
+    }
+  }, [isDataLoaded]);
+
+  const handleExport = () => {
+    const state = useBudgetStore.getState();
+    const notes = useNotesStore.getState().notes;
+    exportToExcel(state, notes);
+    localStorage.setItem('budget-app-last-export', String(Date.now()));
+    setBackupReminder(false);
+    setSnackbar({ open: true, type: 'success', text: 'Eksport zakończony — plik został pobrany' });
+  };
 
   const handleFile = async (file: File) => {
     if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
@@ -142,6 +163,12 @@ export function ImportView() {
           Zarządzaj danymi — importuj z pliku Excel lub wyeksportuj aktualny stan
         </Typography>
       </Box>
+
+      {backupReminder && (
+        <Alert severity="warning" sx={{ mb: 3, maxWidth: 640 }} action={<Button color="inherit" size="small" onClick={handleExport}>Eksportuj teraz</Button>} onClose={() => setBackupReminder(false)}>
+          Minęło ponad 7 dni od ostatniego backupu. Zalecamy wyeksportować dane.
+        </Alert>
+      )}
 
       <Card sx={{ maxWidth: 640 }}>
         <CardContent sx={{ p: 4 }}>
@@ -282,12 +309,7 @@ export function ImportView() {
             <Button
               variant="outlined"
               startIcon={<DownloadIcon />}
-              onClick={() => {
-                const state = useBudgetStore.getState();
-                const notes = useNotesStore.getState().notes;
-                exportToExcel(state, notes);
-                setSnackbar({ open: true, type: 'success', text: 'Eksport zakończony — plik został pobrany' });
-              }}
+              onClick={handleExport}
             >
               Pobierz plik .xlsx
             </Button>
