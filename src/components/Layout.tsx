@@ -332,7 +332,7 @@ export function Layout({ children, currentView, onViewChange, themeVariant, them
         {/* Version bar */}
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', px: { xs: 2, sm: 3, md: 4 }, pt: 1.5 }}>
           <Typography variant="caption" sx={{ fontSize: '0.6rem', color: 'text.secondary', opacity: 0.5 }}>
-            v2.4.0
+            v2.5.0
           </Typography>
         </Box>
         {showTopBar && <BudgetTopBar />}

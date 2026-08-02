@@ -16,6 +16,15 @@ interface ChangeEntry {
 
 const changelog: ChangeEntry[] = [
   {
+    version: '2.5.0',
+    date: '2026-08-02',
+    changes: [
+      { type: 'feat', text: 'Nowy design bannera „Nowa wersja" — gradient, animacja wjazdu, blur, emoji 🔄' },
+      { type: 'feat', text: 'Banner sticky na górze — widoczny na każdej stronie, nie znika przy scrollu' },
+      { type: 'feat', text: 'Przycisk „Wczytaj" + zamknięcie ✕ zamiast zwykłego Alert' },
+    ],
+  },
+  {
     version: '2.4.0',
     date: '2026-08-02',
     changes: [
